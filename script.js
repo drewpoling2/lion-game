@@ -18,7 +18,7 @@ document.addEventListener('keydown', handleStart, { once: true });
 let lastTime;
 let speedScale;
 let score;
-let highScore = localStorage.getItem('high-score');
+let highScore = localStorage.getItem('lion-high-score');
 highScoreElem.textContent = highScore;
 
 function update(time) {
@@ -60,14 +60,14 @@ function updateSpeedScale(delta) {
 
 function updateScore(delta) {
   score += delta * 0.01;
-  scoreElem.textContent = Math.floor(score);
+  scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
 }
 
 function updateHighScore(highScore, score) {
   if (score > highScore) {
-    highScore = Math.floor(score);
+    highScore = Math.floor(score).toString().padStart(6, 0);
     highScoreElem.textContent = highScore;
-    localStorage.setItem('high-score', highScore);
+    localStorage.setItem('lion-high-score', highScore);
   }
 }
 function handleStart() {

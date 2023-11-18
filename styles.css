@@ -39,7 +39,7 @@ body {
 .high-score {
   position: absolute;
   font-size: 3vmin;
-  right: 10vmin;
+  right: 20vmin;
   top: 1vmin;
   font-family: 'DotGothic16', sans-serif;
 }
@@ -47,7 +47,7 @@ body {
 .high-score-label {
   position: absolute;
   font-size: 3vmin;
-  right: 16vmin;
+  right: 30vmin;
   top: 1vmin;
   font-family: 'DotGothic16', sans-serif;
 }
