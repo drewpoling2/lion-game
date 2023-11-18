@@ -8,8 +8,9 @@ const SPEED_SCALE_INCREASE = 0.00001;
 
 const worldElem = document.querySelector('[data-world]');
 const scoreElem = document.querySelector('[data-score]');
+const highScoreElem = document.querySelector('[data-high-score]');
 const startScreenElem = document.querySelector('[data-start-screen]');
-
+const endScreenElem = document.querySelector('[data-game-over-screen]');
 setPixelToWorldScale();
 window.addEventListener('resize', setPixelToWorldScale);
 document.addEventListener('keydown', handleStart, { once: true });
@@ -17,6 +18,9 @@ document.addEventListener('keydown', handleStart, { once: true });
 let lastTime;
 let speedScale;
 let score;
+let highScore = localStorage.getItem('high-score');
+highScoreElem.textContent = highScore;
+
 function update(time) {
   if (lastTime == null) {
     lastTime = time;
@@ -59,6 +63,13 @@ function updateScore(delta) {
   scoreElem.textContent = Math.floor(score);
 }
 
+function updateHighScore(highScore, score) {
+  if (score > highScore) {
+    highScore = Math.floor(score);
+    highScoreElem.textContent = highScore;
+    localStorage.setItem('high-score', highScore);
+  }
+}
 function handleStart() {
   lastTime = null;
   speedScale = 0.9;
@@ -67,14 +78,16 @@ function handleStart() {
   setupDino();
   setupCactus();
   startScreenElem.classList.add('hide');
+  endScreenElem.classList.add('hide');
   window.requestAnimationFrame(update);
 }
 
 function handleLose() {
+  updateHighScore(highScore, score);
   setDinoLose();
   setTimeout(() => {
     document.addEventListener('keydown', handleStart, { once: true });
-    startScreenElem.classList.remove('hide');
+    endScreenElem.classList.remove('hide');
   }, 100);
 }
 
