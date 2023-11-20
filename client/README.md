@@ -1,2 +1,0 @@
-# Express
-A JavaScript project
