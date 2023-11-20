@@ -1,5 +1,15 @@
 # lion game
 
+grab packages
+
+```
+cd server
+yarn
+
+cd client
+yarn
+```
+
 start frontend
 
 ```
