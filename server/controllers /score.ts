@@ -2,6 +2,7 @@ import { UserErrors } from '../common/errors';
 import { UserModel } from '../models/score';
 import { Request, Response } from 'express';
 
+//create new high score if username doesnt exist already
 const createNewHigh = async (req: Request, res: Response) => {
   const { username, score } = req.body;
   try {
@@ -17,4 +18,11 @@ const createNewHigh = async (req: Request, res: Response) => {
   }
 };
 
-export { createNewHigh };
+//gets all users on leaderboard
+const getAllUsers = async (_: Request, res: Response) => {
+  const users = await UserModel.find({});
+
+  res.json({ users });
+};
+
+export { createNewHigh, getAllUsers };

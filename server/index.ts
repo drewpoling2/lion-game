@@ -9,7 +9,6 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/scores', scoreRouter);
-
 mongoose.connect(
   'mongodb+srv://drewpoling2:5Uu4NNRWb4zf6HmM@cluster0.lmegfru.mongodb.net/?retryWrites=true&w=majority'
 );

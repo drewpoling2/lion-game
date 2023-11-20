@@ -1,5 +1,4 @@
 import { updateGround, setupGround } from './elements/ground.js';
-// import axios from 'axios';
 import {
   updateDino,
   setupDino,
@@ -12,6 +11,7 @@ import {
   getCactusRects,
 } from './elements/cactus.js';
 import { soundController } from './utility/sound-controller.js';
+import { getAllHighScoreUsers } from './apis.js';
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 30;
 const SPEED_SCALE_INCREASE = 0.00001;
@@ -32,6 +32,7 @@ let highScore = localStorage.getItem('lion-high-score');
 highScoreElem.textContent = highScore;
 
 let isBeatScore;
+
 function update(time) {
   if (lastTime == null) {
     lastTime = time;
@@ -55,22 +56,6 @@ function checkLose() {
   const dinoRect = getDinoRect();
   return getCactusRects().some((rect) => isCollision(rect, dinoRect));
 }
-
-// const test = async () => {
-//   try {
-//     const result = await axios.post('http://localhost:3001/scores/new-high', {
-//       username: 'testuser',
-//       score: '555',
-//     });
-//     return result;
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
-
-// test();
-
-//problem appears to be with import
 
 function isCollision(rect1, rect2) {
   return (
@@ -114,8 +99,23 @@ function handleStart() {
   window.requestAnimationFrame(update);
 }
 
+//not working for some reason
+function handleCheckIfNewHighScore(score) {
+  const users = getAllHighScoreUsers().then((data) => {
+    console.log(
+      data.users.findIndex((element) => {
+        parseInt(score, 10) > parseInt(element.score, 10);
+      })
+    ),
+      console.log(data.users);
+  });
+}
+
+handleCheckIfNewHighScore('41144');
+
 function handleLose() {
   updateHighScore(highScore, score);
+  handleCheckIfNewHighScore();
   soundController.die.play();
   setDinoLose();
   setTimeout(() => {
