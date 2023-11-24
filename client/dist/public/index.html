@@ -10,23 +10,41 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Pixelify+Sans&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <script src="/script.76d4bba4.js" type="module"></script>
+    <script src="/game-manager.e0ee197a.js" type="module"></script>
   <script src="/styles.8986bff4.js"></script></head>
   <body>
-    <div class="title">Lion Game</div>
-    <div class="hint">Press space to jump the lion</div>
+    <script src="/button-function.0d28162f.js" type="module"></script>
+    <div class="high-score-label">HIGH</div>
+    <div class="high-score" data-high-score="">000000</div>
+    <div class="score-label">SCORE</div>
+    <div class="score" data-score="">000000</div>
 
+    <!-- <div class="title">Lion Game</div>
+    <div class="hint">Press space to jump the lion</div> -->
     <div class="world" data-world="">
-      <div class="high-score-label">HI</div>
-      <div class="high-score" data-high-score="">00</div>
-      <div class="score" data-score="">000000</div>
       <div class="game-over-screen hide" data-game-over-screen="">Game over</div>
       <div class="start-screen blink" data-start-screen="">
         Press Any Key To Start
       </div>
+
       <img src="/ground.efe81358.png" class="ground" data-ground="">
       <img src="/ground.efe81358.png" class="ground" data-ground="">
       <img src="/dino-stationary.68563e8d.png" class="dino" data-dino="">
+      <!-- <button class="pixel2" data-play-again>Play Again</button> -->
+
+      <!-- <div class="leaderboard scrollable-table" data-scrollable-table>
+        <div class="leaderboard-title">TOP 100</div>
+        <table class="leaderboard-table" style="border-collapse: collapse">
+          <thead>
+            <tr>
+              <th class="leaderboard-item"></th>
+              <th class="leaderboard-item">Score</th>
+              <th class="leaderboard-name-item">Name</th>
+            </tr>
+          </thead>
+          <tbody data-leaderboard-body></tbody>
+        </table>
+      </div> -->
     </div>
   </body>
 </html>

@@ -18,14 +18,27 @@ let isJumping;
 let dinoFrame;
 let currentFrameTime;
 let yVelocity;
+
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+}
 export function setupDino() {
   isJumping = false;
   dinoFrame = 0;
   currentFrameTime = 0;
   yVelocity = 0;
   setCustomProperty(dinoElem, '--bottom', 0);
-  document.removeEventListener('keydown', onJump);
-  document.addEventListener('keydown', onJump);
+  // Function to check if the device is a mobile device
+
+  if (isMobileDevice()) {
+    document.removeEventListener('touchstart', onJump);
+    document.addEventListener('touchstart', onJump);
+  } else {
+    document.removeEventListener('keydown', onJump);
+    document.addEventListener('keydown', onJump);
+  }
 }
 
 export function updateDino(delta, speedScale) {
@@ -57,7 +70,6 @@ function handleRun(delta, speedScale) {
 
 function handleJump(delta) {
   if (!isJumping) return;
-
   incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
 
   if (getCustomProperty(dinoElem, '--bottom') <= 0) {
@@ -70,8 +82,7 @@ function handleJump(delta) {
 
 function onJump(e) {
   if (e.code !== 'Space' || isJumping) return;
-
+  soundController.jump.play();
   yVelocity = JUMP_SPEED;
   isJumping = true;
-  soundController.jump.play();
 }

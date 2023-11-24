@@ -10,8 +10,10 @@ import {
   setupCactus,
   getCactusRects,
 } from './elements/cactus.js';
+import { createLeaderboard } from './elements/leaderboard.js';
 import { soundController } from './utility/sound-controller.js';
 import { getAllHighScoreUsers } from './apis.js';
+import { useState } from 'react';
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 30;
 const SPEED_SCALE_INCREASE = 0.00001;
@@ -21,10 +23,18 @@ const scoreElem = document.querySelector('[data-score]');
 const highScoreElem = document.querySelector('[data-high-score]');
 const startScreenElem = document.querySelector('[data-start-screen]');
 const endScreenElem = document.querySelector('[data-game-over-screen]');
+const leaderboardElem = document.querySelector('[data-leaderboard-body]');
+// const playAgainButtonElem = document.querySelector('[data-play-again]');
+
+// playAgainButtonElem.addEventListener('click', function () {
+//   handleStart(); // Add any other actions you want to perform on button click
+// });
+
 setPixelToWorldScale();
+// createLeaderboard(leaderboardElem);
 window.addEventListener('resize', setPixelToWorldScale);
 document.addEventListener('keydown', handleStart, { once: true });
-
+document.addEventListener('touchstart', handleStart, { once: true });
 let lastTime;
 let speedScale;
 let score;
@@ -111,15 +121,14 @@ function handleCheckIfNewHighScore(score) {
   });
 }
 
-handleCheckIfNewHighScore('41144');
-
 function handleLose() {
   updateHighScore(highScore, score);
-  handleCheckIfNewHighScore();
+  // handleCheckIfNewHighScore();
   soundController.die.play();
   setDinoLose();
   setTimeout(() => {
     document.addEventListener('keydown', handleStart, { once: true });
+    document.addEventListener('touchstart', handleStart, { once: true });
     endScreenElem.classList.remove('hide');
   }, 100);
 }

@@ -3502,9 +3502,9 @@ function handleJump(delta) {
 }
 function onJump(e) {
   if (e.code !== 'Space' || isJumping) return;
+  _soundController.soundController.jump.play();
   yVelocity = JUMP_SPEED;
   isJumping = true;
-  _soundController.soundController.jump.play();
 }
 },{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/dino-stationary.png":"imgs/dino-stationary.png","../public/imgs/dino-lose.png":"imgs/dino-lose.png","../public/imgs/dino-run-0.png":"imgs/dino-run-0.png","../public/imgs/dino-run-1.png":"imgs/dino-run-1.png","../utility/sound-controller.js":"../utility/sound-controller.js"}],"imgs/cactus.png":[function(require,module,exports) {
 module.exports = "/cactus.ec72be49.png";
@@ -3517,7 +3517,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.getCactusRects = getCactusRects;
 exports.setupCactus = setupCactus;
 exports.updateCactus = updateCactus;
-var _updateCustomProperty = require("../utility/updateCustomProperty.js");
+var _updateCustomProperty = require("../utility/updateCustomProperty");
 var _cactus = _interopRequireDefault(require("../public/imgs/cactus.png"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -3566,7 +3566,7 @@ function createCactus() {
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/cactus.png":"imgs/cactus.png"}],"../../../server/common/errors.ts":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/cactus.png":"imgs/cactus.png"}],"../../../server/common/errors.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3813,6 +3813,8 @@ function handleStart() {
   endScreenElem.classList.add('hide');
   window.requestAnimationFrame(update);
 }
+
+//not working for some reason
 function handleCheckIfNewHighScore(score) {
   var users = (0, _apis.getAllHighScoreUsers)().then(function (data) {
     console.log(data.users.findIndex(function (element) {
@@ -3868,7 +3870,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63876" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49267" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

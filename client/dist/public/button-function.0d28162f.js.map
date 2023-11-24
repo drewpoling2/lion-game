@@ -1,0 +1,1 @@
+{"version":3,"sources":["../button-function.js"],"names":["myFunction","alert"],"mappings":"AAAA,SAASA,UAAUA,CAAA,EAAG;EACpB;EACAC,KAAK,CAAC,iBAAiB,CAAC;AAC1B","file":"button-function.0d28162f.js","sourceRoot":"../../src/public","sourcesContent":["function myFunction() {\n  // Your custom function logic goes here\n  alert('Button clicked!');\n}\n"]}
