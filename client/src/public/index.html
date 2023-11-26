@@ -16,7 +16,6 @@
     <script src="../game-manager.js" type="module"></script>
   </head>
   <body>
-    <script src="../../src/button-function.js" type="module"></script>
     <div class="high-score-label">HIGH</div>
     <div class="high-score" data-high-score>000000</div>
     <div class="score-label">SCORE</div>
@@ -33,8 +32,62 @@
       <img src="imgs/ground.png" class="ground" data-ground />
       <img src="imgs/ground.png" class="ground" data-ground />
       <img src="imgs/dino-stationary.png" class="dino" data-dino />
-      <!-- <button class="pixel2" data-play-again>Play Again</button> -->
 
+      <!-- new high score form -->
+      <!-- <div class="flex-col w-fit enter-initials-form">
+        <div class="uppercase sans" style="margin-bottom: 5px">
+          Enter your initials!
+        </div>
+        <table class="leaderboard-table" style="border-collapse: collapse">
+          <thead>
+            <tr>
+              <th class="sans uppercase text-left">Score</th>
+              <th class="sans uppercase text-left">Name</th>
+            </tr>
+          </thead>
+          <tbody class="py-10" data-leaderboard-body>
+            <td class="sans text-left" data-score-new-high-score>91122</td>
+            <td>
+              <input
+                type="text"
+                autofocus
+                class="pixel-art-input sans text-left uppercase"
+                placeholder="___"
+                maxlength="3"
+                id="newHighScoreInput"
+                oninput="handleInput(this)"
+              />
+            </td>
+          </tbody>
+        </table>
+        <div
+          class="sans error-message uppercase hide"
+          data-score-error-message
+        ></div>
+        <button
+          id="submit-button"
+          style="margin-top: 5px"
+          class="sans submit-button uppercase"
+        >
+          Submit
+        </button>
+      </div> -->
+      <!-- end -->
+
+      <script>
+        function handleInput(input) {
+          const maxLength = parseInt(input.getAttribute('maxlength'));
+          const value = input.value;
+
+          if (value.length >= maxLength) {
+            // Focus on the submit button
+            document.getElementById('submit-button').focus();
+          }
+        }
+      </script>
+
+      <!-- leaderboard -->
+      <!-- <button class="pixel2" data-play-again>Play Again</button> -->
       <!-- <div class="leaderboard scrollable-table" data-scrollable-table>
         <div class="leaderboard-title">TOP 100</div>
         <table class="leaderboard-table" style="border-collapse: collapse">
@@ -48,6 +101,7 @@
           <tbody data-leaderboard-body></tbody>
         </table>
       </div> -->
+      <!-- end -->
     </div>
   </body>
 </html>
