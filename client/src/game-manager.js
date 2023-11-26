@@ -12,8 +12,12 @@ import {
 } from './elements/cactus.js';
 import { createLeaderboard } from './elements/leaderboard.js';
 import { soundController } from './utility/sound-controller.js';
-import { getAllHighScoreUsers } from './apis.js';
-import { useState } from 'react';
+import {
+  getAllHighScoreUsers,
+  handleNewHighScore,
+  handleSortAndDeleteLastEntry,
+} from './apis.js';
+import { validateInput } from './utility/validate-input.js';
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 30;
 const SPEED_SCALE_INCREASE = 0.00001;
@@ -24,6 +28,12 @@ const highScoreElem = document.querySelector('[data-high-score]');
 const startScreenElem = document.querySelector('[data-start-screen]');
 const endScreenElem = document.querySelector('[data-game-over-screen]');
 const leaderboardElem = document.querySelector('[data-leaderboard-body]');
+const scoreNewHighScoreElem = document.querySelector(
+  '[data-score-new-high-score]'
+);
+const scoreErrorMessageElem = document.querySelector(
+  '[data-score-error-message]'
+);
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
@@ -40,7 +50,6 @@ let speedScale;
 let score;
 let highScore = localStorage.getItem('lion-high-score');
 highScoreElem.textContent = highScore;
-
 let isBeatScore;
 
 function update(time) {
@@ -89,13 +98,15 @@ function updateScore(delta) {
   }
 }
 
-function updateHighScore(highScore, score) {
+function handleCheckIfHighScore(highScore, score) {
   if (score > highScore) {
     highScore = Math.floor(score).toString().padStart(6, 0);
     highScoreElem.textContent = highScore;
     localStorage.setItem('lion-high-score', highScore);
+    handleCheckLeaderboardHighScore(highScore);
   }
 }
+
 function handleStart() {
   lastTime = null;
   speedScale = 0.9;
@@ -109,21 +120,51 @@ function handleStart() {
   window.requestAnimationFrame(update);
 }
 
-//not working for some reason
-function handleCheckIfNewHighScore(score) {
+function handleCheckLeaderboardHighScore(score) {
   const users = getAllHighScoreUsers().then((data) => {
-    console.log(
-      data.users.findIndex((element) => {
-        parseInt(score, 10) > parseInt(element.score, 10);
-      })
-    ),
-      console.log(data.users);
+    const sortedData = data.users.sort((a, b) => {
+      return parseInt(b.score, 10) - parseInt(a.score, 10);
+    });
   });
 }
 
+handleCheckLeaderboardHighScore('90013');
+
+async function handleSubmitNewScore() {
+  const userInput = document.getElementById('newHighScoreInput').value;
+  //check for validation errors and update error message accordingly
+  if (!validateInput() || !userInput) {
+    scoreErrorMessageElem.textContent = 'Enter a valid name!';
+    scoreErrorMessageElem.classList.remove('hide');
+    return;
+  }
+
+  const scoreNewHighScoreElem = document.querySelector(
+    '[data-score-new-high-score]'
+  );
+  const res = await handleNewHighScore(
+    userInput,
+    scoreNewHighScoreElem.textContent
+  );
+
+  //check if user already exists from res and update error message accordingly, else submit new score
+  if (res === 'user already exists') {
+    scoreErrorMessageElem.textContent = res;
+    scoreErrorMessageElem.classList.remove('hide');
+    return;
+  } else {
+    scoreErrorMessageElem.classList.add('hide');
+  }
+}
+
+if (document.getElementById('submit-button')) {
+  document
+    .getElementById('submit-button')
+    .addEventListener('click', handleSubmitNewScore);
+}
+
 function handleLose() {
-  updateHighScore(highScore, score);
-  // handleCheckIfNewHighScore();
+  handleCheckIfHighScore(highScore, score);
   soundController.die.play();
   setDinoLose();
   setTimeout(() => {

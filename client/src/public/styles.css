@@ -5,12 +5,23 @@
   user-select: none;
 }
 
+*:focus {
+  outline: 2px dashed rgb(169, 169, 169);
+  outline-offset: 5px;
+}
+
 body {
   margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  font-size: 24px;
+  letter-spacing: 1.5px;
+}
+
+button {
+  cursor: pointer;
 }
 
 .world {
@@ -26,6 +37,31 @@ body {
   50% {
     opacity: 0;
   }
+}
+
+.sans {
+  font-family: 'DotGothic16', sans-serif;
+}
+
+.submit-button {
+  border: 2px solid #222;
+  background: transparent;
+  color: #222;
+  padding: 5px 15px;
+  font-size: 24px;
+  letter-spacing: 3px;
+}
+
+.submit-button:focus {
+  outline: 2px dashed rgb(169, 169, 169);
+  outline-offset: 5px;
+  background-color: #222;
+  color: white;
+}
+
+.submit-button:hover {
+  background-color: #222;
+  color: white;
 }
 
 .score {
@@ -112,9 +148,24 @@ body {
   transform: translate(-50%, -50%);
 }
 
+.leaderboard-item {
+  width: fit-content;
+  text-align: right;
+  padding-inline: 15px;
+  font-family: 'DotGothic16', sans-serif;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+
 .table-heading {
   display: flex;
   flex-direction: row;
+}
+
+th,
+td {
+  padding-top: 5px; /* Adjust the padding as needed */
+  padding-bottom: 5px; /* Adjust the padding as needed */
 }
 
 .leaderboard-title {
@@ -166,6 +217,34 @@ body {
   scroll-behavior: smooth; /* Add smooth scrolling (optional) */
   max-height: 500px; /* Adjust the height as needed */
   overflow-y: auto;
+}
+
+.error-message {
+  color: red;
+}
+
+.pixel-art-input {
+  border: 2px dashed;
+  border-color: transparent;
+  padding: 10px;
+  width: 100px;
+  font-size: 24px;
+  letter-spacing: 3px;
+  outline: none;
+  background-color: #fff;
+}
+
+.pixel-art-input:focus {
+  border: 2px dashed;
+  border-color: rgb(169, 169, 169);
+}
+
+.enter-initials-form {
+  width: fit-content;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .ground {
@@ -306,4 +385,350 @@ body {
   background: rgb(33, 33, 33);
   width: auto;
   z-index: 2;
+}
+
+/* utility classes */
+.disappear {
+  opacity: 0;
+}
+
+.hide {
+  display: none;
+}
+
+.inherit {
+  display: inherit;
+}
+
+.flex {
+  display: flex;
+}
+
+.block {
+  display: block;
+}
+
+.inline {
+  display: inline;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-start {
+  justify-content: flex-start;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.justify-around {
+  justify-content: space-around;
+}
+
+.justify-evenly {
+  justify-content: space-evenly;
+}
+
+.justify-items-stretch {
+  justify-items: stretch;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.items-stretch {
+  align-items: stretch;
+}
+
+.items-baseline {
+  align-items: baseline;
+}
+
+.content-center {
+  align-content: center;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-col-reverse {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-row-reverse {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.cursor-default {
+  cursor: default;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.max-w-full {
+  max-width: 100%;
+}
+
+.w-fit {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.h-full {
+  height: 100%;
+}
+.max-h-full {
+  max-width: 100%;
+}
+
+.h-fit {
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
+.bg-center {
+  background-position: center;
+}
+
+.bg-no-repeat {
+  background-repeat: no-repeat;
+}
+
+.bg-cover {
+  background-size: cover;
+}
+
+.bg-auto {
+  background-size: auto;
+}
+
+.bg-contain {
+  background-size: contain;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.relative {
+  position: relative;
+}
+
+.static {
+  position: static;
+}
+
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+.decoration-none {
+  text-decoration: none;
+}
+
+.z-top {
+  z-index: 0;
+}
+
+.z-middle {
+  z-index: 50;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none !important;
+  cursor: none !important;
+}
+
+.hover-underline:hover {
+  text-decoration: underline;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.text-decoration-none {
+  text-decoration: none;
+}
+
+.hover-italic:hover {
+  font-style: italic;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.outline-none {
+  outline: none;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.list-none {
+  list-style-type: none;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-justify {
+  text-align: justify;
+}
+
+.text-start {
+  text-align: start;
+}
+
+.text-end {
+  text-align: end;
+}
+
+.grid-area-a {
+  grid-area: a;
+}
+.grid-area-b {
+  grid-area: b;
+}
+.grid-area-c {
+  grid-area: c;
+}
+.grid-area-d {
+  grid-area: d;
+}
+.grid-area-e {
+  grid-area: e;
+}
+.grid-area-f {
+  grid-area: f;
+}
+.grid-area-g {
+  grid-area: g;
+}
+.grid-area-h {
+  grid-area: h;
+}
+
+::-webkit-input-placeholder {
+  font-style: italic;
+}
+:-moz-placeholder {
+  font-style: italic;
+}
+::-moz-placeholder {
+  font-style: italic;
+}
+:-ms-input-placeholder {
+  font-style: italic;
+}
+
+*:focus {
+  outline: none;
+}
+
+.no-transition {
+  transition: all 0s;
+}
+
+.visually-hidden {
+  clip: rect(0, 0, 0, 0);
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
