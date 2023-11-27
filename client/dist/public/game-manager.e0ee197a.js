@@ -3434,6 +3434,10 @@ var soundController = exports.soundController = {
   jump: new _howler.Howl({
     src: ['sounds/jump.wav'],
     volume: 0.075
+  }),
+  beatScore: new _howler.Howl({
+    src: ['sounds/beatScore.wav'],
+    volume: 0.075
   })
 };
 },{"howler":"../node_modules/howler/dist/howler.js"}],"../elements/dino.js":[function(require,module,exports) {
@@ -3958,9 +3962,8 @@ document.addEventListener('touchstart', handleStart, {
 var lastTime;
 var speedScale;
 var score;
-var highScore = localStorage.getItem('lion-high-score');
-highScoreElem.textContent = highScore;
-var isBeatScore;
+highScoreElem.textContent = localStorage.getItem('lion-high-score') ? localStorage.getItem('lion-high-score') : Math.floor('0').toString().padStart(6, 0);
+var hasBeatenScore = false;
 function update(time) {
   if (lastTime == null) {
     lastTime = time;
@@ -3992,24 +3995,23 @@ function updateSpeedScale(delta) {
 function updateScore(delta) {
   score += delta * 0.01;
   scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
-  if (!isBeatScore && score > highScore) {
-    console.log(highScore);
-    isBeatScore = true;
+  if (score > highScoreElem.textContent && !hasBeatenScore && highScoreElem.textContent !== '000000') {
+    _soundController.soundController.beatScore.play();
+    hasBeatenScore = true;
   }
 }
-function handleCheckIfHighScore(highScore, score) {
-  if (score > highScore) {
-    highScore = Math.floor(score).toString().padStart(6, 0);
-    highScoreElem.textContent = highScore;
-    localStorage.setItem('lion-high-score', highScore);
-    handleCheckLeaderboardHighScore(highScore);
+function handleCheckIfHighScore(score) {
+  if (score > highScoreElem.textContent) {
+    highScoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+    localStorage.setItem('lion-high-score', highScoreElem.textContent);
+    handleCheckLeaderboardHighScore(highScoreElem.textContent);
   }
 }
 function handleStart() {
   lastTime = null;
+  hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
-  isBeatScore = false;
   (0, _ground.setupGround)();
   (0, _dino.setupDino)();
   (0, _cactus.setupCactus)();
@@ -4069,7 +4071,8 @@ if (document.getElementById('submit-button')) {
   document.getElementById('submit-button').addEventListener('click', handleSubmitNewScore);
 }
 function handleLose() {
-  handleCheckIfHighScore(highScore, score);
+  console.log(highScoreElem.textContent);
+  handleCheckIfHighScore(score);
   _soundController.soundController.die.play();
   (0, _dino.setDinoLose)();
   setTimeout(function () {
@@ -4117,7 +4120,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55659" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58763" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
