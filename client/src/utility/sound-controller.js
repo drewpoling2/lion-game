@@ -8,4 +8,8 @@ export const soundController = {
     src: ['sounds/jump.wav'],
     volume: 0.075,
   }),
+  beatScore: new Howl({
+    src: ['sounds/beatScore.wav'],
+    volume: 0.075,
+  }),
 };

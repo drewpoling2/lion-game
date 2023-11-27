@@ -48,9 +48,10 @@ document.addEventListener('touchstart', handleStart, { once: true });
 let lastTime;
 let speedScale;
 let score;
-let highScore = localStorage.getItem('lion-high-score');
-highScoreElem.textContent = highScore;
-let isBeatScore;
+highScoreElem.textContent = localStorage.getItem('lion-high-score')
+  ? localStorage.getItem('lion-high-score')
+  : Math.floor('0').toString().padStart(6, 0);
+let hasBeatenScore = false;
 
 function update(time) {
   if (lastTime == null) {
@@ -92,26 +93,30 @@ function updateSpeedScale(delta) {
 function updateScore(delta) {
   score += delta * 0.01;
   scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
-  if (!isBeatScore && score > highScore) {
-    console.log(highScore);
-    isBeatScore = true;
+
+  if (
+    score > highScoreElem.textContent &&
+    !hasBeatenScore &&
+    highScoreElem.textContent !== '000000'
+  ) {
+    soundController.beatScore.play();
+    hasBeatenScore = true;
   }
 }
 
-function handleCheckIfHighScore(highScore, score) {
-  if (score > highScore) {
-    highScore = Math.floor(score).toString().padStart(6, 0);
-    highScoreElem.textContent = highScore;
-    localStorage.setItem('lion-high-score', highScore);
-    handleCheckLeaderboardHighScore(highScore);
+function handleCheckIfHighScore(score) {
+  if (score > highScoreElem.textContent) {
+    highScoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+    localStorage.setItem('lion-high-score', highScoreElem.textContent);
+    handleCheckLeaderboardHighScore(highScoreElem.textContent);
   }
 }
 
 function handleStart() {
   lastTime = null;
+  hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
-  isBeatScore = false;
   setupGround();
   setupDino();
   setupCactus();
@@ -164,7 +169,8 @@ if (document.getElementById('submit-button')) {
 }
 
 function handleLose() {
-  handleCheckIfHighScore(highScore, score);
+  console.log(highScoreElem.textContent);
+  handleCheckIfHighScore(score);
   soundController.die.play();
   setDinoLose();
   setTimeout(() => {
