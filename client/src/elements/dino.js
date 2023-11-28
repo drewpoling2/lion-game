@@ -10,9 +10,9 @@ import dinoRun1Img from '../public/imgs/dino-run-1.png';
 import { soundController } from '../utility/sound-controller.js';
 
 const dinoElem = document.querySelector('[data-dino]');
-const JUMP_SPEED = 0.35;
-const DOUBLE_JUMP_SPEED = 0.4; // Adjust this as needed
-const GRAVITY = 0.0015;
+const JUMP_SPEED = 0.21;
+const DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
+const GRAVITY = 0.00075;
 const DINO_FRAME_COUNT = 2;
 const FRAME_TIME = 100;
 
@@ -59,6 +59,7 @@ export function getDinoRect() {
 
 export function setDinoLose() {
   dinoElem.src = dinoLoseImg;
+  dinoElem.classList.remove('flash-animation');
 }
 
 function handleRun(delta, speedScale) {

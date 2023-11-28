@@ -67,8 +67,9 @@ button {
 .score {
   position: absolute;
   font-size: 3vmin;
-  top: 5%;
+  top: 10%;
   left: 50%;
+  transform: translate(-50%, 0%);
   font-family: 'DotGothic16', sans-serif;
 }
 
@@ -77,24 +78,23 @@ button {
   font-size: 3vmin;
   top: 5%;
   left: 50%;
-  top: 1vmin;
+  transform: translate(-50%, 0%);
   font-family: 'DotGothic16', sans-serif;
 }
 
 .high-score {
   position: absolute;
   font-size: 3vmin;
-  top: 5%;
-  left: 5%;
+  top: 10%;
+  left: 10%;
   font-family: 'DotGothic16', sans-serif;
 }
 
 .high-score-label {
   position: absolute;
   font-size: 3vmin;
-  top: 10%;
-  left: 5%;
-  top: 1vmin;
+  top: 5%;
+  left: 10%;
   font-family: 'DotGothic16', sans-serif;
 }
 
@@ -223,6 +223,39 @@ td {
   color: red;
 }
 
+.lives {
+  position: absolute;
+  font-size: 3vmin;
+  top: 10%;
+  left: 83%;
+  font-family: 'DotGothic16', sans-serif;
+}
+
+.lives-label {
+  position: absolute;
+  font-size: 3vmin;
+  top: 5%;
+  left: 83%;
+  font-family: 'DotGothic16', sans-serif;
+}
+
+.stop-time {
+  animation-play-state: paused;
+}
+
+.flash-animation {
+  animation: flash 0.15s infinite alternate; /* Adjust the duration and other properties as needed */
+}
+
+@keyframes flash {
+  from {
+    filter: none;
+  }
+  to {
+    filter: grayscale(100%) brightness(200%); /* Adjust values as needed */
+  }
+}
+
 .pixel-art-input {
   border: 2px dashed;
   border-color: transparent;
@@ -259,14 +292,14 @@ td {
   --bottom: 0;
   position: absolute;
   left: 1%;
-  height: 30%;
+  height: 15%;
   bottom: calc(var(--bottom) * 1%);
 }
 
 .cactus {
   position: absolute;
   left: calc(var(--left) * 1%);
-  height: 30%;
+  height: 15%;
   bottom: 0;
 }
 

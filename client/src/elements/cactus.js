@@ -74,7 +74,7 @@ function createCactus(newPosition) {
   cactus.src = cactusImg;
   cactus.classList.add('cactus');
   setCustomProperty(cactus, '--left', newPosition);
-  setCustomProperty(cactus, 'height', `${randomNumberBetween(22, 27)}%`);
+  setCustomProperty(cactus, 'height', `${randomNumberBetween(13, 17)}%`);
 
   worldElem.append(cactus);
 }

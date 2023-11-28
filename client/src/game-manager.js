@@ -18,8 +18,8 @@ import {
   handleSortAndDeleteLastEntry,
 } from './apis.js';
 import { validateInput } from './utility/validate-input.js';
-const WORLD_WIDTH = 100;
-const WORLD_HEIGHT = 30;
+const WORLD_WIDTH = 82;
+const WORLD_HEIGHT = 32;
 const SPEED_SCALE_INCREASE = 0.00001;
 
 const worldElem = document.querySelector('[data-world]');
@@ -34,6 +34,9 @@ const scoreNewHighScoreElem = document.querySelector(
 const scoreErrorMessageElem = document.querySelector(
   '[data-score-error-message]'
 );
+
+const livesElem = document.querySelector('[data-lives]');
+const dinoElem = document.querySelector('[data-dino]');
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
@@ -48,6 +51,9 @@ document.addEventListener('touchstart', handleStart, { once: true });
 let lastTime;
 let speedScale;
 let score;
+let collisionOccurred = false; // Flag to track collision
+
+//init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
   : Math.floor('0').toString().padStart(6, 0);
@@ -73,9 +79,58 @@ function update(time) {
 }
 
 function checkLose() {
+  //init dino rect
   const dinoRect = getDinoRect();
-  return getCactusRects().some((rect) => isCollision(rect, dinoRect));
+
+  //init enemy and player collision state
+  const isEnemyAndPlayerCollision = getCactusRects().some((rect) =>
+    isCollision(rect, dinoRect)
+  );
+
+  //if no lives remain then lose
+  if (livesElem.textContent === '0') {
+    return true;
+  } //check if enemy and player are in colliding
+  else if (isEnemyAndPlayerCollision) {
+    //check if player is not in previous collision state
+    if (!collisionOccurred) {
+      // decrement lives elem by 1
+      if (livesElem) {
+        let currentLives = parseInt(livesElem.textContent, 10);
+        if (!isNaN(currentLives)) {
+          currentLives -= 1;
+          livesElem.textContent = currentLives;
+        }
+      }
+      //switch player collision state to true
+      collisionOccurred = true;
+      //set player to flash
+      dinoElem.classList.add('flash-animation');
+      //set world update pause
+      worldElem.classList.add('stop-time'); // Add the class to stop time
+      //set timeout for world update pause
+      setTimeout(() => {
+        worldElem.classList.remove('stop-time'); // Add the class to stop time
+      }, 750);
+      // Set a timeout to reset player collision state and player flash
+      setTimeout(() => {
+        collisionOccurred = false;
+        dinoElem.classList.remove('flash-animation');
+      }, 2000);
+    }
+  }
 }
+
+//wip
+// function checkLose() {
+//   const dinoRect = getDinoRect();
+//   if (
+//     getCactusRects().some((rect) => isCollision(rect, dinoRect)) &&
+//     livesElem.textContent === 0
+//   ) {
+//     return true;
+//   } else return false;
+// }
 
 function isCollision(rect1, rect2) {
   return (
@@ -117,6 +172,7 @@ function handleStart() {
   hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
+  livesElem.textContent = 2;
   setupGround();
   setupDino();
   setupCactus();
@@ -183,7 +239,7 @@ function handleLose() {
 function setPixelToWorldScale() {
   let worldToPixelScale;
   if (window.innerWidth / window.innerHeight < WORLD_WIDTH / WORLD_HEIGHT) {
-    worldToPixelScale = window.innerWidth / WORLD_WIDTH;
+    worldToPixelScale = window.innerWidth / WORLD_WIDTH / 1.25;
   } else {
     worldToPixelScale = window.innerHeight / WORLD_HEIGHT;
   }
