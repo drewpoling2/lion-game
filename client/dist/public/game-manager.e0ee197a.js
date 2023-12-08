@@ -3438,6 +3438,10 @@ var soundController = exports.soundController = {
   beatScore: new _howler.Howl({
     src: ['sounds/beatScore.wav'],
     volume: 0.075
+  }),
+  pickupCoin: new _howler.Howl({
+    src: ['sounds/pickupCoin.wav'],
+    volume: 0.075
   })
 };
 },{"howler":"../node_modules/howler/dist/howler.js"}],"../elements/dino.js":[function(require,module,exports) {
@@ -3458,9 +3462,9 @@ var _dinoRun2 = _interopRequireDefault(require("../public/imgs/dino-run-1.png"))
 var _soundController = require("../utility/sound-controller.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 var dinoElem = document.querySelector('[data-dino]');
-var JUMP_SPEED = 0.35;
-var DOUBLE_JUMP_SPEED = 0.4; // Adjust this as needed
-var GRAVITY = 0.0015;
+var JUMP_SPEED = 0.21;
+var DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
+var GRAVITY = 0.00075;
 var DINO_FRAME_COUNT = 2;
 var FRAME_TIME = 100;
 var isJumping;
@@ -3485,20 +3489,24 @@ function setupDino() {
   if (isMobileDevice()) {
     document.removeEventListener('touchstart', onJump);
     document.addEventListener('touchstart', onJump);
+    document.addEventListener('touchstart', onDive);
   } else {
     document.removeEventListener('keydown', onJump);
     document.addEventListener('keydown', onJump);
+    document.addEventListener('keydown', onDive);
   }
 }
 function updateDino(delta, speedScale) {
   handleRun(delta, speedScale);
   handleJump(delta);
+  handleDive(delta);
 }
 function getDinoRect() {
   return dinoElem.getBoundingClientRect();
 }
 function setDinoLose() {
   dinoElem.src = _dinoLose.default;
+  dinoElem.classList.remove('flash-animation');
 }
 function handleRun(delta, speedScale) {
   if (isJumping) {
@@ -3533,6 +3541,29 @@ function onJump(e) {
   yVelocity = JUMP_SPEED;
   isJumping = true;
   jumpCount++;
+}
+var DIVE_SPEED = 0.2; // Adjust the dive speed as needed
+var isDiving = false;
+function handleDive(delta) {
+  if (!isDiving) return;
+  (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
+  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= 0) {
+    (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', 0);
+    isDiving = false;
+    jumpCount = 0;
+  }
+  yVelocity -= GRAVITY * delta;
+}
+function onDive(e) {
+  if (e.code !== 'ArrowDown' && e.type !== 'touchstart' || isDiving) return;
+  yVelocity = -DIVE_SPEED; // Negative value for diving down
+  isDiving = true;
+
+  // Add any additional logic you need for the dive action
+
+  // Optional: You might want to reset isJumping and jumpCount here if needed
+  isJumping = false;
+  jumpCount = 0;
 }
 },{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/dino-stationary.png":"imgs/dino-stationary.png","../public/imgs/dino-lose.png":"imgs/dino-lose.png","../public/imgs/dino-run-0.png":"imgs/dino-run-0.png","../public/imgs/dino-run-1.png":"imgs/dino-run-1.png","../utility/sound-controller.js":"../utility/sound-controller.js"}],"imgs/cactus.png":[function(require,module,exports) {
 module.exports = "/cactus.ec72be49.png";
@@ -3610,7 +3641,7 @@ function createCactus(newPosition) {
   cactus.src = _cactus.default;
   cactus.classList.add('cactus');
   (0, _updateCustomProperty.setCustomProperty)(cactus, '--left', newPosition);
-  (0, _updateCustomProperty.setCustomProperty)(cactus, 'height', "".concat(randomNumberBetween(22, 27), "%"));
+  (0, _updateCustomProperty.setCustomProperty)(cactus, 'height', "".concat(randomNumberBetween(13, 17), "%"));
   worldElem.append(cactus);
 }
 function randomNumberBetween(min, max) {
@@ -3680,6 +3711,8 @@ var getAllHighScoreUsers = exports.getAllHighScoreUsers = /*#__PURE__*/function 
     return _ref.apply(this, arguments);
   };
 }();
+
+//insertions instead of delete
 
 //deletes entry by field
 var handleDeleteEntry = /*#__PURE__*/function () {
@@ -3919,7 +3952,129 @@ function validateInput() {
     return true;
   }
 }
-},{}],"../game-manager.js":[function(require,module,exports) {
+},{}],"../elements/score-multiplier.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getMultiplierRects = getMultiplierRects;
+exports.setupMultiplier = setupMultiplier;
+exports.updateMultiplier = updateMultiplier;
+var _updateCustomProperty = require("../utility/updateCustomProperty");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var multiplierPositions = [];
+var SPEED = 0.05;
+var MULTIPLIER_INTERVAL_MIN = 4000;
+var MULTIPLIER_INTERVAL_MAX = 6000;
+var worldElem = document.querySelector('[data-world]');
+var nextMultiplierTime;
+function setupMultiplier() {
+  nextMultiplierTime = MULTIPLIER_INTERVAL_MIN;
+  document.querySelectorAll('[data-multiplier]').forEach(function (multiplier) {
+    multiplier.remove();
+  });
+}
+function updateMultiplier(delta, speedScale) {
+  document.querySelectorAll('[data-multiplier]').forEach(function (multiplier) {
+    (0, _updateCustomProperty.incrementCustomProperty)(multiplier, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(multiplier, '--left') <= -100) {
+      multiplier.remove();
+    }
+  });
+  if (nextMultiplierTime <= 0) {
+    createMultipliers();
+    nextMultiplierTime = randomNumberBetween(MULTIPLIER_INTERVAL_MIN, MULTIPLIER_INTERVAL_MAX) / speedScale;
+  }
+  nextMultiplierTime -= delta;
+}
+function getMultiplierRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-multiplier]')).map(function (multiplier) {
+    return {
+      id: multiplier.id,
+      rect: multiplier.getBoundingClientRect()
+    };
+  });
+}
+function createMultipliers() {
+  var multiplier = document.createElement('div');
+  multiplier.dataset.multiplier = true;
+  multiplier.textContent = 'm';
+  multiplier.classList.add('multiplier', 'floating-item');
+  multiplier.id = Math.random().toString(16).slice(2);
+  (0, _updateCustomProperty.setCustomProperty)(multiplier, '--left', 100);
+  worldElem.append(multiplier);
+}
+function randomNumberBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"../elements/coin.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getCoinRects = getCoinRects;
+exports.setupCoin = setupCoin;
+exports.updateCoin = updateCoin;
+var _updateCustomProperty = require("../utility/updateCustomProperty");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var coinPositions = [];
+var SPEED = 0.05;
+var COIN_INTERVAL_MIN = 75;
+var COIN_INTERVAL_MAX = 1200;
+var worldElem = document.querySelector('[data-world]');
+var nextCoinTime;
+function setupCoin() {
+  nextCoinTime = COIN_INTERVAL_MIN;
+  document.querySelectorAll('[data-coin]').forEach(function (coin) {
+    coin.remove();
+  });
+}
+function updateCoin(delta, speedScale) {
+  document.querySelectorAll('[data-coin]').forEach(function (coin) {
+    (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(coin, '--left') <= -100) {
+      coin.remove();
+    }
+  });
+  if (nextCoinTime <= 0) {
+    createCoins();
+    nextCoinTime = randomNumberBetween(COIN_INTERVAL_MIN, COIN_INTERVAL_MAX) / speedScale;
+  }
+  nextCoinTime -= delta;
+}
+function getCoinRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-coin]')).map(function (coin) {
+    return {
+      id: coin.id,
+      rect: coin.getBoundingClientRect()
+    };
+  });
+}
+function createCoins() {
+  var coin = document.createElement('div');
+  coin.dataset.coin = true;
+  coin.textContent = 'c';
+  coin.classList.add('coin', 'floating-item');
+  coin.id = Math.random().toString(16).slice(2);
+  (0, _updateCustomProperty.setCustomProperty)(coin, '--left', 100);
+  worldElem.append(coin);
+}
+function randomNumberBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"../game-manager.js":[function(require,module,exports) {
 "use strict";
 
 var _ground = require("./elements/ground.js");
@@ -3929,12 +4084,14 @@ var _leaderboard = require("./elements/leaderboard.js");
 var _soundController = require("./utility/sound-controller.js");
 var _apis = require("./apis.js");
 var _validateInput = require("./utility/validate-input.js");
+var _scoreMultiplier = require("./elements/score-multiplier.js");
+var _coin = require("./elements/coin.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-var WORLD_WIDTH = 100;
-var WORLD_HEIGHT = 30;
+var WORLD_WIDTH = 82;
+var WORLD_HEIGHT = 32;
 var SPEED_SCALE_INCREASE = 0.00001;
 var worldElem = document.querySelector('[data-world]');
 var scoreElem = document.querySelector('[data-score]');
@@ -3942,8 +4099,11 @@ var highScoreElem = document.querySelector('[data-high-score]');
 var startScreenElem = document.querySelector('[data-start-screen]');
 var endScreenElem = document.querySelector('[data-game-over-screen]');
 var leaderboardElem = document.querySelector('[data-leaderboard-body]');
+var scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
 var scoreNewHighScoreElem = document.querySelector('[data-score-new-high-score]');
 var scoreErrorMessageElem = document.querySelector('[data-score-error-message]');
+var livesElem = document.querySelector('[data-lives]');
+var dinoElem = document.querySelector('[data-dino]');
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
@@ -3962,30 +4122,179 @@ document.addEventListener('touchstart', handleStart, {
 var lastTime;
 var speedScale;
 var score;
+var collisionOccurred = false; // Flag to track collision
+
+//init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score') ? localStorage.getItem('lion-high-score') : Math.floor('0').toString().padStart(6, 0);
 var hasBeatenScore = false;
+var isPaused = false;
+var playerImmunity = false;
+var immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
+
+// Function to toggle the pause state
+function togglePause() {
+  isPaused = !isPaused;
+  if (isPaused) {
+    // Record the start time of the pause
+    // pauseStartTime = performance.now();
+  } else {
+    // Calculate the total pause duration
+    // pauseDuration += performance.now() - pauseStartTime;
+    // isFirstFrameAfterCollision = false;
+
+    // Trigger the next animation frame
+    window.requestAnimationFrame(update);
+  }
+}
+
+// Function to set player immunity
+function setPlayerImmunity() {
+  playerImmunity = true;
+
+  // Reset player immunity after the specified duration
+  setTimeout(function () {
+    playerImmunity = false;
+  }, immunityDuration);
+}
 function update(time) {
+  if (isPaused) {
+    // Do nothing if the game is paused
+    return;
+  }
   if (lastTime == null) {
     lastTime = time;
     window.requestAnimationFrame(update);
     return;
   }
-  var delta = time - lastTime;
+
+  // let delta = time - lastTime;
+  var delta = 8;
+  if (collisionOccurred) {
+    setPlayerImmunity();
+    togglePause();
+    setTimeout(function () {
+      collisionOccurred = false; // Reset the collision flag after the delay
+      togglePause();
+    }, 400);
+    return; // Pause the update during the delay
+  }
+
   (0, _ground.updateGround)(delta, speedScale);
   (0, _dino.updateDino)(delta, speedScale);
   (0, _cactus.updateCactus)(delta, speedScale);
   updateSpeedScale(delta);
   updateScore(delta);
+  (0, _scoreMultiplier.updateMultiplier)(delta, speedScale);
+  (0, _coin.updateCoin)(delta, speedScale);
   if (checkLose()) return handleLose();
+  if (checkMultiplierCollision()) ;
+  if (checkCoinCollision()) ;
   lastTime = time;
   window.requestAnimationFrame(update);
 }
-function checkLose() {
+function checkMultiplierCollision() {
   var dinoRect = (0, _dino.getDinoRect)();
-  return (0, _cactus.getCactusRects)().some(function (rect) {
-    return isCollision(rect, dinoRect);
+  (0, _scoreMultiplier.getMultiplierRects)().some(function (element) {
+    if (isCollision(element.rect, dinoRect)) {
+      _soundController.soundController.beatScore.play();
+      document.getElementById(element.id).remove();
+      updateScoreWithMultiplier(1000);
+      return true;
+    }
   });
 }
+var duration = 1000;
+var updateInterval = 50;
+function updateScoreWithMultiplier(delta) {
+  var initialScore = score;
+  var increments = Math.ceil(duration / updateInterval);
+  var incrementAmount = delta / increments;
+  var intervalId = setInterval(function () {
+    score += incrementAmount;
+    scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+    if (score >= initialScore + delta) {
+      // Stop the interval when the target score is reached
+      clearInterval(intervalId);
+    }
+  }, updateInterval);
+}
+function checkCoinCollision() {
+  var dinoRect = (0, _dino.getDinoRect)();
+  (0, _coin.getCoinRects)().some(function (element) {
+    if (isCollision(element.rect, dinoRect)) {
+      _soundController.soundController.pickupCoin.play();
+      document.getElementById(element.id).remove();
+      updateScoreWithMultiplier(100);
+      return true;
+    }
+  });
+}
+function checkLose() {
+  //init dino rect
+  var dinoRect = (0, _dino.getDinoRect)();
+
+  //init enemy and player collision state
+  var isEnemyAndPlayerCollision = (0, _cactus.getCactusRects)().some(function (rect) {
+    return isCollision(rect, dinoRect);
+  });
+
+  //if no lives remain then lose
+  if (livesElem.textContent === '0') {
+    return true;
+  } //check if enemy and player are in colliding
+  else if (isEnemyAndPlayerCollision && !playerImmunity) {
+    //check if player is not in previous collision state
+    if (!collisionOccurred) {
+      // decrement lives elem by 1
+      if (livesElem) {
+        var currentLives = parseInt(livesElem.textContent, 10);
+        if (!isNaN(currentLives)) {
+          currentLives -= 1;
+          livesElem.textContent = currentLives;
+        }
+      }
+      //switch player collision state to true
+      collisionOccurred = true;
+      //set player to flash
+      dinoElem.classList.add('flash-animation');
+      //set world update pause
+      worldElem.classList.add('stop-time'); // Add the class to stop time
+      //set timeout for world update pause
+
+      // // Set a timeout to reset player collision state and player flash
+      setTimeout(function () {
+        collisionOccurred = false;
+        dinoElem.classList.remove('flash-animation');
+        dinoElem.classList.add('flash-light-animation');
+      }, 400);
+      setTimeout(function () {
+        collisionOccurred = false;
+        dinoElem.classList.remove('flash-light-animation');
+      }, 1600);
+    }
+  }
+}
+var muteButton = document.getElementById('muteButton');
+var soundControllerMuted = false;
+
+//mute/unmute function
+muteButton.addEventListener('click', function () {
+  if (!soundControllerMuted) {
+    Object.keys(_soundController.soundController).forEach(function (key) {
+      _soundController.soundController[key].mute(true);
+    });
+    muteButton.textContent = 'Unmute';
+    soundControllerMuted = true;
+    muteButton.blur();
+  } else {
+    Object.keys(_soundController.soundController).forEach(function (key) {
+      _soundController.soundController[key].mute(false);
+    });
+    muteButton.textContent = 'Mute';
+    soundControllerMuted = false;
+    muteButton.blur();
+  }
+});
 function isCollision(rect1, rect2) {
   return rect1.left < rect2.right && rect1.top < rect2.bottom && rect1.right > rect2.left && rect1.bottom > rect2.top;
 }
@@ -4012,9 +4321,12 @@ function handleStart() {
   hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
+  livesElem.textContent = 2;
   (0, _ground.setupGround)();
   (0, _dino.setupDino)();
   (0, _cactus.setupCactus)();
+  (0, _scoreMultiplier.setupMultiplier)();
+  (0, _coin.setupCoin)();
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
   window.requestAnimationFrame(update);
@@ -4071,7 +4383,6 @@ if (document.getElementById('submit-button')) {
   document.getElementById('submit-button').addEventListener('click', handleSubmitNewScore);
 }
 function handleLose() {
-  console.log(highScoreElem.textContent);
   handleCheckIfHighScore(score);
   _soundController.soundController.die.play();
   (0, _dino.setDinoLose)();
@@ -4088,14 +4399,14 @@ function handleLose() {
 function setPixelToWorldScale() {
   var worldToPixelScale;
   if (window.innerWidth / window.innerHeight < WORLD_WIDTH / WORLD_HEIGHT) {
-    worldToPixelScale = window.innerWidth / WORLD_WIDTH;
+    worldToPixelScale = window.innerWidth / WORLD_WIDTH / 1.25;
   } else {
     worldToPixelScale = window.innerHeight / WORLD_HEIGHT;
   }
   worldElem.style.width = "".concat(WORLD_WIDTH * worldToPixelScale, "px");
   worldElem.style.height = "".concat(WORLD_HEIGHT * worldToPixelScale, "px");
 }
-},{"./elements/ground.js":"../elements/ground.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./elements/ground.js":"../elements/ground.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -4120,7 +4431,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58763" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62083" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -14,6 +14,8 @@ const getAllHighScoreUsers = async () => {
   }
 };
 
+//insertions instead of delete
+
 //deletes entry by field
 const handleDeleteEntry = async (entryField) => {
   try {
