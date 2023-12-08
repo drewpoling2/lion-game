@@ -247,12 +247,25 @@ td {
   animation: flash 0.15s infinite alternate; /* Adjust the duration and other properties as needed */
 }
 
+.flash-light-animation {
+  animation: flashlight 0.15s infinite alternate; /* Adjust the duration and other properties as needed */
+}
+
 @keyframes flash {
   from {
     filter: none;
   }
   to {
-    filter: grayscale(100%) brightness(200%); /* Adjust values as needed */
+    filter: grayscale(100%) brightness(275%); /* Adjust values as needed */
+  }
+}
+
+@keyframes flashlight {
+  from {
+    filter: none;
+  }
+  to {
+    filter: grayscale(100%) brightness(150%); /* Adjust values as needed */
   }
 }
 
@@ -278,6 +291,15 @@ td {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.multiplier {
+  position: absolute;
+  background-color: aquamarine;
+  height: 20px;
+  width: 20px;
+  bottom: 20px;
+  left: calc(var(--left) * 1%);
 }
 
 .ground {

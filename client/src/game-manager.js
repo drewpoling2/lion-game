@@ -18,6 +18,11 @@ import {
   handleSortAndDeleteLastEntry,
 } from './apis.js';
 import { validateInput } from './utility/validate-input.js';
+import {
+  setupMultiplier,
+  updateMultiplier,
+  getMultiplierRects,
+} from './elements/score-multiplier.js';
 const WORLD_WIDTH = 82;
 const WORLD_HEIGHT = 32;
 const SPEED_SCALE_INCREASE = 0.00001;
@@ -28,6 +33,7 @@ const highScoreElem = document.querySelector('[data-high-score]');
 const startScreenElem = document.querySelector('[data-start-screen]');
 const endScreenElem = document.querySelector('[data-game-over-screen]');
 const leaderboardElem = document.querySelector('[data-leaderboard-body]');
+const scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
 const scoreNewHighScoreElem = document.querySelector(
   '[data-score-new-high-score]'
 );
@@ -58,24 +64,86 @@ highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
   : Math.floor('0').toString().padStart(6, 0);
 let hasBeatenScore = false;
+let isPaused = false;
+let playerImmunity = false;
+let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
+
+// Function to toggle the pause state
+function togglePause() {
+  isPaused = !isPaused;
+
+  if (isPaused) {
+    // Record the start time of the pause
+    // pauseStartTime = performance.now();
+  } else {
+    // Calculate the total pause duration
+    // pauseDuration += performance.now() - pauseStartTime;
+    // isFirstFrameAfterCollision = false;
+
+    // Trigger the next animation frame
+    window.requestAnimationFrame(update);
+  }
+}
+
+// Function to set player immunity
+function setPlayerImmunity() {
+  playerImmunity = true;
+
+  // Reset player immunity after the specified duration
+  setTimeout(() => {
+    playerImmunity = false;
+  }, immunityDuration);
+}
 
 function update(time) {
+  if (isPaused) {
+    // Do nothing if the game is paused
+    return;
+  }
+
   if (lastTime == null) {
     lastTime = time;
     window.requestAnimationFrame(update);
     return;
   }
-  const delta = time - lastTime;
+
+  // let delta = time - lastTime;
+  let delta = 8;
+  if (collisionOccurred) {
+    setPlayerImmunity();
+    togglePause();
+    setTimeout(() => {
+      collisionOccurred = false; // Reset the collision flag after the delay
+      togglePause();
+    }, 400);
+    return; // Pause the update during the delay
+  }
 
   updateGround(delta, speedScale);
   updateDino(delta, speedScale);
   updateCactus(delta, speedScale);
   updateSpeedScale(delta);
   updateScore(delta);
+  updateMultiplier(delta, speedScale);
   if (checkLose()) return handleLose();
-
-  lastTime = time;
+  if (checkMultiplierCollision()) lastTime = time;
   window.requestAnimationFrame(update);
+}
+
+function checkMultiplierCollision() {
+  const dinoRect = getDinoRect();
+  getMultiplierRects().some((element) => {
+    if (isCollision(element.rect, dinoRect)) {
+      document.getElementById(element.id).remove();
+      updateScoreWithMultiplier(100);
+      return true;
+    }
+  });
+}
+
+function updateScoreWithMultiplier(delta) {
+  score += delta;
+  scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
 }
 
 function checkLose() {
@@ -91,7 +159,7 @@ function checkLose() {
   if (livesElem.textContent === '0') {
     return true;
   } //check if enemy and player are in colliding
-  else if (isEnemyAndPlayerCollision) {
+  else if (isEnemyAndPlayerCollision && !playerImmunity) {
     //check if player is not in previous collision state
     if (!collisionOccurred) {
       // decrement lives elem by 1
@@ -109,28 +177,42 @@ function checkLose() {
       //set world update pause
       worldElem.classList.add('stop-time'); // Add the class to stop time
       //set timeout for world update pause
-      setTimeout(() => {
-        worldElem.classList.remove('stop-time'); // Add the class to stop time
-      }, 750);
-      // Set a timeout to reset player collision state and player flash
+
+      // // Set a timeout to reset player collision state and player flash
       setTimeout(() => {
         collisionOccurred = false;
         dinoElem.classList.remove('flash-animation');
-      }, 2000);
+        dinoElem.classList.add('flash-light-animation');
+      }, 400);
+      setTimeout(() => {
+        collisionOccurred = false;
+        dinoElem.classList.remove('flash-light-animation');
+      }, 1600);
     }
   }
 }
 
-//wip
-// function checkLose() {
-//   const dinoRect = getDinoRect();
-//   if (
-//     getCactusRects().some((rect) => isCollision(rect, dinoRect)) &&
-//     livesElem.textContent === 0
-//   ) {
-//     return true;
-//   } else return false;
-// }
+const muteButton = document.getElementById('muteButton');
+let soundControllerMuted = false;
+
+//mute/unmute function
+muteButton.addEventListener('click', function () {
+  if (!soundControllerMuted) {
+    Object.keys(soundController).forEach(function (key) {
+      soundController[key].mute(true);
+    });
+    muteButton.textContent = 'Unmute';
+    soundControllerMuted = true;
+    muteButton.blur();
+  } else {
+    Object.keys(soundController).forEach(function (key) {
+      soundController[key].mute(false);
+    });
+    muteButton.textContent = 'Mute';
+    soundControllerMuted = false;
+    muteButton.blur();
+  }
+});
 
 function isCollision(rect1, rect2) {
   return (
@@ -176,6 +258,7 @@ function handleStart() {
   setupGround();
   setupDino();
   setupCactus();
+  setupMultiplier();
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
   window.requestAnimationFrame(update);
@@ -225,7 +308,6 @@ if (document.getElementById('submit-button')) {
 }
 
 function handleLose() {
-  console.log(highScoreElem.textContent);
   handleCheckIfHighScore(score);
   soundController.die.play();
   setDinoLose();
