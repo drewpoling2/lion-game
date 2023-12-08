@@ -295,11 +295,36 @@ td {
 
 .multiplier {
   position: absolute;
-  background-color: aquamarine;
-  height: 20px;
-  width: 20px;
-  bottom: 20px;
+  background-color: darkgreen;
+  padding: 10px;
+  line-height: 14px;
+  bottom: 120px;
   left: calc(var(--left) * 1%);
+}
+
+.coin {
+  position: absolute;
+  background-color: gold;
+  padding: 5px;
+  line-height: 14px;
+  bottom: 40px;
+  left: calc(var(--left) * 1%);
+}
+
+@keyframes floating {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.floating-item {
+  animation: floating 2.75s ease-in-out infinite; /* Adjust the duration and timing function as needed */
 }
 
 .ground {

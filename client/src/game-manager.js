@@ -23,6 +23,7 @@ import {
   updateMultiplier,
   getMultiplierRects,
 } from './elements/score-multiplier.js';
+import { setupCoin, updateCoin, getCoinRects } from './elements/coin.js';
 const WORLD_WIDTH = 82;
 const WORLD_HEIGHT = 32;
 const SPEED_SCALE_INCREASE = 0.00001;
@@ -125,8 +126,11 @@ function update(time) {
   updateSpeedScale(delta);
   updateScore(delta);
   updateMultiplier(delta, speedScale);
+  updateCoin(delta, speedScale);
   if (checkLose()) return handleLose();
-  if (checkMultiplierCollision()) lastTime = time;
+  if (checkMultiplierCollision());
+  if (checkCoinCollision());
+  lastTime = time;
   window.requestAnimationFrame(update);
 }
 
@@ -134,16 +138,43 @@ function checkMultiplierCollision() {
   const dinoRect = getDinoRect();
   getMultiplierRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
+      soundController.beatScore.play();
       document.getElementById(element.id).remove();
-      updateScoreWithMultiplier(100);
+      updateScoreWithMultiplier(1000);
       return true;
     }
   });
 }
 
+const duration = 1000;
+const updateInterval = 50;
+
 function updateScoreWithMultiplier(delta) {
-  score += delta;
-  scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+  const initialScore = score;
+  const increments = Math.ceil(duration / updateInterval);
+  const incrementAmount = delta / increments;
+
+  const intervalId = setInterval(() => {
+    score += incrementAmount;
+    scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+
+    if (score >= initialScore + delta) {
+      // Stop the interval when the target score is reached
+      clearInterval(intervalId);
+    }
+  }, updateInterval);
+}
+
+function checkCoinCollision() {
+  const dinoRect = getDinoRect();
+  getCoinRects().some((element) => {
+    if (isCollision(element.rect, dinoRect)) {
+      soundController.pickupCoin.play();
+      document.getElementById(element.id).remove();
+      updateScoreWithMultiplier(100);
+      return true;
+    }
+  });
 }
 
 function checkLose() {
@@ -259,6 +290,7 @@ function handleStart() {
   setupDino();
   setupCactus();
   setupMultiplier();
+  setupCoin();
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
   window.requestAnimationFrame(update);

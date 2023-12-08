@@ -7,8 +7,8 @@ import {
 const multiplierPositions = [];
 
 const SPEED = 0.05;
-const MULTIPLIER_INTERVAL_MIN = 500;
-const MULTIPLIER_INTERVAL_MAX = 2000;
+const MULTIPLIER_INTERVAL_MIN = 4000;
+const MULTIPLIER_INTERVAL_MAX = 6000;
 const worldElem = document.querySelector('[data-world]');
 
 let nextMultiplierTime;
@@ -17,34 +17,6 @@ export function setupMultiplier() {
   document.querySelectorAll('[data-multiplier]').forEach((multiplier) => {
     multiplier.remove();
   });
-}
-
-function isPositionOccupied(position) {
-  return multiplierPositions.includes(position);
-}
-
-function generateRandomMultiplier() {
-  const minMultipliers = 1;
-  const maxMultipliers = 3; // Adjust the range as needed
-
-  const numberOfMultipliers = randomNumberBetween(
-    minMultipliers,
-    maxMultipliers
-  );
-
-  for (let i = 0; i < numberOfMultipliers; i++) {
-    let newPosition;
-
-    do {
-      newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
-    } while (isPositionOccupied(newPosition));
-
-    multiplierPositions.push(newPosition);
-    createMultipliers(newPosition);
-  }
-
-  // Clear multiplier positions for the next round (optional)
-  multiplierPositions.length = 0;
 }
 
 export function updateMultiplier(delta, speedScale) {
@@ -60,7 +32,7 @@ export function updateMultiplier(delta, speedScale) {
   });
 
   if (nextMultiplierTime <= 0) {
-    generateRandomMultiplier();
+    createMultipliers();
     nextMultiplierTime =
       randomNumberBetween(MULTIPLIER_INTERVAL_MIN, MULTIPLIER_INTERVAL_MAX) /
       speedScale;
@@ -79,12 +51,13 @@ export function getMultiplierRects() {
   );
 }
 
-function createMultipliers(newPosition) {
-  const multiplier = document.createElement('img');
+function createMultipliers() {
+  const multiplier = document.createElement('div');
   multiplier.dataset.multiplier = true;
-  multiplier.classList.add('multiplier');
+  multiplier.textContent = 'm';
+  multiplier.classList.add('multiplier', 'floating-item');
   multiplier.id = Math.random().toString(16).slice(2);
-  setCustomProperty(multiplier, '--left', newPosition);
+  setCustomProperty(multiplier, '--left', 100);
 
   worldElem.append(multiplier);
 }

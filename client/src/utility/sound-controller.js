@@ -12,4 +12,8 @@ export const soundController = {
     src: ['sounds/beatScore.wav'],
     volume: 0.075,
   }),
+  pickupCoin: new Howl({
+    src: ['sounds/pickupCoin.wav'],
+    volume: 0.075,
+  }),
 };

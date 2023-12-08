@@ -42,15 +42,18 @@ export function setupDino() {
   if (isMobileDevice()) {
     document.removeEventListener('touchstart', onJump);
     document.addEventListener('touchstart', onJump);
+    document.addEventListener('touchstart', onDive);
   } else {
     document.removeEventListener('keydown', onJump);
     document.addEventListener('keydown', onJump);
+    document.addEventListener('keydown', onDive);
   }
 }
 
 export function updateDino(delta, speedScale) {
   handleRun(delta, speedScale);
   handleJump(delta);
+  handleDive(delta);
 }
 
 export function getDinoRect() {
@@ -106,4 +109,32 @@ function onJump(e) {
   yVelocity = JUMP_SPEED;
   isJumping = true;
   jumpCount++;
+}
+
+const DIVE_SPEED = 0.2; // Adjust the dive speed as needed
+let isDiving = false;
+
+function handleDive(delta) {
+  if (!isDiving) return;
+  incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
+
+  if (getCustomProperty(dinoElem, '--bottom') <= 0) {
+    setCustomProperty(dinoElem, '--bottom', 0);
+    isDiving = false;
+    jumpCount = 0;
+  }
+  yVelocity -= GRAVITY * delta;
+}
+
+function onDive(e) {
+  if ((e.code !== 'ArrowDown' && e.type !== 'touchstart') || isDiving) return;
+
+  yVelocity = -DIVE_SPEED; // Negative value for diving down
+  isDiving = true;
+
+  // Add any additional logic you need for the dive action
+
+  // Optional: You might want to reset isJumping and jumpCount here if needed
+  isJumping = false;
+  jumpCount = 0;
 }
