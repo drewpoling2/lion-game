@@ -10,32 +10,34 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Pixelify+Sans&family=Press+Start+2P&family=VT323&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Pixelify+Sans&family=Press+Start+2P&family=VT323&display=swap&family=Roboto+Mono&display=swap"
       rel="stylesheet"
     />
     <script src="../game-manager.js" type="module"></script>
   </head>
   <body>
-    <div class="high-score-label">HIGH</div>
-    <div class="high-score" data-high-score>000000</div>
-    <div class="score-label">SCORE</div>
-    <div class="score" data-score>000000</div>
-    <div class="lives-label uppercase">lives</div>
-    <div class="lives" data-lives>1</div>
-    <!-- <button id="muteButton">Mute/unmute</button> -->
-    <!-- <div class="title">Lion Game</div>
+    <div class="flex-col">
+      <div class="high-score-label">HIGH</div>
+      <div class="high-score" data-high-score>000000</div>
+      <div class="score-label">SCORE</div>
+      <div class="score" data-score>000000</div>
+      <div class="lives-label uppercase">lives</div>
+      <div class="lives" data-lives>1</div>
+      <div class="timer" data-multiplier-timer>0</div>
+      <div class="current-multiplier sans" data-current-multiplier></div>
+      <!-- <div class="title">Lion Game</div>
     <div class="hint">Press space to jump the lion</div> -->
-    <div class="world" data-world>
-      <div class="game-over-screen hide" data-game-over-screen>Game over</div>
-      <div class="start-screen blink" data-start-screen>
-        Press Any Key To Start
-      </div>
-      <img src="imgs/ground.png" class="ground" data-ground />
-      <img src="imgs/ground.png" class="ground" data-ground />
-      <img src="imgs/dino-stationary.png" class="dino" data-dino />
-      <!-- <div class="multiplier">multiplier</div> -->
-      <!-- new high score form -->
-      <!-- <div class="flex-col w-fit enter-initials-form">
+      <div class="world" data-world>
+        <div class="game-over-screen hide" data-game-over-screen>Game over</div>
+        <div class="start-screen blink" data-start-screen>
+          Press Any Key To Start
+        </div>
+        <img src="imgs/ground.png" class="ground" data-ground />
+        <img src="imgs/ground.png" class="ground" data-ground />
+        <img src="imgs/dino-stationary.png" class="dino" data-dino />
+        <!-- <div class="multiplier">multiplier</div> -->
+        <!-- new high score form -->
+        <!-- <div class="flex-col w-fit enter-initials-form">
         <div class="uppercase sans" style="margin-bottom: 5px">
           Enter your initials!
         </div>
@@ -73,23 +75,23 @@
           Submit
         </button>
       </div> -->
-      <!-- end -->
+        <!-- end -->
 
-      <script>
-        function handleInput(input) {
-          const maxLength = parseInt(input.getAttribute('maxlength'));
-          const value = input.value;
+        <script>
+          function handleInput(input) {
+            const maxLength = parseInt(input.getAttribute('maxlength'));
+            const value = input.value;
 
-          if (value.length >= maxLength) {
-            // Focus on the submit button
-            document.getElementById('submit-button').focus();
+            if (value.length >= maxLength) {
+              // Focus on the submit button
+              document.getElementById('submit-button').focus();
+            }
           }
-        }
-      </script>
+        </script>
 
-      <!-- leaderboard -->
-      <!-- <button class="pixel2" data-play-again>Play Again</button> -->
-      <!-- <div class="leaderboard scrollable-table" data-scrollable-table>
+        <!-- leaderboard -->
+        <!-- <button class="pixel2" data-play-again>Play Again</button> -->
+        <!-- <div class="leaderboard scrollable-table" data-scrollable-table>
         <div class="leaderboard-title">TOP 100</div>
         <table class="leaderboard-table" style="border-collapse: collapse">
           <thead>
@@ -101,8 +103,83 @@
           </thead>
           <tbody data-leaderboard-body></tbody>
         </table>
-      </div> --> 
-      <!-- end
+      </div> -->
+      </div>
+      <div class="flex-row justify-between bottom-interface-container">
+        <div class="ticker">
+          <div class="flex-row ticker-list" data-ticker>
+            <div class="flex-row">
+              <div class="ticker-item">1</div>
+              <div class="ticker-item">2</div>
+              <div class="ticker-item">3</div>
+              <div class="ticker-item">4</div>
+              <div class="ticker-item">5</div>
+              <div class="ticker-item">6</div>
+              <div class="ticker-item">7</div>
+              <div class="ticker-item">1</div>
+              <div class="ticker-item">2</div>
+              <div class="ticker-item">3</div>
+              <div class="ticker-item">4</div>
+              <div class="ticker-item">5</div>
+              <div class="ticker-item">6</div>
+              <div class="ticker-item">7</div>
+              <div class="ticker-item">1</div>
+              <div class="ticker-item">2</div>
+              <div class="ticker-item">3</div>
+              <div class="ticker-item">4</div>
+              <div class="ticker-item">5</div>
+              <div class="ticker-item">6</div>
+              <div class="ticker-item">7</div>
+              <div class="ticker-item">1</div>
+              <div class="ticker-item">2</div>
+              <div class="ticker-item">3</div>
+              <div class="ticker-item">4</div>
+              <div class="ticker-item">5</div>
+              <div class="ticker-item">6</div>
+              <div class="ticker-item">7</div>
+            </div>
+            <div class="flex-row">
+              <div class="ticker-item">1</div>
+              <div class="ticker-item">2</div>
+              <div class="ticker-item">3</div>
+              <div class="ticker-item">4</div>
+              <div class="ticker-item">5</div>
+              <div class="ticker-item">6</div>
+              <div class="ticker-item">7</div>
+              <div class="ticker-item">1</div>
+              <div class="ticker-item">2</div>
+              <div class="ticker-item">3</div>
+              <div class="ticker-item">4</div>
+              <div class="ticker-item">5</div>
+              <div class="ticker-item">6</div>
+              <div class="ticker-item">7</div>
+              <div class="ticker-item">1</div>
+              <div class="ticker-item">2</div>
+              <div class="ticker-item">3</div>
+              <div class="ticker-item">4</div>
+              <div class="ticker-item">5</div>
+              <div class="ticker-item">6</div>
+              <div class="ticker-item">7</div>
+              <div class="ticker-item">1</div>
+              <div class="ticker-item">2</div>
+              <div class="ticker-item">3</div>
+              <div class="ticker-item">4</div>
+              <div class="ticker-item">5</div>
+              <div class="ticker-item">6</div>
+              <div class="ticker-item">7</div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-row">
+          <button data-leaderboard-button>top 50</button>
+          <button id="pauseButton">pause</button>
+          <button id="muteButton">mute</button>
+          <button class="tooltip">
+            help
+            <span class="tooltiptext">Tooltip text</span>
+          </button>
+        </div>
+      </div>
     </div>
   </body>
 </html>

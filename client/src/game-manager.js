@@ -24,10 +24,10 @@ import {
   getMultiplierRects,
 } from './elements/score-multiplier.js';
 import { setupCoin, updateCoin, getCoinRects } from './elements/coin.js';
-const WORLD_WIDTH = 82;
+const WORLD_WIDTH = 95;
 const WORLD_HEIGHT = 32;
 const SPEED_SCALE_INCREASE = 0.00001;
-
+let multiplierRatio = 1;
 const worldElem = document.querySelector('[data-world]');
 const scoreElem = document.querySelector('[data-score]');
 const highScoreElem = document.querySelector('[data-high-score]');
@@ -41,9 +41,14 @@ const scoreNewHighScoreElem = document.querySelector(
 const scoreErrorMessageElem = document.querySelector(
   '[data-score-error-message]'
 );
-
+const multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
+const tickerElem = document.querySelector('[data-ticker]');
 const livesElem = document.querySelector('[data-lives]');
 const dinoElem = document.querySelector('[data-dino]');
+const currentMultiplierElem = document.querySelector(
+  '[data-current-multiplier]'
+);
+const plusPointsElem = document.querySelector('[data-plus-points]');
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
@@ -72,19 +77,18 @@ let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
 // Function to toggle the pause state
 function togglePause() {
   isPaused = !isPaused;
-
   if (isPaused) {
-    // Record the start time of the pause
-    // pauseStartTime = performance.now();
   } else {
-    // Calculate the total pause duration
-    // pauseDuration += performance.now() - pauseStartTime;
-    // isFirstFrameAfterCollision = false;
-
-    // Trigger the next animation frame
     window.requestAnimationFrame(update);
   }
 }
+
+const pauseButton = document.getElementById('pauseButton');
+
+pauseButton.addEventListener('click', function () {
+  togglePause();
+  pauseButton.blur();
+});
 
 // Function to set player immunity
 function setPlayerImmunity() {
@@ -134,13 +138,43 @@ function update(time) {
   window.requestAnimationFrame(update);
 }
 
+let multiplierTimer = 5;
+let timerInterval;
+
+function startMultiplierTimer() {
+  //reset the old timer
+  clearInterval(timerInterval);
+  multiplierTimer = 5;
+  multiplierTimerElem.textContent = multiplierTimer;
+
+  //start new interval
+  timerInterval = setInterval(() => {
+    multiplierTimer--;
+    if (multiplierTimer === 0) {
+      clearInterval(timerInterval);
+      console.log('hit');
+      multiplierTimerElem.textContent = '';
+      // Reset the timer and multiplier when the countdown ends
+      multiplierTimer = 5;
+      multiplierRatio = 1;
+      currentMultiplierElem.textContent = 1;
+    } else {
+      multiplierTimerElem.textContent = multiplierTimer;
+    }
+  }, 1000); // Update the timer every second (1000 milliseconds)
+}
+
 function checkMultiplierCollision() {
   const dinoRect = getDinoRect();
   getMultiplierRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
       soundController.beatScore.play();
       document.getElementById(element.id).remove();
-      updateScoreWithMultiplier(1000);
+      clearInterval(timerInterval);
+      startMultiplierTimer();
+      // Multiply the existing multiplier by the newly collided multiplier
+      multiplierRatio *= parseInt(element.multiplier);
+      currentMultiplierElem.textContent = multiplierRatio;
       return true;
     }
   });
@@ -149,7 +183,48 @@ function checkMultiplierCollision() {
 const duration = 1000;
 const updateInterval = 50;
 
-function updateScoreWithMultiplier(delta) {
+function randomArc(element) {
+  // Set random horizontal movement values
+  const randomXEnd = Math.random() * 100 - 50; // Adjust the range based on your preference
+  console.log(randomXEnd);
+  document.documentElement.style.setProperty(
+    '--random-x-end',
+    randomXEnd + 'px'
+  );
+}
+
+function calculateFontSize(points) {
+  return Math.min(17 + points * 0.05, 35);
+}
+
+function checkCoinCollision() {
+  const dinoRect = getDinoRect();
+  getCoinRects().some((element) => {
+    if (isCollision(element.rect, dinoRect)) {
+      soundController.pickupCoin.play();
+      const coinElement = document.getElementById(element.id);
+      const newElement = document.createElement('div');
+      newElement.classList.add('plus-points', 'sans');
+      newElement.style.position = 'absolute';
+      newElement.style.left = coinElement.offsetLeft + 'px';
+      newElement.style.top = coinElement.offsetTop - 70 + 'px';
+      randomArc(newElement);
+      coinElement.parentNode.insertBefore(newElement, coinElement);
+      coinElement.remove();
+      const points = 100 * multiplierRatio;
+      updateScoreWithPoints(points);
+      const fontSize = calculateFontSize(points);
+      newElement.style.fontSize = fontSize + 'px';
+      newElement.textContent = `+${points}`;
+      setTimeout(() => {
+        newElement.remove();
+      }, 600);
+      return true;
+    }
+  });
+}
+
+function updateScoreWithPoints(delta) {
   const initialScore = score;
   const increments = Math.ceil(duration / updateInterval);
   const incrementAmount = delta / increments;
@@ -163,18 +238,6 @@ function updateScoreWithMultiplier(delta) {
       clearInterval(intervalId);
     }
   }, updateInterval);
-}
-
-function checkCoinCollision() {
-  const dinoRect = getDinoRect();
-  getCoinRects().some((element) => {
-    if (isCollision(element.rect, dinoRect)) {
-      soundController.pickupCoin.play();
-      document.getElementById(element.id).remove();
-      updateScoreWithMultiplier(100);
-      return true;
-    }
-  });
 }
 
 function checkLose() {
@@ -285,6 +348,9 @@ function handleStart() {
   hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
+  multiplierRatio = 1;
+  console.log(multiplierRatio);
+  currentMultiplierElem.textContent = multiplierRatio;
   livesElem.textContent = 2;
   setupGround();
   setupDino();
@@ -293,6 +359,61 @@ function handleStart() {
   setupCoin();
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
+  // Get the container element where the ticker items will be appended
+  const tickerData = [
+    {
+      username: 'bap',
+      score: 'start',
+    },
+    { username: 'b4p', score: '323451' },
+    { username: 'fgp', score: '331451' },
+    { username: 'agf', score: '131451' },
+    {
+      username: 'bap',
+      score: '353451',
+    },
+    { username: 'b4p', score: '323451' },
+    { username: 'fgp', score: '331451' },
+    {
+      username: 'bap',
+      score: '353451',
+    },
+    { username: 'b4p', score: '323451' },
+    { username: 'fgp', score: '331451' },
+    { username: 'agf', score: '131451' },
+    {
+      username: 'bap',
+      score: '353451',
+    },
+    { username: 'b4p', score: '323451' },
+    { username: 'fgp', score: 'end' },
+  ];
+  // // Map over the data and create HTML elements for each item
+  // tickerData.forEach((item, index) => {
+  //   const tickerItem = document.createElement('div');
+  //   tickerItem.classList.add('ticker-item');
+  //   tickerItem.innerHTML = `${item.username} - ${item.score}`;
+  //   const tickerDivider = document.createElement('div');
+  //   tickerDivider.classList.add('ticker-divider');
+  //   tickerElem.appendChild(tickerItem);
+  //   // Add a divider after each item, except for the last one
+  //   if (index < tickerData.length - 1) {
+  //     tickerElem.appendChild(tickerDivider);
+  //   }
+  // });
+  // tickerData.forEach((item, index) => {
+  //   const tickerItem = document.createElement('div');
+  //   tickerItem.classList.add('ticker-item');
+  //   tickerItem.innerHTML = `${item.username} - ${item.score}`;
+  //   const tickerDivider = document.createElement('div');
+  //   tickerDivider.classList.add('ticker-divider');
+  //   tickerElem.appendChild(tickerItem);
+  //   // Add a divider after each item, except for the last one
+  //   if (index < tickerData.length - 1) {
+  //     tickerElem.appendChild(tickerDivider);
+  //   }
+  // });
+
   window.requestAnimationFrame(update);
 }
 
