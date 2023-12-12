@@ -3968,10 +3968,9 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-var multiplierPositions = [];
 var SPEED = 0.05;
-var MULTIPLIER_INTERVAL_MIN = 4000;
-var MULTIPLIER_INTERVAL_MAX = 6000;
+var MULTIPLIER_INTERVAL_MIN = 2000;
+var MULTIPLIER_INTERVAL_MAX = 4000;
 var worldElem = document.querySelector('[data-world]');
 var nextMultiplierTime;
 function setupMultiplier() {
@@ -3997,14 +3996,30 @@ function getMultiplierRects() {
   return _toConsumableArray(document.querySelectorAll('[data-multiplier]')).map(function (multiplier) {
     return {
       id: multiplier.id,
-      rect: multiplier.getBoundingClientRect()
+      rect: multiplier.getBoundingClientRect(),
+      multiplier: multiplier.dataset.multiplier
     };
   });
 }
+function getRandomKeyWeighted(obj) {
+  var keys = Object.keys(obj);
+  var probabilities = [0.7, 0.2, 0.1]; // Adjust probabilities as needed
+  var randomValue = Math.random();
+  var cumulativeProbability = 0;
+  for (var i = 0; i < keys.length; i++) {
+    cumulativeProbability += probabilities[i];
+    if (randomValue <= cumulativeProbability) {
+      return keys[i];
+    }
+  }
+
+  // Default case (fallback)
+  return keys[keys.length - 1];
+}
 function createMultipliers() {
   var multiplier = document.createElement('div');
-  multiplier.dataset.multiplier = true;
-  multiplier.textContent = 'm';
+  multiplier.dataset.multiplier = multiplierRatios[getRandomKeyWeighted(multiplierRatios)];
+  multiplier.textContent = multiplier.dataset.multiplier;
   multiplier.classList.add('multiplier', 'floating-item');
   multiplier.id = Math.random().toString(16).slice(2);
   (0, _updateCustomProperty.setCustomProperty)(multiplier, '--left', 100);
@@ -4013,6 +4028,11 @@ function createMultipliers() {
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
+var multiplierRatios = {
+  x2: 2,
+  x5: 5,
+  x10: 10
+};
 },{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"../elements/coin.js":[function(require,module,exports) {
 "use strict";
 
@@ -4090,9 +4110,10 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-var WORLD_WIDTH = 82;
+var WORLD_WIDTH = 95;
 var WORLD_HEIGHT = 32;
 var SPEED_SCALE_INCREASE = 0.00001;
+var multiplierRatio = 1;
 var worldElem = document.querySelector('[data-world]');
 var scoreElem = document.querySelector('[data-score]');
 var highScoreElem = document.querySelector('[data-high-score]');
@@ -4102,8 +4123,12 @@ var leaderboardElem = document.querySelector('[data-leaderboard-body]');
 var scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
 var scoreNewHighScoreElem = document.querySelector('[data-score-new-high-score]');
 var scoreErrorMessageElem = document.querySelector('[data-score-error-message]');
+var multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
+var tickerElem = document.querySelector('[data-ticker]');
 var livesElem = document.querySelector('[data-lives]');
 var dinoElem = document.querySelector('[data-dino]');
+var currentMultiplierElem = document.querySelector('[data-current-multiplier]');
+var plusPointsElem = document.querySelector('[data-plus-points]');
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
@@ -4134,18 +4159,15 @@ var immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
 // Function to toggle the pause state
 function togglePause() {
   isPaused = !isPaused;
-  if (isPaused) {
-    // Record the start time of the pause
-    // pauseStartTime = performance.now();
-  } else {
-    // Calculate the total pause duration
-    // pauseDuration += performance.now() - pauseStartTime;
-    // isFirstFrameAfterCollision = false;
-
-    // Trigger the next animation frame
+  if (isPaused) {} else {
     window.requestAnimationFrame(update);
   }
 }
+var pauseButton = document.getElementById('pauseButton');
+pauseButton.addEventListener('click', function () {
+  togglePause();
+  pauseButton.blur();
+});
 
 // Function to set player immunity
 function setPlayerImmunity() {
@@ -4192,20 +4214,84 @@ function update(time) {
   lastTime = time;
   window.requestAnimationFrame(update);
 }
+var multiplierTimer = 5;
+var timerInterval;
+function startMultiplierTimer() {
+  //reset the old timer
+  clearInterval(timerInterval);
+  multiplierTimer = 5;
+  multiplierTimerElem.textContent = multiplierTimer;
+
+  //start new interval
+  timerInterval = setInterval(function () {
+    multiplierTimer--;
+    if (multiplierTimer === 0) {
+      clearInterval(timerInterval);
+      console.log('hit');
+      multiplierTimerElem.textContent = '';
+      // Reset the timer and multiplier when the countdown ends
+      multiplierTimer = 5;
+      multiplierRatio = 1;
+      currentMultiplierElem.textContent = 1;
+    } else {
+      multiplierTimerElem.textContent = multiplierTimer;
+    }
+  }, 1000); // Update the timer every second (1000 milliseconds)
+}
+
 function checkMultiplierCollision() {
   var dinoRect = (0, _dino.getDinoRect)();
   (0, _scoreMultiplier.getMultiplierRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       _soundController.soundController.beatScore.play();
       document.getElementById(element.id).remove();
-      updateScoreWithMultiplier(1000);
+      clearInterval(timerInterval);
+      startMultiplierTimer();
+      // Multiply the existing multiplier by the newly collided multiplier
+      multiplierRatio *= parseInt(element.multiplier);
+      currentMultiplierElem.textContent = multiplierRatio;
       return true;
     }
   });
 }
 var duration = 1000;
 var updateInterval = 50;
-function updateScoreWithMultiplier(delta) {
+function randomArc(element) {
+  // Set random horizontal movement values
+  var randomXEnd = Math.random() * 100 - 50; // Adjust the range based on your preference
+  console.log(randomXEnd);
+  document.documentElement.style.setProperty('--random-x-end', randomXEnd + 'px');
+}
+function calculateFontSize(points) {
+  return Math.min(17 + points * 0.05, 35);
+}
+function checkCoinCollision() {
+  var dinoRect = (0, _dino.getDinoRect)();
+  (0, _coin.getCoinRects)().some(function (element) {
+    if (isCollision(element.rect, dinoRect)) {
+      _soundController.soundController.pickupCoin.play();
+      var coinElement = document.getElementById(element.id);
+      var newElement = document.createElement('div');
+      newElement.classList.add('plus-points', 'sans');
+      newElement.style.position = 'absolute';
+      newElement.style.left = coinElement.offsetLeft + 'px';
+      newElement.style.top = coinElement.offsetTop - 70 + 'px';
+      randomArc(newElement);
+      coinElement.parentNode.insertBefore(newElement, coinElement);
+      coinElement.remove();
+      var points = 100 * multiplierRatio;
+      updateScoreWithPoints(points);
+      var fontSize = calculateFontSize(points);
+      newElement.style.fontSize = fontSize + 'px';
+      newElement.textContent = "+".concat(points);
+      setTimeout(function () {
+        newElement.remove();
+      }, 600);
+      return true;
+    }
+  });
+}
+function updateScoreWithPoints(delta) {
   var initialScore = score;
   var increments = Math.ceil(duration / updateInterval);
   var incrementAmount = delta / increments;
@@ -4217,17 +4303,6 @@ function updateScoreWithMultiplier(delta) {
       clearInterval(intervalId);
     }
   }, updateInterval);
-}
-function checkCoinCollision() {
-  var dinoRect = (0, _dino.getDinoRect)();
-  (0, _coin.getCoinRects)().some(function (element) {
-    if (isCollision(element.rect, dinoRect)) {
-      _soundController.soundController.pickupCoin.play();
-      document.getElementById(element.id).remove();
-      updateScoreWithMultiplier(100);
-      return true;
-    }
-  });
 }
 function checkLose() {
   //init dino rect
@@ -4321,6 +4396,9 @@ function handleStart() {
   hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
+  multiplierRatio = 1;
+  console.log(multiplierRatio);
+  currentMultiplierElem.textContent = multiplierRatio;
   livesElem.textContent = 2;
   (0, _ground.setupGround)();
   (0, _dino.setupDino)();
@@ -4329,6 +4407,76 @@ function handleStart() {
   (0, _coin.setupCoin)();
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
+  // Get the container element where the ticker items will be appended
+  var tickerData = [{
+    username: 'bap',
+    score: 'start'
+  }, {
+    username: 'b4p',
+    score: '323451'
+  }, {
+    username: 'fgp',
+    score: '331451'
+  }, {
+    username: 'agf',
+    score: '131451'
+  }, {
+    username: 'bap',
+    score: '353451'
+  }, {
+    username: 'b4p',
+    score: '323451'
+  }, {
+    username: 'fgp',
+    score: '331451'
+  }, {
+    username: 'bap',
+    score: '353451'
+  }, {
+    username: 'b4p',
+    score: '323451'
+  }, {
+    username: 'fgp',
+    score: '331451'
+  }, {
+    username: 'agf',
+    score: '131451'
+  }, {
+    username: 'bap',
+    score: '353451'
+  }, {
+    username: 'b4p',
+    score: '323451'
+  }, {
+    username: 'fgp',
+    score: 'end'
+  }];
+  // // Map over the data and create HTML elements for each item
+  // tickerData.forEach((item, index) => {
+  //   const tickerItem = document.createElement('div');
+  //   tickerItem.classList.add('ticker-item');
+  //   tickerItem.innerHTML = `${item.username} - ${item.score}`;
+  //   const tickerDivider = document.createElement('div');
+  //   tickerDivider.classList.add('ticker-divider');
+  //   tickerElem.appendChild(tickerItem);
+  //   // Add a divider after each item, except for the last one
+  //   if (index < tickerData.length - 1) {
+  //     tickerElem.appendChild(tickerDivider);
+  //   }
+  // });
+  // tickerData.forEach((item, index) => {
+  //   const tickerItem = document.createElement('div');
+  //   tickerItem.classList.add('ticker-item');
+  //   tickerItem.innerHTML = `${item.username} - ${item.score}`;
+  //   const tickerDivider = document.createElement('div');
+  //   tickerDivider.classList.add('ticker-divider');
+  //   tickerElem.appendChild(tickerItem);
+  //   // Add a divider after each item, except for the last one
+  //   if (index < tickerData.length - 1) {
+  //     tickerElem.appendChild(tickerDivider);
+  //   }
+  // });
+
   window.requestAnimationFrame(update);
 }
 function handleCheckLeaderboardHighScore(score) {
@@ -4431,7 +4579,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62083" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49640" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
