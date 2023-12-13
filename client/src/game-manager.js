@@ -43,12 +43,16 @@ const scoreErrorMessageElem = document.querySelector(
 );
 const multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
 const tickerElem = document.querySelector('[data-ticker]');
+const tickerElem2 = document.querySelector('[data-ticker2]');
+const tickerElem3 = document.querySelector('[data-ticker3]');
 const livesElem = document.querySelector('[data-lives]');
 const dinoElem = document.querySelector('[data-dino]');
+const scrollableTableElem = document.querySelector('[data-scrollable-table]');
 const currentMultiplierElem = document.querySelector(
   '[data-current-multiplier]'
 );
 const plusPointsElem = document.querySelector('[data-plus-points]');
+const tickerContainerElem = document.querySelector('[data-ticker-container]');
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
@@ -56,7 +60,7 @@ const plusPointsElem = document.querySelector('[data-plus-points]');
 // });
 
 setPixelToWorldScale();
-// createLeaderboard(leaderboardElem);
+createLeaderboard(leaderboardElem);
 window.addEventListener('resize', setPixelToWorldScale);
 document.addEventListener('keydown', handleStart, { once: true });
 document.addEventListener('touchstart', handleStart, { once: true });
@@ -73,6 +77,9 @@ let hasBeatenScore = false;
 let isPaused = false;
 let playerImmunity = false;
 let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
+scrollableTableElem.classList.add('hide-element');
+tickerContainerElem.classList.add('hide-element');
+tickerContainerElem.classList.remove('show-element');
 
 // Function to toggle the pause state
 function togglePause() {
@@ -362,57 +369,70 @@ function handleStart() {
   // Get the container element where the ticker items will be appended
   const tickerData = [
     {
-      username: 'bap',
+      username: 'bap1',
       score: 'start',
     },
-    { username: 'b4p', score: '323451' },
-    { username: 'fgp', score: '331451' },
-    { username: 'agf', score: '131451' },
+    { username: 'b4p2', score: '323451' },
+    { username: 'fgp3', score: '331451' },
+    { username: 'agf4', score: '131451' },
     {
-      username: 'bap',
+      username: 'bap5',
       score: '353451',
     },
-    { username: 'b4p', score: '323451' },
+    { username: 'b4p6', score: '323451' },
     { username: 'fgp', score: '331451' },
     {
-      username: 'bap',
+      username: 'bap7',
       score: '353451',
     },
-    { username: 'b4p', score: '323451' },
-    { username: 'fgp', score: '331451' },
-    { username: 'agf', score: '131451' },
+    { username: 'b4p8', score: '323451' },
+    { username: 'fgp9', score: '331451' },
+    { username: 'agf10', score: '131451' },
     {
-      username: 'bap',
+      username: 'bap11',
       score: '353451',
     },
-    { username: 'b4p', score: '323451' },
-    { username: 'fgp', score: 'end' },
+    { username: 'b4p12', score: '323451' },
+    { username: 'fgp13', score: 'end' },
   ];
-  // // Map over the data and create HTML elements for each item
-  // tickerData.forEach((item, index) => {
-  //   const tickerItem = document.createElement('div');
-  //   tickerItem.classList.add('ticker-item');
-  //   tickerItem.innerHTML = `${item.username} - ${item.score}`;
-  //   const tickerDivider = document.createElement('div');
-  //   tickerDivider.classList.add('ticker-divider');
-  //   tickerElem.appendChild(tickerItem);
-  //   // Add a divider after each item, except for the last one
-  //   if (index < tickerData.length - 1) {
-  //     tickerElem.appendChild(tickerDivider);
-  //   }
-  // });
-  // tickerData.forEach((item, index) => {
-  //   const tickerItem = document.createElement('div');
-  //   tickerItem.classList.add('ticker-item');
-  //   tickerItem.innerHTML = `${item.username} - ${item.score}`;
-  //   const tickerDivider = document.createElement('div');
-  //   tickerDivider.classList.add('ticker-divider');
-  //   tickerElem.appendChild(tickerItem);
-  //   // Add a divider after each item, except for the last one
-  //   if (index < tickerData.length - 1) {
-  //     tickerElem.appendChild(tickerDivider);
-  //   }
-  // });
+  tickerData.forEach((item, index) => {
+    const tickerItem = document.createElement('div');
+    tickerItem.classList.add('ticker__item');
+    tickerItem.innerHTML = `${item.username} - ${item.score}`;
+    const tickerDivider = document.createElement('div');
+    tickerDivider.classList.add('ticker-divider');
+    tickerElem.appendChild(tickerItem);
+    // Add a divider after each item, except for the last one
+    if (index < tickerData.length - 1) {
+      tickerElem.appendChild(tickerDivider);
+    }
+  });
+  tickerData.forEach((item, index) => {
+    const tickerItem = document.createElement('div');
+    tickerItem.classList.add('ticker__item');
+    tickerItem.innerHTML = `${item.username} - ${item.score}`;
+    const tickerDivider = document.createElement('div');
+    tickerDivider.classList.add('ticker-divider');
+    tickerElem2.appendChild(tickerItem);
+    // Add a divider after each item, except for the last one
+    if (index < tickerData.length - 1) {
+      tickerElem2.appendChild(tickerDivider);
+    }
+  });
+  tickerData.forEach((item, index) => {
+    const tickerItem = document.createElement('div');
+    tickerItem.classList.add('ticker__item');
+    tickerItem.innerHTML = `${item.username} - ${item.score}`;
+    const tickerDivider = document.createElement('div');
+    tickerDivider.classList.add('ticker-divider');
+    tickerElem3.appendChild(tickerItem);
+    // Add a divider after each item, except for the last one
+    if (index < tickerData.length - 1) {
+      tickerElem3.appendChild(tickerDivider);
+    }
+  });
+  tickerContainerElem.classList.add('hide-element');
+  tickerContainerElem.classList.remove('show-element');
 
   window.requestAnimationFrame(update);
 }
@@ -460,7 +480,31 @@ if (document.getElementById('submit-button')) {
     .addEventListener('click', handleSubmitNewScore);
 }
 
+document
+  .getElementById('closeLeaderboard')
+  .addEventListener('click', handleToggleLeaderboard);
+
+document
+  .getElementById('toggleLeaderboard')
+  .addEventListener('click', handleToggleLeaderboard);
+
+let showLeaderboard = false;
+
+function handleToggleLeaderboard() {
+  if (!showLeaderboard) {
+    showLeaderboard = !showLeaderboard;
+    scrollableTableElem.classList.add('show-element');
+    scrollableTableElem.classList.remove('hide-element');
+  } else {
+    showLeaderboard = !showLeaderboard;
+    scrollableTableElem.classList.remove('show-element');
+    scrollableTableElem.classList.add('hide-element');
+  }
+}
+
 function handleLose() {
+  tickerContainerElem.classList.add('show-element');
+  tickerContainerElem.classList.remove('hide-element');
   handleCheckIfHighScore(score);
   soundController.die.play();
   setDinoLose();

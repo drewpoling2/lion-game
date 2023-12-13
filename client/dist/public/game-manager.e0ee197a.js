@@ -4125,10 +4125,14 @@ var scoreNewHighScoreElem = document.querySelector('[data-score-new-high-score]'
 var scoreErrorMessageElem = document.querySelector('[data-score-error-message]');
 var multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
 var tickerElem = document.querySelector('[data-ticker]');
+var tickerElem2 = document.querySelector('[data-ticker2]');
+var tickerElem3 = document.querySelector('[data-ticker3]');
 var livesElem = document.querySelector('[data-lives]');
 var dinoElem = document.querySelector('[data-dino]');
+var scrollableTableElem = document.querySelector('[data-scrollable-table]');
 var currentMultiplierElem = document.querySelector('[data-current-multiplier]');
 var plusPointsElem = document.querySelector('[data-plus-points]');
+var tickerContainerElem = document.querySelector('[data-ticker-container]');
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
@@ -4136,7 +4140,7 @@ var plusPointsElem = document.querySelector('[data-plus-points]');
 // });
 
 setPixelToWorldScale();
-// createLeaderboard(leaderboardElem);
+(0, _leaderboard.createLeaderboard)(leaderboardElem);
 window.addEventListener('resize', setPixelToWorldScale);
 document.addEventListener('keydown', handleStart, {
   once: true
@@ -4155,6 +4159,9 @@ var hasBeatenScore = false;
 var isPaused = false;
 var playerImmunity = false;
 var immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
+scrollableTableElem.classList.add('hide-element');
+tickerContainerElem.classList.add('hide-element');
+tickerContainerElem.classList.remove('show-element');
 
 // Function to toggle the pause state
 function togglePause() {
@@ -4409,74 +4416,86 @@ function handleStart() {
   endScreenElem.classList.add('hide');
   // Get the container element where the ticker items will be appended
   var tickerData = [{
-    username: 'bap',
+    username: 'bap1',
     score: 'start'
   }, {
-    username: 'b4p',
+    username: 'b4p2',
     score: '323451'
   }, {
-    username: 'fgp',
+    username: 'fgp3',
     score: '331451'
   }, {
-    username: 'agf',
+    username: 'agf4',
     score: '131451'
   }, {
-    username: 'bap',
+    username: 'bap5',
     score: '353451'
   }, {
-    username: 'b4p',
+    username: 'b4p6',
     score: '323451'
   }, {
     username: 'fgp',
     score: '331451'
   }, {
-    username: 'bap',
+    username: 'bap7',
     score: '353451'
   }, {
-    username: 'b4p',
+    username: 'b4p8',
     score: '323451'
   }, {
-    username: 'fgp',
+    username: 'fgp9',
     score: '331451'
   }, {
-    username: 'agf',
+    username: 'agf10',
     score: '131451'
   }, {
-    username: 'bap',
+    username: 'bap11',
     score: '353451'
   }, {
-    username: 'b4p',
+    username: 'b4p12',
     score: '323451'
   }, {
-    username: 'fgp',
+    username: 'fgp13',
     score: 'end'
   }];
-  // // Map over the data and create HTML elements for each item
-  // tickerData.forEach((item, index) => {
-  //   const tickerItem = document.createElement('div');
-  //   tickerItem.classList.add('ticker-item');
-  //   tickerItem.innerHTML = `${item.username} - ${item.score}`;
-  //   const tickerDivider = document.createElement('div');
-  //   tickerDivider.classList.add('ticker-divider');
-  //   tickerElem.appendChild(tickerItem);
-  //   // Add a divider after each item, except for the last one
-  //   if (index < tickerData.length - 1) {
-  //     tickerElem.appendChild(tickerDivider);
-  //   }
-  // });
-  // tickerData.forEach((item, index) => {
-  //   const tickerItem = document.createElement('div');
-  //   tickerItem.classList.add('ticker-item');
-  //   tickerItem.innerHTML = `${item.username} - ${item.score}`;
-  //   const tickerDivider = document.createElement('div');
-  //   tickerDivider.classList.add('ticker-divider');
-  //   tickerElem.appendChild(tickerItem);
-  //   // Add a divider after each item, except for the last one
-  //   if (index < tickerData.length - 1) {
-  //     tickerElem.appendChild(tickerDivider);
-  //   }
-  // });
-
+  tickerData.forEach(function (item, index) {
+    var tickerItem = document.createElement('div');
+    tickerItem.classList.add('ticker__item');
+    tickerItem.innerHTML = "".concat(item.username, " - ").concat(item.score);
+    var tickerDivider = document.createElement('div');
+    tickerDivider.classList.add('ticker-divider');
+    tickerElem.appendChild(tickerItem);
+    // Add a divider after each item, except for the last one
+    if (index < tickerData.length - 1) {
+      tickerElem.appendChild(tickerDivider);
+    }
+  });
+  tickerData.forEach(function (item, index) {
+    var tickerItem = document.createElement('div');
+    tickerItem.classList.add('ticker__item');
+    tickerItem.innerHTML = "".concat(item.username, " - ").concat(item.score);
+    var tickerDivider = document.createElement('div');
+    tickerDivider.classList.add('ticker-divider');
+    tickerElem2.appendChild(tickerItem);
+    // Add a divider after each item, except for the last one
+    if (index < tickerData.length - 1) {
+      tickerElem2.appendChild(tickerDivider);
+    }
+  });
+  tickerData.forEach(function (item, index) {
+    var tickerItem = document.createElement('div');
+    tickerItem.classList.add('ticker__item');
+    tickerItem.innerHTML = "".concat(item.username, " - ").concat(item.score);
+    var tickerDivider = document.createElement('div');
+    tickerDivider.classList.add('ticker-divider');
+    tickerElem3.appendChild(tickerItem);
+    // Add a divider after each item, except for the last one
+    if (index < tickerData.length - 1) {
+      tickerElem3.appendChild(tickerDivider);
+    }
+  });
+  tickerContainerElem.classList.add('hide-element');
+  tickerContainerElem.classList.remove('show-element');
   window.requestAnimationFrame(update);
 }
 function handleCheckLeaderboardHighScore(score) {
@@ -4530,7 +4549,23 @@ function _handleSubmitNewScore() {
 if (document.getElementById('submit-button')) {
   document.getElementById('submit-button').addEventListener('click', handleSubmitNewScore);
 }
+document.getElementById('closeLeaderboard').addEventListener('click', handleToggleLeaderboard);
+document.getElementById('toggleLeaderboard').addEventListener('click', handleToggleLeaderboard);
+var showLeaderboard = false;
+function handleToggleLeaderboard() {
+  if (!showLeaderboard) {
+    showLeaderboard = !showLeaderboard;
+    scrollableTableElem.classList.add('show-element');
+    scrollableTableElem.classList.remove('hide-element');
+  } else {
+    showLeaderboard = !showLeaderboard;
+    scrollableTableElem.classList.remove('show-element');
+    scrollableTableElem.classList.add('hide-element');
+  }
+}
 function handleLose() {
+  tickerContainerElem.classList.add('show-element');
+  tickerContainerElem.classList.remove('hide-element');
   handleCheckIfHighScore(score);
   _soundController.soundController.die.play();
   (0, _dino.setDinoLose)();
@@ -4579,7 +4614,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49640" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59087" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
