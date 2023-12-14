@@ -9,10 +9,28 @@
     <link rel="stylesheet" href="/styles.8986bff4.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Pixelify+Sans&family=Press+Start+2P&family=VT323&display=swap&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Pixelify+Sans&family=Press+Start+2P&family=VT323&display=swap&family=Roboto+Mono:wght@400;700&display=swa" rel="stylesheet">
     <script src="/game-manager.e0ee197a.js" type="module"></script>
   <script src="/styles.8986bff4.js"></script></head>
   <body>
+    <div class="leaderboard" data-scrollable-table="">
+      <div class="flex-row justify-between">
+        <div class="leaderboard-title">TOP 50</div>
+        <button id="closeLeaderboard">close</button>
+      </div>
+      <div class="scrollable-table">
+        <table class="leaderboard-table" style="border-collapse: collapse">
+          <thead>
+            <tr>
+              <th class="leaderboard-item"></th>
+              <th class="leaderboard-item">Score</th>
+              <th class="leaderboard-name-item">Name</th>
+            </tr>
+          </thead>
+          <tbody data-leaderboard-body=""></tbody>
+        </table>
+      </div>
+    </div>
     <div class="flex-col">
       <div class="high-score-label">HIGH</div>
       <div class="high-score" data-high-score="">000000</div>
@@ -85,92 +103,28 @@
 
         <!-- leaderboard -->
         <!-- <button class="pixel2" data-play-again>Play Again</button> -->
-        <!-- <div class="leaderboard scrollable-table" data-scrollable-table>
-        <div class="leaderboard-title">TOP 100</div>
-        <table class="leaderboard-table" style="border-collapse: collapse">
-          <thead>
-            <tr>
-              <th class="leaderboard-item"></th>
-              <th class="leaderboard-item">Score</th>
-              <th class="leaderboard-name-item">Name</th>
-            </tr>
-          </thead>
-          <tbody data-leaderboard-body></tbody>
-        </table>
-      </div> -->
       </div>
       <div class="flex-row justify-between bottom-interface-container">
-        <div class="ticker">
-          <div class="flex-row ticker-list" data-ticker="">
-            <div class="flex-row">
-              <div class="ticker-item">1</div>
-              <div class="ticker-item">2</div>
-              <div class="ticker-item">3</div>
-              <div class="ticker-item">4</div>
-              <div class="ticker-item">5</div>
-              <div class="ticker-item">6</div>
-              <div class="ticker-item">7</div>
-              <div class="ticker-item">1</div>
-              <div class="ticker-item">2</div>
-              <div class="ticker-item">3</div>
-              <div class="ticker-item">4</div>
-              <div class="ticker-item">5</div>
-              <div class="ticker-item">6</div>
-              <div class="ticker-item">7</div>
-              <div class="ticker-item">1</div>
-              <div class="ticker-item">2</div>
-              <div class="ticker-item">3</div>
-              <div class="ticker-item">4</div>
-              <div class="ticker-item">5</div>
-              <div class="ticker-item">6</div>
-              <div class="ticker-item">7</div>
-              <div class="ticker-item">1</div>
-              <div class="ticker-item">2</div>
-              <div class="ticker-item">3</div>
-              <div class="ticker-item">4</div>
-              <div class="ticker-item">5</div>
-              <div class="ticker-item">6</div>
-              <div class="ticker-item">7</div>
-            </div>
-            <div class="flex-row">
-              <div class="ticker-item">1</div>
-              <div class="ticker-item">2</div>
-              <div class="ticker-item">3</div>
-              <div class="ticker-item">4</div>
-              <div class="ticker-item">5</div>
-              <div class="ticker-item">6</div>
-              <div class="ticker-item">7</div>
-              <div class="ticker-item">1</div>
-              <div class="ticker-item">2</div>
-              <div class="ticker-item">3</div>
-              <div class="ticker-item">4</div>
-              <div class="ticker-item">5</div>
-              <div class="ticker-item">6</div>
-              <div class="ticker-item">7</div>
-              <div class="ticker-item">1</div>
-              <div class="ticker-item">2</div>
-              <div class="ticker-item">3</div>
-              <div class="ticker-item">4</div>
-              <div class="ticker-item">5</div>
-              <div class="ticker-item">6</div>
-              <div class="ticker-item">7</div>
-              <div class="ticker-item">1</div>
-              <div class="ticker-item">2</div>
-              <div class="ticker-item">3</div>
-              <div class="ticker-item">4</div>
-              <div class="ticker-item">5</div>
-              <div class="ticker-item">6</div>
-              <div class="ticker-item">7</div>
-            </div>
-          </div>
+        <div class="ticker-container" data-ticker-container="">
+          <div class="ticker-content" data-ticker=""></div>
+          <div class="ticker-divider"></div>
+          <div class="ticker-content2" data-ticker2=""></div>
+          <div class="ticker-divider"></div>
+          <div class="ticker-content3" data-ticker3=""></div>
         </div>
         <div class="flex-row">
-          <button data-leaderboard-button="">top 50</button>
+          <button id="toggleLeaderboard">top 50</button>
           <button id="pauseButton">pause</button>
           <button id="muteButton">mute</button>
           <button class="tooltip">
             help
-            <span class="tooltiptext">Tooltip text</span>
+            <span class="tooltiptext pixel-corners">
+              <div class="tooltip-container">
+                <b class="mono tooltip-heading">Controls</b>
+                <span class="mono tooltip-item">- Press space to jump!</span>
+                <span class="mono tooltip-item">- Press down to dive while in the air!</span>
+              </div>
+            </span>
           </button>
         </div>
       </div>
