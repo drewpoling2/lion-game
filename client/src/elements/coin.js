@@ -3,6 +3,7 @@ import {
   incrementCustomProperty,
   getCustomProperty,
 } from '../utility/updateCustomProperty';
+import coinImg from '../public/imgs/Coin-1.png';
 
 const coinPositions = [];
 
@@ -47,11 +48,9 @@ export function getCoinRects() {
 function createCoins() {
   const coin = document.createElement('div');
   coin.dataset.coin = true;
-  coin.textContent = 'c';
-  coin.classList.add('coin', 'floating-item');
+  coin.classList.add('coin');
   coin.id = Math.random().toString(16).slice(2);
   setCustomProperty(coin, '--left', 100);
-
   worldElem.append(coin);
 }
 

@@ -1,5 +1,13 @@
 import { updateGround, setupGround } from './elements/ground.js';
 import {
+  updateGroundLayerTwo,
+  setupGroundLayerTwo,
+} from './elements/groundLayerTwo';
+import {
+  updateGroundLayerThree,
+  setupGroundLayerThree,
+} from './elements/groundLayerThree';
+import {
   updateDino,
   setupDino,
   getDinoRect,
@@ -24,8 +32,13 @@ import {
   getMultiplierRects,
 } from './elements/score-multiplier.js';
 import { setupCoin, updateCoin, getCoinRects } from './elements/coin.js';
-const WORLD_WIDTH = 95;
-const WORLD_HEIGHT = 32;
+import muteImg from './public/imgs/icons/Mute.png';
+import unmuteImg from './public/imgs/icons/Volume.png';
+import pauseImg from './public/imgs/icons/Pause.png';
+import playImg from './public/imgs/icons/Play.png';
+import foregroundImg from './public/imgs/backgrounds/Foreground-Trees.png';
+const WORLD_WIDTH = 100;
+const WORLD_HEIGHT = 30;
 const SPEED_SCALE_INCREASE = 0.00001;
 let multiplierRatio = 1;
 const worldElem = document.querySelector('[data-world]');
@@ -58,7 +71,6 @@ const tickerContainerElem = document.querySelector('[data-ticker-container]');
 // playAgainButtonElem.addEventListener('click', function () {
 //   handleStart(); // Add any other actions you want to perform on button click
 // });
-
 setPixelToWorldScale();
 createLeaderboard(leaderboardElem);
 window.addEventListener('resize', setPixelToWorldScale);
@@ -68,7 +80,7 @@ let lastTime;
 let speedScale;
 let score;
 let collisionOccurred = false; // Flag to track collision
-
+let milestone = 10000;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
@@ -80,18 +92,20 @@ let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
 scrollableTableElem.classList.add('hide-element');
 tickerContainerElem.classList.add('hide-element');
 tickerContainerElem.classList.remove('show-element');
+const pauseIconButton = document.getElementById('pause-icon-button');
 
 // Function to toggle the pause state
 function togglePause() {
   isPaused = !isPaused;
   if (isPaused) {
+    pauseIconButton.src = playImg;
   } else {
+    pauseIconButton.src = pauseImg;
     window.requestAnimationFrame(update);
   }
 }
 
 const pauseButton = document.getElementById('pauseButton');
-
 pauseButton.addEventListener('click', function () {
   togglePause();
   pauseButton.blur();
@@ -106,6 +120,8 @@ function setPlayerImmunity() {
     playerImmunity = false;
   }, immunityDuration);
 }
+
+function updateElements() {}
 
 function update(time) {
   if (isPaused) {
@@ -132,6 +148,8 @@ function update(time) {
   }
 
   updateGround(delta, speedScale);
+  updateGroundLayerThree(delta, speedScale);
+  updateGroundLayerTwo(delta, speedScale);
   updateDino(delta, speedScale);
   updateCactus(delta, speedScale);
   updateSpeedScale(delta);
@@ -143,6 +161,22 @@ function update(time) {
   if (checkCoinCollision());
   lastTime = time;
   window.requestAnimationFrame(update);
+}
+
+function createOneUpText() {
+  soundController.beatScore.play();
+
+  const newElement = document.createElement('div');
+  newElement.classList.add('one-up', 'sans');
+  newElement.style.position = 'absolute';
+  newElement.style.left = livesElem.offsetLeft + 'px';
+  newElement.style.top = '20%';
+  livesElem.parentNode.insertBefore(newElement, livesElem);
+  newElement.textContent = '1UP';
+  setTimeout(() => {
+    newElement.remove();
+  }, 600);
+  return true;
 }
 
 let multiplierTimer = 5;
@@ -159,7 +193,6 @@ function startMultiplierTimer() {
     multiplierTimer--;
     if (multiplierTimer === 0) {
       clearInterval(timerInterval);
-      console.log('hit');
       multiplierTimerElem.textContent = '';
       // Reset the timer and multiplier when the countdown ends
       multiplierTimer = 5;
@@ -193,7 +226,6 @@ const updateInterval = 50;
 function randomArc(element) {
   // Set random horizontal movement values
   const randomXEnd = Math.random() * 100 - 50; // Adjust the range based on your preference
-  console.log(randomXEnd);
   document.documentElement.style.setProperty(
     '--random-x-end',
     randomXEnd + 'px'
@@ -264,12 +296,11 @@ function checkLose() {
     //check if player is not in previous collision state
     if (!collisionOccurred) {
       // decrement lives elem by 1
-      if (livesElem) {
-        let currentLives = parseInt(livesElem.textContent, 10);
-        if (!isNaN(currentLives)) {
-          currentLives -= 1;
-          livesElem.textContent = currentLives;
-        }
+      soundController.takeDamage.play();
+      let currentLives = parseInt(livesElem.textContent, 10);
+      if (!isNaN(currentLives)) {
+        currentLives -= 1;
+        livesElem.textContent = currentLives;
       }
       //switch player collision state to true
       collisionOccurred = true;
@@ -295,21 +326,21 @@ function checkLose() {
 
 const muteButton = document.getElementById('muteButton');
 let soundControllerMuted = false;
-
+const muteIconButton = document.getElementById('mute-icon-button');
 //mute/unmute function
 muteButton.addEventListener('click', function () {
   if (!soundControllerMuted) {
     Object.keys(soundController).forEach(function (key) {
       soundController[key].mute(true);
     });
-    muteButton.textContent = 'Unmute';
+    muteIconButton.src = muteImg;
     soundControllerMuted = true;
     muteButton.blur();
   } else {
     Object.keys(soundController).forEach(function (key) {
       soundController[key].mute(false);
     });
-    muteButton.textContent = 'Mute';
+    muteIconButton.src = unmuteImg;
     soundControllerMuted = false;
     muteButton.blur();
   }
@@ -328,6 +359,12 @@ function updateSpeedScale(delta) {
   speedScale += delta * SPEED_SCALE_INCREASE;
 }
 
+function calculateNextMilestone(currentMilestone) {
+  // You can customize the growth rate based on your requirements
+  const growthRate = 1.5; // Adjust this as needed
+  return Math.floor(currentMilestone * growthRate);
+}
+
 function updateScore(delta) {
   score += delta * 0.01;
   scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
@@ -340,6 +377,14 @@ function updateScore(delta) {
     soundController.beatScore.play();
     hasBeatenScore = true;
   }
+  if (score > milestone) {
+    createOneUpText();
+    let currentLives = parseInt(livesElem.textContent, 10);
+    currentLives += 1;
+    livesElem.textContent = currentLives;
+    milestone = calculateNextMilestone(milestone);
+    console.log(milestone);
+  }
 }
 
 function handleCheckIfHighScore(score) {
@@ -350,20 +395,25 @@ function handleCheckIfHighScore(score) {
   }
 }
 
+function setUpElements() {
+  setupGround();
+  setupGroundLayerTwo();
+  setupGroundLayerThree();
+  setupDino();
+  setupCactus();
+  setupMultiplier();
+  setupCoin();
+}
+
 function handleStart() {
   lastTime = null;
   hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
   multiplierRatio = 1;
-  console.log(multiplierRatio);
+  setUpElements();
   currentMultiplierElem.textContent = multiplierRatio;
   livesElem.textContent = 2;
-  setupGround();
-  setupDino();
-  setupCactus();
-  setupMultiplier();
-  setupCoin();
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
   // Get the container element where the ticker items will be appended
@@ -518,7 +568,7 @@ function handleLose() {
 function setPixelToWorldScale() {
   let worldToPixelScale;
   if (window.innerWidth / window.innerHeight < WORLD_WIDTH / WORLD_HEIGHT) {
-    worldToPixelScale = window.innerWidth / WORLD_WIDTH / 1.25;
+    worldToPixelScale = window.innerWidth / WORLD_WIDTH;
   } else {
     worldToPixelScale = window.innerHeight / WORLD_HEIGHT;
   }
@@ -526,3 +576,25 @@ function setPixelToWorldScale() {
   worldElem.style.width = `${WORLD_WIDTH * worldToPixelScale}px`;
   worldElem.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`;
 }
+
+function handleOrientationChange() {
+  var blackScreen = document.getElementById('blackScreen');
+
+  if ((isMobile() && window.orientation === 0) || window.orientation === 180) {
+    // Portrait orientation on mobile
+    blackScreen.style.display = 'flex';
+  } else {
+    // Hide black screen in other cases
+    blackScreen.style.display = 'none';
+  }
+}
+
+function isMobile() {
+  return /Mobi|Android/i.test(navigator.userAgent);
+}
+
+// Initial check
+handleOrientationChange();
+
+// Listen for orientation changes
+window.addEventListener('orientationchange', handleOrientationChange);

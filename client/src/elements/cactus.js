@@ -72,7 +72,7 @@ function createCactus(newPosition) {
   const cactus = document.createElement('img');
   cactus.dataset.cactus = true;
   cactus.src = cactusImg;
-  cactus.classList.add('cactus');
+  cactus.classList.add('cactus', 'game-element');
   setCustomProperty(cactus, '--left', newPosition);
   setCustomProperty(cactus, 'height', `${randomNumberBetween(13, 17)}%`);
 

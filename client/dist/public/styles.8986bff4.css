@@ -15,13 +15,54 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   font-size: 24px;
   letter-spacing: 1.5px;
+  min-height: 100vh;
 }
 
 button {
   cursor: pointer;
+}
+
+#blackScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+}
+
+.foreground {
+  --left: 0;
+  position: absolute;
+  width: 300%;
+  bottom: 0;
+  z-index: -1;
+  left: calc(var(--left) * 1%);
+}
+
+.foreground-trees {
+  --left: 0;
+  position: absolute;
+  width: 300%;
+  bottom: 0;
+  z-index: -1;
+  left: calc(var(--left) * 1%);
+}
+
+.mountains {
+  --left: 0;
+  position: absolute;
+  width: 300%;
+  bottom: -425px;
+  z-index: -1;
+  left: calc(var(--left) * 1%);
 }
 
 .world {
@@ -40,7 +81,9 @@ button {
 }
 
 .sans {
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 .submit-button {
@@ -70,7 +113,9 @@ button {
   top: 10%;
   left: 50%;
   transform: translate(-50%, 0%);
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 .timer {
@@ -79,11 +124,14 @@ button {
   top: 30%;
   left: 10%;
   transform: translate(-50%, 0%);
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 .bottom-interface-container {
-  margin-top: 40px;
+  bottom: 0px;
+  width: 100%;
 }
 
 .hide-element {
@@ -128,7 +176,7 @@ button {
 .ticker-container {
   transition: all 0.2s ease-in-out;
   display: flex;
-  width: 70vw;
+  width: 100vw;
   flex-direction: row;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -182,7 +230,9 @@ button {
   top: 5%;
   left: 50%;
   transform: translate(-50%, 0%);
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 .high-score {
@@ -190,7 +240,9 @@ button {
   font-size: 3vmin;
   top: 10%;
   left: 10%;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 .high-score-label {
@@ -198,7 +250,9 @@ button {
   font-size: 3vmin;
   top: 5%;
   left: 10%;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 .start-screen {
@@ -209,8 +263,11 @@ button {
   left: 50%;
   letter-spacing: 3px;
   transform: translate(-50%, -50%);
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
+
 .game-over-screen {
   text-transform: uppercase;
   position: absolute;
@@ -219,15 +276,20 @@ button {
   left: 50%;
   letter-spacing: 10px;
   transform: translate(-50%, -50%);
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
+
 .title {
   position: absolute;
   font-size: 6vmin;
   top: 10%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 .hint {
   position: absolute;
@@ -236,7 +298,9 @@ button {
   left: 50%;
   letter-spacing: 1px;
   transform: translate(-50%, -50%);
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 .hide {
@@ -263,7 +327,9 @@ button {
   width: fit-content;
   text-align: right;
   padding-inline: 15px;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
   font-size: 24px;
   text-transform: uppercase;
 }
@@ -281,7 +347,9 @@ td {
 
 .leaderboard-title {
   text-align: center;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
   font-size: 24px;
   text-transform: uppercase;
 }
@@ -290,7 +358,9 @@ td {
   width: fit-content;
   text-align: right;
   padding-inline: 15px;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
   font-size: 24px;
   text-transform: uppercase;
 }
@@ -298,7 +368,9 @@ td {
   width: fit-content;
   text-align: right;
   padding-inline: 15px;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
   font-size: 24px;
   text-transform: uppercase;
 }
@@ -306,7 +378,9 @@ td {
   width: fit-content;
   text-align: right;
   padding-right: 15px;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
   font-size: 24px;
   text-transform: uppercase;
 }
@@ -314,7 +388,9 @@ td {
   width: fit-content;
   text-align: right;
   padding-left: 60px;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
   font-size: 24px;
   text-transform: uppercase;
 }
@@ -334,12 +410,49 @@ td {
   color: red;
 }
 
-.lives {
+.lion-head {
+  width: 1.5%;
   position: absolute;
   font-size: 3vmin;
   top: 10%;
   left: 83%;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.lives {
+  position: absolute;
+  font-size: 3vmin;
+  top: 10%;
+  left: 86%;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+.lives-x {
+  position: absolute;
+  font-size: 3vmin;
+  top: 10%;
+  left: 84.9%;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.icon {
+  width: 30px;
+}
+
+.top-50-image {
+}
+
+.icon-button {
+  cursor: pointer;
+  display: flex;
+  height: fit-content;
+  width: fit-content;
+  background-color: lightgray;
 }
 
 .lives-label {
@@ -347,7 +460,9 @@ td {
   font-size: 3vmin;
   top: 5%;
   left: 83%;
-  font-family: 'DotGothic16', sans-serif;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 .stop-time {
@@ -411,6 +526,27 @@ td {
   transition: opacity 0.6s; /* Add a transition for the opacity property over 1 second */
 }
 
+@keyframes fadeUpNoArc {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(20px) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-30px) scale(1);
+  }
+}
+
+.one-up {
+  width: fit-content;
+  animation: fadeUpNoArc 0.6s forwards; /* Animation for fade in with upward translate */
+  transition: opacity 0.6s; /* Add a transition for the opacity property over 1 second */
+}
+
 .pixel-art-input {
   border: 2px dashed;
   border-color: transparent;
@@ -446,11 +582,33 @@ td {
 
 .coin {
   position: absolute;
-  background-color: gold;
-  padding: 5px;
-  line-height: 14px;
   bottom: 40px;
+  width: 27px;
+  height: 27px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   left: calc(var(--left) * 1%);
+  transition: none !important;
+  animation: shineCoin 2s linear infinite, floating 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
+}
+
+@keyframes shineCoin {
+  0% {
+    background-image: url('/Coin-4.0a2145f1.png');
+  }
+  70% {
+    background-image: url('/Coin-4.0a2145f1.png');
+  }
+  80% {
+    background-image: url('/Coin-1.b2590e0a.png');
+  }
+  90% {
+    background-image: url('/Coin-2.32aa1f3e.png');
+  }
+  100% {
+    background-image: url('/Coin-3.0dd0aa29.png');
+  }
 }
 
 @keyframes floating {
@@ -573,6 +731,7 @@ td {
   position: absolute;
   width: 300%;
   bottom: 0;
+  z-index: -1;
   left: calc(var(--left) * 1%);
 }
 
