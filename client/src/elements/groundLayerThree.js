@@ -11,15 +11,15 @@ const groundLayerThreeElems = document.querySelectorAll(
 
 export function setupGroundLayerThree() {
   setCustomProperty(groundLayerThreeElems[0], '--left', 0);
-  setCustomProperty(groundLayerThreeElems[1], '--left', 300);
+  setCustomProperty(groundLayerThreeElems[1], '--left', 200);
 }
 
 export function updateGroundLayerThree(delta, speedScale) {
   groundLayerThreeElems.forEach((ground) => {
     incrementCustomProperty(ground, '--left', delta * speedScale * SPEED * -1);
 
-    if (getCustomProperty(ground, '--left') <= -300) {
-      incrementCustomProperty(ground, '--left', 600);
+    if (getCustomProperty(ground, '--left') <= -200) {
+      incrementCustomProperty(ground, '--left', 400);
     }
   });
 }

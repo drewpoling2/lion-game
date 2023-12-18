@@ -1,3 +1,5 @@
+@import 'transition-style';
+
 *,
 *::before,
 *::after {
@@ -11,13 +13,15 @@
 }
 
 body {
+  image-rendering: pixelated;
   margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
+  font-size: 20px;
   letter-spacing: 1.5px;
   min-height: 100vh;
+  transition: all 0s;
 }
 
 button {
@@ -41,7 +45,7 @@ button {
 .foreground {
   --left: 0;
   position: absolute;
-  width: 300%;
+  width: 250%;
   bottom: 0;
   z-index: -1;
   left: calc(var(--left) * 1%);
@@ -50,8 +54,8 @@ button {
 .foreground-trees {
   --left: 0;
   position: absolute;
-  width: 300%;
-  bottom: 0;
+  width: 260%;
+  bottom: -12%;
   z-index: -1;
   left: calc(var(--left) * 1%);
 }
@@ -59,14 +63,25 @@ button {
 .mountains {
   --left: 0;
   position: absolute;
-  width: 300%;
-  bottom: -425px;
+  width: 200%;
+  bottom: -60%;
   z-index: -1;
   left: calc(var(--left) * 1%);
 }
 
-.world {
+.world-container {
+  border-radius: 8px;
+  border: 2px solid #555;
+  max-width: 1316px;
   overflow: hidden;
+  position: relative;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.world {
+  max-width: 1316px;
+  overflow: hidden;
+
   position: relative;
 }
 
@@ -108,11 +123,7 @@ button {
 }
 
 .score {
-  position: absolute;
-  font-size: 3vmin;
-  top: 10%;
-  left: 50%;
-  transform: translate(-50%, 0%);
+  font-size: 2.5vmin;
   font-family: 'bitcount-mono-single-square', sans-serif;
   font-weight: 500;
   font-style: normal;
@@ -120,7 +131,7 @@ button {
 
 .timer {
   position: absolute;
-  font-size: 3vmin;
+  font-size: 2.5vmin;
   top: 30%;
   left: 10%;
   transform: translate(-50%, 0%);
@@ -174,8 +185,8 @@ button {
 
 /* Apply the ticker animation to an element */
 .ticker-container {
+  display: none;
   transition: all 0.2s ease-in-out;
-  display: flex;
   width: 100vw;
   flex-direction: row;
   padding-top: 4px;
@@ -225,31 +236,79 @@ button {
 }
 
 .score-label {
-  position: absolute;
-  font-size: 3vmin;
-  top: 5%;
-  left: 50%;
-  transform: translate(-50%, 0%);
+  font-size: 2.5vmin;
+
   font-family: 'bitcount-mono-single-square', sans-serif;
   font-weight: 500;
   font-style: normal;
 }
 
-.high-score {
+.pixel-border-game-container {
+  border-style: solid;
+  border-width: 4px;
+  border-color: #cccccc;
+  border-image-slice: 2;
+  border-image-width: 1;
+  border-image-outset: 0;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><path d='M0 2h2v2H0zM2 0h2v2H2zM4 2h2v2H4zM2 4h2v2H2z' fill='%23cccccc' /></svg>");
+}
+
+.hud-container {
   position: absolute;
-  font-size: 3vmin;
-  top: 10%;
-  left: 10%;
+  bottom: 2%;
+  left: 1%;
+  z-index: 100000;
+}
+
+.inner-pixel-border-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+.pixel-borders-inset {
+  background-color: white;
+  padding: 2px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  position: relative;
+  border-style: solid;
+  border-width: 4px;
+  border-color: #000;
+  border-image-slice: 4;
+  border-image-width: 2;
+  border-image-outset: 0;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><path d='M2 2h2v2H2zM4 0h2v2H4zM10 4h2v2h-2zM0 4h2v2H0zM6 0h2v2H6zM8 2h2v2H8zM8 8h2v2H8zM6 10h2v2H6zM0 6h2v2H0zM10 6h2v2h-2zM4 10h2v2H4zM2 8h2v2H2z' fill='%23000' /></svg>");
+}
+
+.pixel-borders-inset::after {
+  border-radius: 14px;
+  border-style: solid;
+  border-width: 4px;
+  border-color: #ddd;
+  border-image-slice: 2;
+  border-image-width: 1;
+  border-image-outset: 0;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><path d='M0 2h2v2H0zM2 0h2v2H2zM4 2h2v2H4zM2 4h2v2H2z' fill='%23ddd' /></svg>");
+  content: '';
+  position: absolute;
+  z-index: 0;
+  bottom: 0;
+  right: 0;
+  border-image-width: 0 1 1 0;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+}
+
+.high-score {
+  font-size: 2.5vmin;
   font-family: 'bitcount-mono-single-square', sans-serif;
   font-weight: 500;
   font-style: normal;
 }
 
 .high-score-label {
-  position: absolute;
-  font-size: 3vmin;
-  top: 5%;
-  left: 10%;
+  font-size: 2.5vmin;
   font-family: 'bitcount-mono-single-square', sans-serif;
   font-weight: 500;
   font-style: normal;
@@ -258,7 +317,7 @@ button {
 .start-screen {
   position: absolute;
   text-transform: uppercase;
-  font-size: 3vmin;
+  font-size: 2.5vmin;
   top: 50%;
   left: 50%;
   letter-spacing: 3px;
@@ -271,7 +330,7 @@ button {
 .game-over-screen {
   text-transform: uppercase;
   position: absolute;
-  font-size: 3vmin;
+  font-size: 2.5vmin;
   top: 50%;
   left: 50%;
   letter-spacing: 10px;
@@ -279,6 +338,7 @@ button {
   font-family: 'bitcount-mono-single-square', sans-serif;
   font-weight: 500;
   font-style: normal;
+  color: white;
 }
 
 .title {
@@ -293,7 +353,7 @@ button {
 }
 .hint {
   position: absolute;
-  font-size: 2vmin;
+  font-size: 2.5vmin;
   top: 17%;
   left: 50%;
   letter-spacing: 1px;
@@ -411,30 +471,22 @@ td {
 }
 
 .lion-head {
-  width: 1.5%;
-  position: absolute;
-  font-size: 3vmin;
-  top: 10%;
-  left: 83%;
+  height: fit-content;
+  width: 18%;
+  font-size: 2.5vmin;
   font-family: 'bitcount-mono-single-square', sans-serif;
   font-weight: 500;
   font-style: normal;
 }
 
 .lives {
-  position: absolute;
-  font-size: 3vmin;
-  top: 10%;
-  left: 86%;
+  font-size: 2.5vmin;
   font-family: 'bitcount-mono-single-square', sans-serif;
   font-weight: 500;
   font-style: normal;
 }
 .lives-x {
-  position: absolute;
-  font-size: 3vmin;
-  top: 10%;
-  left: 84.9%;
+  font-size: 2.5vmin;
   font-family: 'bitcount-mono-single-square', sans-serif;
   font-weight: 500;
   font-style: normal;
@@ -456,10 +508,7 @@ td {
 }
 
 .lives-label {
-  position: absolute;
-  font-size: 3vmin;
-  top: 5%;
-  left: 83%;
+  font-size: 2.5vmin;
   font-family: 'bitcount-mono-single-square', sans-serif;
   font-weight: 500;
   font-style: normal;
@@ -520,8 +569,26 @@ td {
   }
 }
 
-.plus-points {
+.test-text {
   width: fit-content;
+  color: white;
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.outline-text {
+  text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
+    2px 2px 0 #000;
+}
+
+.plus-points {
+  font-family: 'bitcount-mono-single-square', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  width: fit-content;
+  -webkit-text-stroke: 0.5px white; /* width and color */
+  color: white;
   animation: fadeInUp 0.6s forwards; /* Animation for fade in with upward translate */
   transition: opacity 0.6s; /* Add a transition for the opacity property over 1 second */
 }
@@ -580,35 +647,95 @@ td {
   left: calc(var(--left) * 1%);
 }
 
-.coin {
+.gold-coin {
+  width: 30px;
+  height: 30px;
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  transition: none !important;
+  animation: shineGoldCoin 1.25s infinite, floating 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
+}
+
+@keyframes shineGoldCoin {
+  0% {
+    background-image: url('./imgs/gold-coin/Gold-Coin-1.png');
+  }
+  20% {
+    background-image: url('./imgs/gold-coin/Gold-Coin-2.png');
+  }
+  40% {
+    background-image: url('./imgs/gold-coin/Gold-Coin-3.png');
+  }
+  60% {
+    background-image: url('./imgs/gold-coin/Gold-Coin-4.png');
+  }
+  80% {
+    background-image: url('./imgs/gold-coin/Gold-Coin-5.png');
+  }
+  100% {
+    background-image: url('./imgs/gold-coin/Gold-Coin-1.png');
+  }
+}
+
+.red-coin {
+  width: 38px;
+  height: 38px;
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  transition: none !important;
+  animation: shineRedCoin 1.25s infinite, floating 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
+}
+
+@keyframes shineRedCoin {
+  0% {
+    background-image: url('./imgs/red-coin/Red-Coin-1.png');
+  }
+  20% {
+    background-image: url('./imgs/red-coin/Red-Coin-2.png');
+  }
+  40% {
+    background-image: url('./imgs/red-coin/Red-Coin-3.png');
+  }
+  60% {
+    background-image: url('./imgs/red-coin/Red-Coin-4.png');
+  }
+  80% {
+    background-image: url('./imgs/red-coin/Red-Coin-5.png');
+  }
+  100% {
+    background-image: url('./imgs/red-coin/Red-Coin-1.png');
+  }
+}
+
+.green-gem {
+  width: 50px;
+  height: 50px;
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  transition: none !important;
+  animation: shineGreenGem 1.25s infinite, floating 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
+}
+
+@keyframes shineGreenGem {
+  0% {
+    background-image: url('./imgs/green-gem/Green-Gem-1.png');
+  }
+  33% {
+    background-image: url('./imgs/green-gem/Green-Gem-2.png');
+  }
+  66% {
+    background-image: url('./imgs/green-gem/Green-Gem-3.png');
+  }
+  100% {
+    background-image: url('./imgs/green-gem/Green-Gem-4.png');
+  }
+}
+
+.collectable {
+  --bottom: 23.5;
+  bottom: calc(var(--bottom) * 1%);
+  left: calc(var(--left) * 1%);
   position: absolute;
-  bottom: 40px;
-  width: 27px;
-  height: 27px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  left: calc(var(--left) * 1%);
-  transition: none !important;
-  animation: shineCoin 2s linear infinite, floating 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
-}
-
-@keyframes shineCoin {
-  0% {
-    background-image: url('./imgs/Coin-4.png');
-  }
-  70% {
-    background-image: url('./imgs/Coin-4.png');
-  }
-  80% {
-    background-image: url('./imgs/Coin-1.png');
-  }
-  90% {
-    background-image: url('./imgs/Coin-2.png');
-  }
-  100% {
-    background-image: url('./imgs/Coin-3.png');
-  }
 }
 
 @keyframes floating {
@@ -616,7 +743,7 @@ td {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-9px);
+    transform: translateY(-19px);
   }
   100% {
     transform: translateY(0);
@@ -729,25 +856,94 @@ td {
 .ground {
   --left: 0;
   position: absolute;
-  width: 300%;
-  bottom: 0;
+  width: 250%;
+  bottom: -12%;
   z-index: -1;
   left: calc(var(--left) * 1%);
 }
 
 .dino {
-  --bottom: 0;
+  --bottom: 17.5;
   position: absolute;
   left: 8%;
-  height: 15%;
+  height: 20.5%;
   bottom: calc(var(--bottom) * 1%);
 }
 
+@keyframes circle-in-center {
+  from {
+    clip-path: circle(0%);
+  }
+  to {
+    clip-path: circle(80%);
+  }
+}
+
+[transition-style='in:circle:center'] {
+  animation: 4s cubic-bezier(0.25, 1, 0.3, 1) circle-in-center both;
+}
+
+@keyframes circle-out-hesitate {
+  0% {
+    clip-path: circle(100%);
+  }
+  40% {
+    clip-path: circle(30%);
+  }
+  100% {
+    clip-path: circle(0%);
+  }
+}
+
+[transition-style='out:circle:hesitate'] {
+  animation: 2.5s cubic-bezier(0.25, 1, 0.3, 1) circle-out-hesitate both;
+}
+
+@keyframes circle-in-hesitate {
+  0% {
+    clip-path: circle(0%);
+  }
+  40% {
+    clip-path: circle(30%);
+  }
+  100% {
+    clip-path: circle(100%);
+  }
+}
+
+[transition-style='in:circle:hesitate'] {
+  animation: 3s cubic-bezier(0.25, 1, 0.3, 1) circle-in-hesitate both;
+}
+
+.test {
+  background-color: #000;
+  inline-size: 100%;
+  overflow: hidden;
+}
+
+.leap {
+  display: flex;
+  animation: leapAnimation 1.5s ease forwards;
+}
+
+@keyframes leapAnimation {
+  0% {
+    transform: translateX(0%) translateY(0);
+  }
+  60% {
+    transform: translateX(500%) translateY(-300px);
+  }
+  100% {
+    transform: translateX(500%) translateY(400px);
+  }
+}
+
 .cactus {
+  --bottom: 17.5;
   position: absolute;
   left: calc(var(--left) * 1%);
   height: 15%;
-  bottom: 0;
+  bottom: calc(var(--bottom) * 1%);
 }
 
 .pixel,

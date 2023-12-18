@@ -3,8 +3,10 @@ import {
   incrementCustomProperty,
   getCustomProperty,
 } from '../utility/updateCustomProperty';
-import cactusImg from '../public/imgs/cactus.png';
-
+import tree1 from '../public/imgs/trees/Bush-Tree.png';
+import tree2 from '../public/imgs/trees/Round-Tree.png';
+import tree3 from '../public/imgs/trees/Pine-Tree.png';
+import snowball from '../public/imgs/Obstacles/Snowball-Small.png';
 const cactiPositions = [];
 
 const SPEED = 0.05;
@@ -68,10 +70,38 @@ export function getCactusRects() {
   });
 }
 
+// Array of possible cactus images with associated weights
+const cactusImages = [
+  { src: tree1, weight: 5 },
+  { src: tree2, weight: 1 },
+  { src: tree3, weight: 2 },
+  { src: snowball, weight: 3 },
+  // Add more image sources with corresponding weights
+];
+
 function createCactus(newPosition) {
+  // Calculate the total weight
+  const totalWeight = cactusImages.reduce(
+    (sum, image) => sum + image.weight,
+    0
+  );
+
+  // Generate a random number between 0 and totalWeight
+  const randomWeight = Math.random() * totalWeight;
+
+  // Select a random cactus image based on the weighted probabilities
+  let cumulativeWeight = 0;
+  let selectedImage;
+  for (const image of cactusImages) {
+    cumulativeWeight += image.weight;
+    if (randomWeight <= cumulativeWeight) {
+      selectedImage = image;
+      break;
+    }
+  }
   const cactus = document.createElement('img');
   cactus.dataset.cactus = true;
-  cactus.src = cactusImg;
+  cactus.src = selectedImage.src;
   cactus.classList.add('cactus', 'game-element');
   setCustomProperty(cactus, '--left', newPosition);
   setCustomProperty(cactus, 'height', `${randomNumberBetween(13, 17)}%`);

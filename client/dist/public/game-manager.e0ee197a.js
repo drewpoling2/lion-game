@@ -148,13 +148,13 @@ var SPEED = 0.05;
 var groundElems = document.querySelectorAll('[data-ground]');
 function setupGround() {
   (0, _updateCustomProperty.setCustomProperty)(groundElems[0], '--left', 0);
-  (0, _updateCustomProperty.setCustomProperty)(groundElems[1], '--left', 300);
+  (0, _updateCustomProperty.setCustomProperty)(groundElems[1], '--left', 250);
 }
 function updateGround(delta, speedScale) {
   groundElems.forEach(function (ground) {
     (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
-    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -300) {
-      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 600);
+    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -250) {
+      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 500);
     }
   });
 }
@@ -171,13 +171,13 @@ var SPEED = 0.022;
 var groundLayerTwoElems = document.querySelectorAll('[data-ground-layer-two]');
 function setupGroundLayerTwo() {
   (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[0], '--left', 0);
-  (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[1], '--left', 300);
+  (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[1], '--left', 260);
 }
 function updateGroundLayerTwo(delta, speedScale) {
   groundLayerTwoElems.forEach(function (ground) {
     (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
-    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -300) {
-      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 600);
+    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -260) {
+      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 520);
     }
   });
 }
@@ -194,24 +194,34 @@ var SPEED = 0.007;
 var groundLayerThreeElems = document.querySelectorAll('[data-ground-layer-three]');
 function setupGroundLayerThree() {
   (0, _updateCustomProperty.setCustomProperty)(groundLayerThreeElems[0], '--left', 0);
-  (0, _updateCustomProperty.setCustomProperty)(groundLayerThreeElems[1], '--left', 300);
+  (0, _updateCustomProperty.setCustomProperty)(groundLayerThreeElems[1], '--left', 200);
 }
 function updateGroundLayerThree(delta, speedScale) {
   groundLayerThreeElems.forEach(function (ground) {
     (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
-    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -300) {
-      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 600);
+    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -200) {
+      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 400);
     }
   });
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"imgs/dino-stationary.png":[function(require,module,exports) {
-module.exports = "/dino-stationary.68563e8d.png";
-},{}],"imgs/dino-lose.png":[function(require,module,exports) {
-module.exports = "/dino-lose.e95d406c.png";
-},{}],"imgs/dino-run-0.png":[function(require,module,exports) {
-module.exports = "/dino-run-0.f3aadbbf.png";
-},{}],"imgs/dino-run-1.png":[function(require,module,exports) {
-module.exports = "/dino-run-1.96d589ba.png";
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"imgs/nittany-lion/jump-animation/Jump-1.png":[function(require,module,exports) {
+module.exports = "/Jump-1.75f1a3cd.png";
+},{}],"imgs/nittany-lion/jump-animation/Jump-2.png":[function(require,module,exports) {
+module.exports = "/Jump-2.6da28d8f.png";
+},{}],"imgs/nittany-lion/jump-animation/Jump-3.png":[function(require,module,exports) {
+module.exports = "/Jump-3.37993b63.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-1.png":[function(require,module,exports) {
+module.exports = "/Run-1.46a06f1c.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-2.png":[function(require,module,exports) {
+module.exports = "/Run-2.3a155b76.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-3.png":[function(require,module,exports) {
+module.exports = "/Run-3.ae5640e0.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-4.png":[function(require,module,exports) {
+module.exports = "/Run-4.920d82db.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-5.png":[function(require,module,exports) {
+module.exports = "/Run-5.cda810b2.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-6.png":[function(require,module,exports) {
+module.exports = "/Run-6.e2d461ae.png";
 },{}],"../node_modules/howler/dist/howler.js":[function(require,module,exports) {
 var define;
 var global = arguments[3];
@@ -3505,35 +3515,44 @@ exports.setDinoLose = setDinoLose;
 exports.setupDino = setupDino;
 exports.updateDino = updateDino;
 var _updateCustomProperty = require("../utility/updateCustomProperty.js");
-var _dinoStationary = _interopRequireDefault(require("../public/imgs/dino-stationary.png"));
-var _dinoLose = _interopRequireDefault(require("../public/imgs/dino-lose.png"));
-var _dinoRun = _interopRequireDefault(require("../public/imgs/dino-run-0.png"));
-var _dinoRun2 = _interopRequireDefault(require("../public/imgs/dino-run-1.png"));
+var _Jump = _interopRequireDefault(require("../public/imgs/nittany-lion/jump-animation/Jump-1.png"));
+var _Jump2 = _interopRequireDefault(require("../public/imgs/nittany-lion/jump-animation/Jump-2.png"));
+var _Jump3 = _interopRequireDefault(require("../public/imgs/nittany-lion/jump-animation/Jump-3.png"));
+var _Run = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-1.png"));
+var _Run2 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-2.png"));
+var _Run3 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-3.png"));
+var _Run4 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-4.png"));
+var _Run5 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-5.png"));
+var _Run6 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-6.png"));
 var _soundController = require("../utility/sound-controller.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 var dinoElem = document.querySelector('[data-dino]');
 var JUMP_SPEED = 0.21;
 var DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
 var GRAVITY = 0.00075;
-var DINO_FRAME_COUNT = 2;
+var DINO_FRAME_COUNT = 6;
+var JUMP_FRAME_COUNT = 3;
 var FRAME_TIME = 100;
+var BOTTOM_ANCHOR = 17.5;
 var isJumping;
 var canDoubleJump;
 var jumpCount;
 var dinoFrame;
 var currentFrameTime;
 var yVelocity;
+var jumpAnimationInProgress;
 function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 function setupDino() {
   isJumping = false;
+  jumpAnimationInProgress = false;
   canDoubleJump = true;
   jumpCount = 0;
   dinoFrame = 0;
   currentFrameTime = 0;
   yVelocity = 0;
-  (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', 0);
+  (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
 
   // Function to check if the device is a mobile device
   if (isMobileDevice()) {
@@ -3555,17 +3574,61 @@ function getDinoRect() {
   return dinoElem.getBoundingClientRect();
 }
 function setDinoLose() {
-  dinoElem.src = _dinoLose.default;
+  dinoElem.src = _Jump.default;
+  dinoElem.classList.add('leap');
   dinoElem.classList.remove('flash-animation');
+  var spotlight = document.getElementById('spotlight');
+  spotlight.classList.add('close-spotlight');
+}
+function startJump() {
+  if (!jumpAnimationInProgress) {
+    jumpAnimationInProgress = true;
+    dinoElem.src = _Jump.default;
+    setTimeout(function () {
+      dinoElem.src = _Jump2.default;
+    }, 320); // Adjust the delay as needed
+
+    setTimeout(function () {
+      dinoElem.src = _Jump3.default;
+    }, 400); // Adjust the delay as needed
+  }
+}
+
+function endJump() {
+  isJumping = false;
+  jumpAnimationInProgress = false;
 }
 function handleRun(delta, speedScale) {
   if (isJumping) {
-    dinoElem.src = _dinoStationary.default;
+    startJump();
     return;
   }
   if (currentFrameTime >= FRAME_TIME) {
     dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT;
-    dinoElem.src = dinoFrame === 1 ? _dinoRun2.default : _dinoRun.default;
+
+    // Use a switch statement to set the image source based on the current frame
+    switch (dinoFrame) {
+      case 0:
+        dinoElem.src = _Run.default;
+        break;
+      case 1:
+        dinoElem.src = _Run2.default;
+        break;
+      case 2:
+        dinoElem.src = _Run3.default;
+        break;
+      case 3:
+        dinoElem.src = _Run4.default;
+        break;
+      case 4:
+        dinoElem.src = _Run5.default;
+        break;
+      case 5:
+        dinoElem.src = _Run6.default;
+        break;
+      // Add more cases if you have more frames
+    }
+
     currentFrameTime -= FRAME_TIME;
   }
   currentFrameTime += delta * speedScale;
@@ -3573,9 +3636,9 @@ function handleRun(delta, speedScale) {
 function handleJump(delta) {
   if (!isJumping) return;
   (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
-  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= 0) {
-    (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', 0);
-    isJumping = false;
+  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= BOTTOM_ANCHOR) {
+    (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
+    endJump();
     canDoubleJump = true;
     jumpCount = 0;
   }
@@ -3587,6 +3650,8 @@ function handleJump(delta) {
 }
 function onJump(e) {
   if (e.code !== 'Space' && e.type !== 'touchstart' || isJumping && jumpCount >= 2) return;
+  endJump();
+  startJump();
   _soundController.soundController.jump.play();
   yVelocity = JUMP_SPEED;
   isJumping = true;
@@ -3597,8 +3662,8 @@ var isDiving = false;
 function handleDive(delta) {
   if (!isDiving) return;
   (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
-  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= 0) {
-    (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', 0);
+  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= BOTTOM_ANCHOR) {
+    (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
     isDiving = false;
     jumpCount = 0;
   }
@@ -3615,8 +3680,14 @@ function onDive(e) {
   isJumping = false;
   jumpCount = 0;
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/dino-stationary.png":"imgs/dino-stationary.png","../public/imgs/dino-lose.png":"imgs/dino-lose.png","../public/imgs/dino-run-0.png":"imgs/dino-run-0.png","../public/imgs/dino-run-1.png":"imgs/dino-run-1.png","../utility/sound-controller.js":"../utility/sound-controller.js"}],"imgs/cactus.png":[function(require,module,exports) {
-module.exports = "/cactus.ec72be49.png";
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/nittany-lion/jump-animation/Jump-1.png":"imgs/nittany-lion/jump-animation/Jump-1.png","../public/imgs/nittany-lion/jump-animation/Jump-2.png":"imgs/nittany-lion/jump-animation/Jump-2.png","../public/imgs/nittany-lion/jump-animation/Jump-3.png":"imgs/nittany-lion/jump-animation/Jump-3.png","../public/imgs/nittany-lion/run-cycle/Run-1.png":"imgs/nittany-lion/run-cycle/Run-1.png","../public/imgs/nittany-lion/run-cycle/Run-2.png":"imgs/nittany-lion/run-cycle/Run-2.png","../public/imgs/nittany-lion/run-cycle/Run-3.png":"imgs/nittany-lion/run-cycle/Run-3.png","../public/imgs/nittany-lion/run-cycle/Run-4.png":"imgs/nittany-lion/run-cycle/Run-4.png","../public/imgs/nittany-lion/run-cycle/Run-5.png":"imgs/nittany-lion/run-cycle/Run-5.png","../public/imgs/nittany-lion/run-cycle/Run-6.png":"imgs/nittany-lion/run-cycle/Run-6.png","../utility/sound-controller.js":"../utility/sound-controller.js"}],"imgs/trees/Bush-Tree.png":[function(require,module,exports) {
+module.exports = "/Bush-Tree.609b3d8f.png";
+},{}],"imgs/trees/Round-Tree.png":[function(require,module,exports) {
+module.exports = "/Round-Tree.9c40ea34.png";
+},{}],"imgs/trees/Pine-Tree.png":[function(require,module,exports) {
+module.exports = "/Pine-Tree.447fc010.png";
+},{}],"imgs/Obstacles/Snowball-Small.png":[function(require,module,exports) {
+module.exports = "/Snowball-Small.68bfe430.png";
 },{}],"../elements/cactus.js":[function(require,module,exports) {
 "use strict";
 
@@ -3627,8 +3698,12 @@ exports.getCactusRects = getCactusRects;
 exports.setupCactus = setupCactus;
 exports.updateCactus = updateCactus;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
-var _cactus = _interopRequireDefault(require("../public/imgs/cactus.png"));
+var _BushTree = _interopRequireDefault(require("../public/imgs/trees/Bush-Tree.png"));
+var _RoundTree = _interopRequireDefault(require("../public/imgs/trees/Round-Tree.png"));
+var _PineTree = _interopRequireDefault(require("../public/imgs/trees/Pine-Tree.png"));
+var _SnowballSmall = _interopRequireDefault(require("../public/imgs/Obstacles/Snowball-Small.png"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -3685,10 +3760,55 @@ function getCactusRects() {
     return cactus.getBoundingClientRect();
   });
 }
+
+// Array of possible cactus images with associated weights
+var cactusImages = [{
+  src: _BushTree.default,
+  weight: 5
+}, {
+  src: _RoundTree.default,
+  weight: 1
+}, {
+  src: _PineTree.default,
+  weight: 2
+}, {
+  src: _SnowballSmall.default,
+  weight: 3
+}
+// Add more image sources with corresponding weights
+];
+
 function createCactus(newPosition) {
+  // Calculate the total weight
+  var totalWeight = cactusImages.reduce(function (sum, image) {
+    return sum + image.weight;
+  }, 0);
+
+  // Generate a random number between 0 and totalWeight
+  var randomWeight = Math.random() * totalWeight;
+
+  // Select a random cactus image based on the weighted probabilities
+  var cumulativeWeight = 0;
+  var selectedImage;
+  var _iterator = _createForOfIteratorHelper(cactusImages),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var image = _step.value;
+      cumulativeWeight += image.weight;
+      if (randomWeight <= cumulativeWeight) {
+        selectedImage = image;
+        break;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
   var cactus = document.createElement('img');
   cactus.dataset.cactus = true;
-  cactus.src = _cactus.default;
+  cactus.src = selectedImage.src;
   cactus.classList.add('cactus', 'game-element');
   (0, _updateCustomProperty.setCustomProperty)(cactus, '--left', newPosition);
   (0, _updateCustomProperty.setCustomProperty)(cactus, 'height', "".concat(randomNumberBetween(13, 17), "%"));
@@ -3697,7 +3817,7 @@ function createCactus(newPosition) {
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/cactus.png":"imgs/cactus.png"}],"../../../server/common/errors.ts":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/trees/Bush-Tree.png":"imgs/trees/Bush-Tree.png","../public/imgs/trees/Round-Tree.png":"imgs/trees/Round-Tree.png","../public/imgs/trees/Pine-Tree.png":"imgs/trees/Pine-Tree.png","../public/imgs/Obstacles/Snowball-Small.png":"imgs/Obstacles/Snowball-Small.png"}],"../../../server/common/errors.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4083,9 +4203,7 @@ var multiplierRatios = {
   x5: 5,
   x10: 10
 };
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"imgs/Coin-1.png":[function(require,module,exports) {
-module.exports = "/Coin-1.b2590e0a.png";
-},{}],"../elements/coin.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"../elements/coin.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4095,8 +4213,7 @@ exports.getCoinRects = getCoinRects;
 exports.setupCoin = setupCoin;
 exports.updateCoin = updateCoin;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
-var _Coin = _interopRequireDefault(require("../public/imgs/Coin-1.png"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -4136,18 +4253,65 @@ function getCoinRects() {
     };
   });
 }
+var collectableOptions = [{
+  type: 'gold-coin',
+  weight: 0.6,
+  points: 46
+}, {
+  type: 'green-gem',
+  weight: 0.1,
+  points: 325
+}, {
+  type: 'red-coin',
+  weight: 0.3,
+  points: 82
+}];
 function createCoins() {
-  var coin = document.createElement('div');
-  coin.dataset.coin = true;
-  coin.classList.add('coin');
-  coin.id = Math.random().toString(16).slice(2);
-  (0, _updateCustomProperty.setCustomProperty)(coin, '--left', 100);
-  worldElem.append(coin);
+  // Calculate the total weight
+  var totalWeight = collectableOptions.reduce(function (sum, item) {
+    return sum + item.weight;
+  }, 0);
+
+  // Generate a random number between 0 and totalWeight
+  var randomWeight = Math.random() * totalWeight;
+
+  // Select a random collectable based on the weighted probabilities
+  var cumulativeWeight = 0;
+  var selectedCollectable;
+  var _iterator = _createForOfIteratorHelper(collectableOptions),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var item = _step.value;
+      cumulativeWeight += item.weight;
+      if (randomWeight <= cumulativeWeight) {
+        selectedCollectable = item;
+        break;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+  var element = document.createElement('div');
+  element.dataset.coin = true;
+  element.dataset.points = selectedCollectable.points;
+  element.classList.add(selectedCollectable.type, 'collectable');
+  element.id = Math.random().toString(16).slice(2);
+  (0, _updateCustomProperty.setCustomProperty)(element, '--left', 100);
+  var initialKeyframe = getRandomKeyframe();
+  element.style.animationDelay = "-".concat(initialKeyframe, "%");
+  worldElem.append(element);
 }
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/Coin-1.png":"imgs/Coin-1.png"}],"imgs/icons/Mute.png":[function(require,module,exports) {
+function getRandomKeyframe() {
+  // Return a random number between 0 and 100 (percentage)
+  return Math.floor(Math.random() * 101);
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"imgs/icons/Mute.png":[function(require,module,exports) {
 module.exports = "/Mute.43af0a86.png";
 },{}],"imgs/icons/Volume.png":[function(require,module,exports) {
 module.exports = "/Volume.b5ea6cba.png";
@@ -4182,7 +4346,7 @@ function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyri
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 var WORLD_WIDTH = 100;
-var WORLD_HEIGHT = 30;
+var WORLD_HEIGHT = 45;
 var SPEED_SCALE_INCREASE = 0.00001;
 var multiplierRatio = 1;
 var worldElem = document.querySelector('[data-world]');
@@ -4230,8 +4394,9 @@ var isPaused = false;
 var playerImmunity = false;
 var immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
 scrollableTableElem.classList.add('hide-element');
-tickerContainerElem.classList.add('hide-element');
-tickerContainerElem.classList.remove('show-element');
+worldElem.setAttribute('transition-style', 'in:circle:center');
+// tickerContainerElem.classList.add('hide-element');
+// tickerContainerElem.classList.remove('show-element');
 var pauseIconButton = document.getElementById('pause-icon-button');
 
 // Function to toggle the pause state
@@ -4359,12 +4524,13 @@ function randomArc(element) {
   document.documentElement.style.setProperty('--random-x-end', randomXEnd + 'px');
 }
 function calculateFontSize(points) {
-  return Math.min(17 + points * 0.05, 35);
+  return Math.min(20 + points * 0.08, 46);
 }
 function checkCoinCollision() {
   var dinoRect = (0, _dino.getDinoRect)();
   (0, _coin.getCoinRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
+      var _coinElement$dataset;
       _soundController.soundController.pickupCoin.play();
       var coinElement = document.getElementById(element.id);
       var newElement = document.createElement('div');
@@ -4374,8 +4540,9 @@ function checkCoinCollision() {
       newElement.style.top = coinElement.offsetTop - 70 + 'px';
       randomArc(newElement);
       coinElement.parentNode.insertBefore(newElement, coinElement);
+      console.log(coinElement.dataset.points);
+      var points = (coinElement === null || coinElement === void 0 || (_coinElement$dataset = coinElement.dataset) === null || _coinElement$dataset === void 0 ? void 0 : _coinElement$dataset.points) * multiplierRatio;
       coinElement.remove();
-      var points = 100 * multiplierRatio;
       updateScoreWithPoints(points);
       var fontSize = calculateFontSize(points);
       newElement.style.fontSize = fontSize + 'px';
@@ -4411,6 +4578,7 @@ function checkLose() {
 
   //if no lives remain then lose
   if (livesElem.textContent === '0') {
+    worldElem.setAttribute('transition-style', 'out:circle:hesitate');
     return true;
   } //check if enemy and player are in colliding
   else if (isEnemyAndPlayerCollision && !playerImmunity) {
@@ -4509,12 +4677,14 @@ function setUpElements() {
   (0, _coin.setupCoin)();
 }
 function handleStart() {
+  worldElem.setAttribute('transition-style', 'in:circle:center');
   lastTime = null;
   hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
   multiplierRatio = 1;
   setUpElements();
+  dinoElem.classList.remove('leap');
   currentMultiplierElem.textContent = multiplierRatio;
   livesElem.textContent = 2;
   startScreenElem.classList.add('hide');
@@ -4599,8 +4769,9 @@ function handleStart() {
       tickerElem3.appendChild(tickerDivider);
     }
   });
-  tickerContainerElem.classList.add('hide-element');
-  tickerContainerElem.classList.remove('show-element');
+  // tickerContainerElem.classList.add('hide-element');
+  // tickerContainerElem.classList.remove('show-element');
+
   window.requestAnimationFrame(update);
 }
 function handleCheckLeaderboardHighScore(score) {
@@ -4669,8 +4840,9 @@ function handleToggleLeaderboard() {
   }
 }
 function handleLose() {
-  tickerContainerElem.classList.add('show-element');
-  tickerContainerElem.classList.remove('hide-element');
+  endScreenElem.textContent = '';
+  // tickerContainerElem.classList.add('show-element');
+  // tickerContainerElem.classList.remove('hide-element');
   handleCheckIfHighScore(score);
   _soundController.soundController.die.play();
   (0, _dino.setDinoLose)();
@@ -4683,6 +4855,9 @@ function handleLose() {
     });
     endScreenElem.classList.remove('hide');
   }, 100);
+  setTimeout(function () {
+    typeLetters(0);
+  }, 1500);
 }
 function setPixelToWorldScale() {
   var worldToPixelScale;
@@ -4713,6 +4888,82 @@ handleOrientationChange();
 
 // Listen for orientation changes
 window.addEventListener('orientationchange', handleOrientationChange);
+var snow = {
+  el: '#snow',
+  density: 12500,
+  // higher = fewer bits
+  maxHSpeed: 1,
+  // How much do you want them to move horizontally
+  minFallSpeed: 0.5,
+  canvas: null,
+  ctx: null,
+  particles: [],
+  colors: [],
+  mp: 1,
+  quit: false,
+  init: function init() {
+    this.canvas = document.querySelector(this.el);
+    this.ctx = this.canvas.getContext('2d');
+    this.reset();
+    requestAnimationFrame(this.render.bind(this));
+    window.addEventListener('resize', this.reset.bind(this));
+  },
+  reset: function reset() {
+    this.w = window.innerWidth;
+    this.h = window.innerHeight;
+    this.canvas.width = this.w;
+    this.canvas.height = this.h;
+    this.particles = [];
+    this.mp = Math.ceil(this.w * this.h / this.density);
+    for (var i = 0; i < this.mp; i++) {
+      var size = Math.random() * 1.7 + 3;
+      this.particles.push({
+        x: Math.random() * this.w,
+        //x-coordinate
+        y: Math.random() * this.h,
+        //y-coordinate
+        w: size,
+        h: size,
+        vy: this.minFallSpeed + Math.random(),
+        //density
+        vx: Math.random() * this.maxHSpeed - this.maxHSpeed / 2,
+        fill: '#ffffff',
+        s: Math.random() * 0.2 - 0.1
+      });
+    }
+  },
+  render: function render() {
+    var _this = this;
+    this.ctx.clearRect(0, 0, this.w, this.h);
+    this.particles.forEach(function (p, i) {
+      p.y += p.vy;
+      p.x += p.vx;
+      _this.ctx.fillStyle = p.fill;
+      _this.ctx.fillRect(p.x, p.y, p.w, p.h);
+      if (p.x > _this.w + 5 || p.x < -5 || p.y > _this.h) {
+        p.x = Math.random() * _this.w;
+        p.y = -10;
+      }
+    });
+    if (this.quit) {
+      return;
+    }
+    requestAnimationFrame(this.render.bind(this));
+  },
+  destroy: function destroy() {
+    this.quit = true;
+  }
+};
+snow.init();
+var textToType = 'Game Over';
+function typeLetters(index) {
+  if (index < textToType.length) {
+    endScreenElem.textContent += textToType.charAt(index);
+    setTimeout(function () {
+      return typeLetters(index + 1);
+    }, 200); // Adjust the delay as needed
+  }
+}
 },{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Mute.png":"imgs/icons/Mute.png","./public/imgs/icons/Volume.png":"imgs/icons/Volume.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -4738,7 +4989,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60274" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65357" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

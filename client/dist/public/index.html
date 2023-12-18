@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Pixelify+Sans&family=Press+Start+2P&family=VT323&display=swap&family=Roboto+Mono:wght@400;700&display=swa" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.typekit.net/ise8qme.css">
     <script src="/game-manager.e0ee197a.js" type="module"></script>
   <script src="/styles.8986bff4.js"></script></head>
@@ -36,22 +39,39 @@
         </table>
       </div>
     </div>
-    <div class="flex-col">
+    <div class="flex-col world-container" style="background-color: #000">
       <!-- <img src="imgs/typography/High-Score.png" class="high-score-label" /> -->
-      <div class="high-score-label">HIGH</div>
-      <div class="high-score" data-high-score="">000000</div>
-      <div class="score-label">SCORE</div>
-      <div class="score" data-score="">000000</div>
-      <div class="lives-label uppercase">lives</div>
-      <div>
-        <img class="lion-head" src="/Health-1.2142179e.png">
-        <div class="lives-x">x</div>
-        <div class="lives" data-lives="">1</div>
-      </div>
-      <div class="timer" data-multiplier-timer="">0</div>
-      <div class="current-multiplier sans" data-current-multiplier=""></div>
+      <div class="game-over-screen hide" data-game-over-screen=""></div>
+
       <div class="world" data-world="">
-        <div class="game-over-screen hide" data-game-over-screen="">Game over</div>
+        <div class="hud-container">
+          <div class="pixel-borders-inset">
+            <div class="flex-row inner-pixel-border-container">
+              <div class="flex-col">
+                <div class="high-score-label">HIGH</div>
+                <div class="high-score" data-high-score="">000000</div>
+              </div>
+              <div class="flex-col">
+                <div class="score-label">SCORE</div>
+                <div class="score" data-score="">000000</div>
+              </div>
+              <div class="flex-col">
+                <div class="lives-label uppercase">lives</div>
+                <div class="flex-row">
+                  <img class="lion-head" src="/Health-1.2142179e.png">
+                  <div class="lives-x">x</div>
+                  <div class="lives" data-lives="">1</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <canvas id="snow"></canvas>
+        <div id="spotlight" class="spotlight pixel-corners"></div>
+
+        <div class="timer test-text" data-multiplier-timer="">0</div>
+        <div class="current-multiplier sans" data-current-multiplier=""></div>
         <div class="start-screen blink" data-start-screen="">
           Press Any Key To Start
         </div>
@@ -63,7 +83,8 @@
         <img src="/ground.efe81358.png" class="ground" data-ground="">
 
         <img src="/ground.efe81358.png" class="ground" data-ground="">
-        <img src="/dino-stationary.68563e8d.png" class="dino" data-dino="">
+        <img src="/Rest-1.d9294cd3.png" class="dino" data-dino="">
+        <div class="">1000</div>
         <div class="absolute flex-row justify-between bottom-interface-container">
           <div class="ticker-container" data-ticker-container="">
             <div class="ticker-content" data-ticker=""></div>
@@ -72,7 +93,7 @@
             <div class="ticker-divider"></div>
             <div class="ticker-content3" data-ticker3=""></div>
           </div>
-          <div class="flex-row">
+          <div class="flex-row" style="display: none">
             <div class="icon-button" id="toggleLeaderboard">
               <img class="top-50-image icon" src="/Leaderboard.94af766d.png">
             </div>
@@ -97,43 +118,43 @@
         <!-- <div class="multiplier">multiplier</div> -->
         <!-- new high score form -->
         <!-- <div class="flex-col w-fit enter-initials-form">
-        <div class="uppercase sans" style="margin-bottom: 5px">
-          Enter your initials!
-        </div>
-        <table class="leaderboard-table" style="border-collapse: collapse">
-          <thead>
-            <tr>
-              <th class="sans uppercase text-left">Score</th>
-              <th class="sans uppercase text-left">Name</th>
-            </tr>
-          </thead>
-          <tbody class="py-10" data-leaderboard-body>
-            <td class="sans text-left" data-score-new-high-score>91122</td>
-            <td>
-              <input
-                type="text"
-                autofocus
-                class="pixel-art-input sans text-left uppercase"
-                placeholder="___"
-                maxlength="3"
-                id="newHighScoreInput"
-                oninput="handleInput(this)"
-              />
-            </td>
-          </tbody>
-        </table>
-        <div
-          class="sans error-message uppercase hide"
-          data-score-error-message
-        ></div>
-        <button
-          id="submit-button"
-          style="margin-top: 5px"
-          class="sans submit-button uppercase"
-        >
-          Submit
-        </button>
-      </div> -->
+          <div class="uppercase sans" style="margin-bottom: 5px">
+            Enter your initials!
+          </div>
+          <table class="leaderboard-table" style="border-collapse: collapse">
+            <thead>
+              <tr>
+                <th class="sans uppercase text-left">Score</th>
+                <th class="sans uppercase text-left">Name</th>
+              </tr>
+            </thead>
+            <tbody class="py-10" data-leaderboard-body>
+              <td class="sans text-left" data-score-new-high-score>91122</td>
+              <td>
+                <input
+                  type="text"
+                  autofocus
+                  class="pixel-art-input sans text-left uppercase"
+                  placeholder="___"
+                  maxlength="3"
+                  id="newHighScoreInput"
+                  oninput="handleInput(this)"
+                />
+              </td>
+            </tbody>
+          </table>
+          <div
+            class="sans error-message uppercase hide"
+            data-score-error-message
+          ></div>
+          <button
+            id="submit-button"
+            style="margin-top: 5px"
+            class="sans submit-button uppercase"
+          >
+            Submit
+          </button>
+        </div> -->
         <!-- end -->
 
         <script>function handleInput(input) {

@@ -38,7 +38,7 @@ import pauseImg from './public/imgs/icons/Pause.png';
 import playImg from './public/imgs/icons/Play.png';
 import foregroundImg from './public/imgs/backgrounds/Foreground-Trees.png';
 const WORLD_WIDTH = 100;
-const WORLD_HEIGHT = 30;
+const WORLD_HEIGHT = 45;
 const SPEED_SCALE_INCREASE = 0.00001;
 let multiplierRatio = 1;
 const worldElem = document.querySelector('[data-world]');
@@ -90,8 +90,9 @@ let isPaused = false;
 let playerImmunity = false;
 let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
 scrollableTableElem.classList.add('hide-element');
-tickerContainerElem.classList.add('hide-element');
-tickerContainerElem.classList.remove('show-element');
+worldElem.setAttribute('transition-style', 'in:circle:center');
+// tickerContainerElem.classList.add('hide-element');
+// tickerContainerElem.classList.remove('show-element');
 const pauseIconButton = document.getElementById('pause-icon-button');
 
 // Function to toggle the pause state
@@ -233,7 +234,7 @@ function randomArc(element) {
 }
 
 function calculateFontSize(points) {
-  return Math.min(17 + points * 0.05, 35);
+  return Math.min(20 + points * 0.08, 46);
 }
 
 function checkCoinCollision() {
@@ -249,8 +250,9 @@ function checkCoinCollision() {
       newElement.style.top = coinElement.offsetTop - 70 + 'px';
       randomArc(newElement);
       coinElement.parentNode.insertBefore(newElement, coinElement);
+      console.log(coinElement.dataset.points);
+      const points = coinElement?.dataset?.points * multiplierRatio;
       coinElement.remove();
-      const points = 100 * multiplierRatio;
       updateScoreWithPoints(points);
       const fontSize = calculateFontSize(points);
       newElement.style.fontSize = fontSize + 'px';
@@ -290,6 +292,7 @@ function checkLose() {
 
   //if no lives remain then lose
   if (livesElem.textContent === '0') {
+    worldElem.setAttribute('transition-style', 'out:circle:hesitate');
     return true;
   } //check if enemy and player are in colliding
   else if (isEnemyAndPlayerCollision && !playerImmunity) {
@@ -406,12 +409,14 @@ function setUpElements() {
 }
 
 function handleStart() {
+  worldElem.setAttribute('transition-style', 'in:circle:center');
   lastTime = null;
   hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
   multiplierRatio = 1;
   setUpElements();
+  dinoElem.classList.remove('leap');
   currentMultiplierElem.textContent = multiplierRatio;
   livesElem.textContent = 2;
   startScreenElem.classList.add('hide');
@@ -481,8 +486,8 @@ function handleStart() {
       tickerElem3.appendChild(tickerDivider);
     }
   });
-  tickerContainerElem.classList.add('hide-element');
-  tickerContainerElem.classList.remove('show-element');
+  // tickerContainerElem.classList.add('hide-element');
+  // tickerContainerElem.classList.remove('show-element');
 
   window.requestAnimationFrame(update);
 }
@@ -553,8 +558,9 @@ function handleToggleLeaderboard() {
 }
 
 function handleLose() {
-  tickerContainerElem.classList.add('show-element');
-  tickerContainerElem.classList.remove('hide-element');
+  endScreenElem.textContent = '';
+  // tickerContainerElem.classList.add('show-element');
+  // tickerContainerElem.classList.remove('hide-element');
   handleCheckIfHighScore(score);
   soundController.die.play();
   setDinoLose();
@@ -563,6 +569,9 @@ function handleLose() {
     document.addEventListener('touchstart', handleStart, { once: true });
     endScreenElem.classList.remove('hide');
   }, 100);
+  setTimeout(() => {
+    typeLetters(0);
+  }, 1500);
 }
 
 function setPixelToWorldScale() {
@@ -598,3 +607,76 @@ handleOrientationChange();
 
 // Listen for orientation changes
 window.addEventListener('orientationchange', handleOrientationChange);
+
+const snow = {
+  el: '#snow',
+  density: 12500, // higher = fewer bits
+  maxHSpeed: 1, // How much do you want them to move horizontally
+  minFallSpeed: 0.5,
+  canvas: null,
+  ctx: null,
+  particles: [],
+  colors: [],
+  mp: 1,
+  quit: false,
+  init() {
+    this.canvas = document.querySelector(this.el);
+    this.ctx = this.canvas.getContext('2d');
+    this.reset();
+    requestAnimationFrame(this.render.bind(this));
+    window.addEventListener('resize', this.reset.bind(this));
+  },
+  reset() {
+    this.w = window.innerWidth;
+    this.h = window.innerHeight;
+    this.canvas.width = this.w;
+    this.canvas.height = this.h;
+    this.particles = [];
+    this.mp = Math.ceil((this.w * this.h) / this.density);
+    for (let i = 0; i < this.mp; i++) {
+      let size = Math.random() * 1.7 + 3;
+      this.particles.push({
+        x: Math.random() * this.w, //x-coordinate
+        y: Math.random() * this.h, //y-coordinate
+        w: size,
+        h: size,
+        vy: this.minFallSpeed + Math.random(), //density
+        vx: Math.random() * this.maxHSpeed - this.maxHSpeed / 2,
+        fill: '#ffffff',
+        s: Math.random() * 0.2 - 0.1,
+      });
+    }
+  },
+
+  render() {
+    this.ctx.clearRect(0, 0, this.w, this.h);
+    this.particles.forEach((p, i) => {
+      p.y += p.vy;
+      p.x += p.vx;
+      this.ctx.fillStyle = p.fill;
+      this.ctx.fillRect(p.x, p.y, p.w, p.h);
+      if (p.x > this.w + 5 || p.x < -5 || p.y > this.h) {
+        p.x = Math.random() * this.w;
+        p.y = -10;
+      }
+    });
+    if (this.quit) {
+      return;
+    }
+    requestAnimationFrame(this.render.bind(this));
+  },
+  destroy() {
+    this.quit = true;
+  },
+};
+
+snow.init();
+
+const textToType = 'Game Over';
+
+function typeLetters(index) {
+  if (index < textToType.length) {
+    endScreenElem.textContent += textToType.charAt(index);
+    setTimeout(() => typeLetters(index + 1), 200); // Adjust the delay as needed
+  }
+}
