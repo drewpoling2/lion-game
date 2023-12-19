@@ -31,9 +31,14 @@ import {
   updateMultiplier,
   getMultiplierRects,
 } from './elements/score-multiplier.js';
-import { setupCoin, updateCoin, getCoinRects } from './elements/coin.js';
-import muteImg from './public/imgs/icons/Mute.png';
-import unmuteImg from './public/imgs/icons/Volume.png';
+import {
+  setupCoin,
+  updateCoin,
+  getCoinRects,
+  getCoinRectsWithOuterRadius,
+} from './elements/coin.js';
+import muteImg from './public/imgs/icons/Speaker-Off.png';
+import unmuteImg from './public/imgs/icons/Speaker-On.png';
 import pauseImg from './public/imgs/icons/Pause.png';
 import playImg from './public/imgs/icons/Play.png';
 import foregroundImg from './public/imgs/backgrounds/Foreground-Trees.png';
@@ -152,7 +157,7 @@ function update(time) {
   updateGroundLayerThree(delta, speedScale);
   updateGroundLayerTwo(delta, speedScale);
   updateDino(delta, speedScale);
-  updateCactus(delta, speedScale);
+  // updateCactus(delta, speedScale);
   updateSpeedScale(delta);
   updateScore(delta);
   updateMultiplier(delta, speedScale);
@@ -237,32 +242,100 @@ function calculateFontSize(points) {
   return Math.min(20 + points * 0.08, 46);
 }
 
+// function moveCoinTowardPlayer(coinElement) {
+//   const speed = 8; // Adjust the speed as needed
+
+//   function move() {
+//     const coinRect = coinElement.getBoundingClientRect();
+//     const dinoRect = getDinoRect();
+//     // Calculate the direction towards the player in each frame
+//     let deltaX = dinoRect.x - coinRect.x;
+//     let deltaY = dinoRect.bottom - coinRect.bottom;
+//     console.log('coin', coinRect);
+//     console.log('dino', dinoRect);
+//     const distanceToPlayer = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+//     // Check if the coin is close enough to the player
+//     if (distanceToPlayer < speed) {
+//       console.log('Hit and stopping coin movement.');
+//       // Create a pickup text element
+//       const newElement = document.createElement('div');
+//       addPickupText(newElement, coinElement);
+//       coinElement.remove();
+//       setTimeout(() => {
+//         newElement.remove();
+//       }, 600);
+
+//       // Remove the coin and update points
+//       soundController.pickupCoin.play();
+//       return;
+//     }
+
+//     // Calculate the angle and normalize it
+//     let angleTowardsPlayer = Math.atan2(deltaY, deltaX);
+//     let normalizedAngle =
+//       angleTowardsPlayer < 0
+//         ? angleTowardsPlayer + 2 * Math.PI
+//         : angleTowardsPlayer;
+
+//     // Calculate movement steps based on the normalized angle
+//     let moveStepX = Math.cos(normalizedAngle) * speed;
+//     let moveStepY = Math.sin(normalizedAngle) * speed;
+//     // Update the coin's position
+//     coinElement.style.left = coinRect.x + moveStepX + 'px';
+//     coinElement.style.bottom = coinRect.bottom + moveStepY + 'px';
+//     requestAnimationFrame(move);
+//   }
+
+//   move();
+// }
+
+// function checkCoinCollision() {
+//   const dinoRect = getDinoRect();
+
+//   getCoinRects().some((element) => {
+//     if (isCollision(element.rect, dinoRect)) {
+//       const coinElement = document.getElementById(element.id);
+//       moveCoinTowardPlayer(coinElement);
+//       return true;
+//     }
+//   });
+// }
+
 function checkCoinCollision() {
   const dinoRect = getDinoRect();
+
   getCoinRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
-      soundController.pickupCoin.play();
       const coinElement = document.getElementById(element.id);
+      // Create a pickup text element
+      console.log('picked up');
       const newElement = document.createElement('div');
-      newElement.classList.add('plus-points', 'sans');
-      newElement.style.position = 'absolute';
-      newElement.style.left = coinElement.offsetLeft + 'px';
-      newElement.style.top = coinElement.offsetTop - 70 + 'px';
-      randomArc(newElement);
-      coinElement.parentNode.insertBefore(newElement, coinElement);
-      console.log(coinElement.dataset.points);
-      const points = coinElement?.dataset?.points * multiplierRatio;
+      addPickupText(newElement, coinElement);
       coinElement.remove();
-      updateScoreWithPoints(points);
-      const fontSize = calculateFontSize(points);
-      newElement.style.fontSize = fontSize + 'px';
-      newElement.textContent = `+${points}`;
       setTimeout(() => {
         newElement.remove();
       }, 600);
+
+      // Remove the coin and update points
+      soundController.pickupCoin.play();
       return true;
     }
   });
+}
+
+function addPickupText(text, pickupElement) {
+  text.classList.add('plus-points', 'sans');
+  text.style.position = 'absolute';
+  text.style.left = pickupElement.offsetLeft + 'px';
+  text.style.top = pickupElement.offsetTop - 70 + 'px';
+  randomArc(text);
+  pickupElement.parentNode.insertBefore(text, pickupElement);
+  const points = pickupElement?.dataset?.points * multiplierRatio;
+  updateScoreWithPoints(points);
+  const fontSize = calculateFontSize(points);
+  text.style.fontSize = fontSize + 'px';
+  text.textContent = `+${points}`;
 }
 
 function updateScoreWithPoints(delta) {
@@ -403,7 +476,7 @@ function setUpElements() {
   setupGroundLayerTwo();
   setupGroundLayerThree();
   setupDino();
-  setupCactus();
+  // setupCactus();
   setupMultiplier();
   setupCoin();
 }

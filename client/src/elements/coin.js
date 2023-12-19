@@ -3,6 +3,7 @@ import {
   incrementCustomProperty,
   getCustomProperty,
 } from '../utility/updateCustomProperty';
+import { getDinoRect } from './dino';
 
 const coinPositions = [];
 
@@ -22,7 +23,38 @@ export function setupCoin() {
 
 export function updateCoin(delta, speedScale) {
   document.querySelectorAll('[data-coin]').forEach((coin) => {
-    incrementCustomProperty(coin, '--left', delta * speedScale * SPEED * -1);
+    // Get positions of the dinosaur and coin
+    const dinoRect = getDinoRect();
+    const coinRect = coin.getBoundingClientRect();
+    // Calculate distance
+    const distance = Math.sqrt(
+      Math.pow(dinoRect.x - coinRect.x, 2) +
+        Math.pow(dinoRect.y - coinRect.y, 2)
+    );
+
+    // If the distance is less than 40px, move the coin towards the dinosaur
+    if (coin.dataset.locked === 'true' || distance < 225) {
+      //lock the coin on the player
+      coin.dataset.locked = 'true';
+      const angle = Math.atan2(
+        dinoRect.y - coinRect.y,
+        dinoRect.x - coinRect.x
+      );
+      const speed = SPEED * delta * speedScale;
+
+      // Calculate incremental movement based on angle and speed
+      const deltaX = Math.cos(angle) * speed * 1.75;
+      const deltaY = Math.sin(angle) * speed * 1.75;
+
+      // Update coin position incrementally
+      incrementCustomProperty(coin, '--left', deltaX);
+      incrementCustomProperty(coin, '--bottom', deltaY * -1);
+    } else {
+      // Move the coin to the left if not close to the dinosaur
+      incrementCustomProperty(coin, '--left', delta * speedScale * SPEED * -1);
+    }
+
+    // Remove the coin if it goes off the screen
     if (getCustomProperty(coin, '--left') <= -100) {
       coin.remove();
     }
@@ -46,9 +78,9 @@ export function getCoinRects() {
 }
 
 const collectableOptions = [
-  { type: 'gold-coin', weight: 0.6, points: 46 },
-  { type: 'green-gem', weight: 0.1, points: 325 },
-  { type: 'red-coin', weight: 0.3, points: 82 },
+  { type: 'gold-coin', weight: 0.3, points: 82 },
+  { type: 'red-gem', weight: 0.1, points: 325 },
+  { type: 'silver-coin', weight: 0.6, points: 46 },
 ];
 
 function createCoins() {
@@ -74,8 +106,9 @@ function createCoins() {
 
   const element = document.createElement('div');
   element.dataset.coin = true;
+  element.dataset.locked = 'false';
   element.dataset.points = selectedCollectable.points;
-  element.classList.add(selectedCollectable.type, 'collectable');
+  element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
   element.id = Math.random().toString(16).slice(2);
   setCustomProperty(element, '--left', 100);
   const initialKeyframe = getRandomKeyframe();

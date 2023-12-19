@@ -4213,6 +4213,7 @@ exports.getCoinRects = getCoinRects;
 exports.setupCoin = setupCoin;
 exports.updateCoin = updateCoin;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
+var _dino = require("./dino");
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -4234,7 +4235,32 @@ function setupCoin() {
 }
 function updateCoin(delta, speedScale) {
   document.querySelectorAll('[data-coin]').forEach(function (coin) {
-    (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', delta * speedScale * SPEED * -1);
+    // Get positions of the dinosaur and coin
+    var dinoRect = (0, _dino.getDinoRect)();
+    var coinRect = coin.getBoundingClientRect();
+    // Calculate distance
+    var distance = Math.sqrt(Math.pow(dinoRect.x - coinRect.x, 2) + Math.pow(dinoRect.y - coinRect.y, 2));
+
+    // If the distance is less than 40px, move the coin towards the dinosaur
+    if (coin.dataset.locked === 'true' || distance < 225) {
+      //lock the coin on the player
+      coin.dataset.locked = 'true';
+      var angle = Math.atan2(dinoRect.y - coinRect.y, dinoRect.x - coinRect.x);
+      var speed = SPEED * delta * speedScale;
+
+      // Calculate incremental movement based on angle and speed
+      var deltaX = Math.cos(angle) * speed * 1.75;
+      var deltaY = Math.sin(angle) * speed * 1.75;
+
+      // Update coin position incrementally
+      (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', deltaX);
+      (0, _updateCustomProperty.incrementCustomProperty)(coin, '--bottom', deltaY * -1);
+    } else {
+      // Move the coin to the left if not close to the dinosaur
+      (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', delta * speedScale * SPEED * -1);
+    }
+
+    // Remove the coin if it goes off the screen
     if ((0, _updateCustomProperty.getCustomProperty)(coin, '--left') <= -100) {
       coin.remove();
     }
@@ -4255,16 +4281,16 @@ function getCoinRects() {
 }
 var collectableOptions = [{
   type: 'gold-coin',
-  weight: 0.6,
-  points: 46
+  weight: 0.3,
+  points: 82
 }, {
-  type: 'green-gem',
+  type: 'red-gem',
   weight: 0.1,
   points: 325
 }, {
-  type: 'red-coin',
-  weight: 0.3,
-  points: 82
+  type: 'silver-coin',
+  weight: 0.6,
+  points: 46
 }];
 function createCoins() {
   // Calculate the total weight
@@ -4296,8 +4322,9 @@ function createCoins() {
   }
   var element = document.createElement('div');
   element.dataset.coin = true;
+  element.dataset.locked = 'false';
   element.dataset.points = selectedCollectable.points;
-  element.classList.add(selectedCollectable.type, 'collectable');
+  element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
   element.id = Math.random().toString(16).slice(2);
   (0, _updateCustomProperty.setCustomProperty)(element, '--left', 100);
   var initialKeyframe = getRandomKeyframe();
@@ -4311,10 +4338,10 @@ function getRandomKeyframe() {
   // Return a random number between 0 and 100 (percentage)
   return Math.floor(Math.random() * 101);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"imgs/icons/Mute.png":[function(require,module,exports) {
-module.exports = "/Mute.43af0a86.png";
-},{}],"imgs/icons/Volume.png":[function(require,module,exports) {
-module.exports = "/Volume.b5ea6cba.png";
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./dino":"../elements/dino.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
+module.exports = "/Speaker-Off.c6acac34.png";
+},{}],"imgs/icons/Speaker-On.png":[function(require,module,exports) {
+module.exports = "/Speaker-On.4eca78fe.png";
 },{}],"imgs/icons/Pause.png":[function(require,module,exports) {
 module.exports = "/Pause.af4380de.png";
 },{}],"imgs/icons/Play.png":[function(require,module,exports) {
@@ -4335,8 +4362,8 @@ var _apis = require("./apis.js");
 var _validateInput = require("./utility/validate-input.js");
 var _scoreMultiplier = require("./elements/score-multiplier.js");
 var _coin = require("./elements/coin.js");
-var _Mute = _interopRequireDefault(require("./public/imgs/icons/Mute.png"));
-var _Volume = _interopRequireDefault(require("./public/imgs/icons/Volume.png"));
+var _SpeakerOff = _interopRequireDefault(require("./public/imgs/icons/Speaker-Off.png"));
+var _SpeakerOn = _interopRequireDefault(require("./public/imgs/icons/Speaker-On.png"));
 var _Pause = _interopRequireDefault(require("./public/imgs/icons/Pause.png"));
 var _Play = _interopRequireDefault(require("./public/imgs/icons/Play.png"));
 var _ForegroundTrees = _interopRequireDefault(require("./public/imgs/backgrounds/Foreground-Trees.png"));
@@ -4452,7 +4479,7 @@ function update(time) {
   (0, _groundLayerThree.updateGroundLayerThree)(delta, speedScale);
   (0, _groundLayerTwo.updateGroundLayerTwo)(delta, speedScale);
   (0, _dino.updateDino)(delta, speedScale);
-  (0, _cactus.updateCactus)(delta, speedScale);
+  // updateCactus(delta, speedScale);
   updateSpeedScale(delta);
   updateScore(delta);
   (0, _scoreMultiplier.updateMultiplier)(delta, speedScale);
@@ -4526,33 +4553,100 @@ function randomArc(element) {
 function calculateFontSize(points) {
   return Math.min(20 + points * 0.08, 46);
 }
+
+// function moveCoinTowardPlayer(coinElement) {
+//   const speed = 8; // Adjust the speed as needed
+
+//   function move() {
+//     const coinRect = coinElement.getBoundingClientRect();
+//     const dinoRect = getDinoRect();
+//     // Calculate the direction towards the player in each frame
+//     let deltaX = dinoRect.x - coinRect.x;
+//     let deltaY = dinoRect.bottom - coinRect.bottom;
+//     console.log('coin', coinRect);
+//     console.log('dino', dinoRect);
+//     const distanceToPlayer = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+//     // Check if the coin is close enough to the player
+//     if (distanceToPlayer < speed) {
+//       console.log('Hit and stopping coin movement.');
+//       // Create a pickup text element
+//       const newElement = document.createElement('div');
+//       addPickupText(newElement, coinElement);
+//       coinElement.remove();
+//       setTimeout(() => {
+//         newElement.remove();
+//       }, 600);
+
+//       // Remove the coin and update points
+//       soundController.pickupCoin.play();
+//       return;
+//     }
+
+//     // Calculate the angle and normalize it
+//     let angleTowardsPlayer = Math.atan2(deltaY, deltaX);
+//     let normalizedAngle =
+//       angleTowardsPlayer < 0
+//         ? angleTowardsPlayer + 2 * Math.PI
+//         : angleTowardsPlayer;
+
+//     // Calculate movement steps based on the normalized angle
+//     let moveStepX = Math.cos(normalizedAngle) * speed;
+//     let moveStepY = Math.sin(normalizedAngle) * speed;
+//     // Update the coin's position
+//     coinElement.style.left = coinRect.x + moveStepX + 'px';
+//     coinElement.style.bottom = coinRect.bottom + moveStepY + 'px';
+//     requestAnimationFrame(move);
+//   }
+
+//   move();
+// }
+
+// function checkCoinCollision() {
+//   const dinoRect = getDinoRect();
+
+//   getCoinRects().some((element) => {
+//     if (isCollision(element.rect, dinoRect)) {
+//       const coinElement = document.getElementById(element.id);
+//       moveCoinTowardPlayer(coinElement);
+//       return true;
+//     }
+//   });
+// }
+
 function checkCoinCollision() {
   var dinoRect = (0, _dino.getDinoRect)();
   (0, _coin.getCoinRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
-      var _coinElement$dataset;
-      _soundController.soundController.pickupCoin.play();
       var coinElement = document.getElementById(element.id);
+      // Create a pickup text element
+      console.log('picked up');
       var newElement = document.createElement('div');
-      newElement.classList.add('plus-points', 'sans');
-      newElement.style.position = 'absolute';
-      newElement.style.left = coinElement.offsetLeft + 'px';
-      newElement.style.top = coinElement.offsetTop - 70 + 'px';
-      randomArc(newElement);
-      coinElement.parentNode.insertBefore(newElement, coinElement);
-      console.log(coinElement.dataset.points);
-      var points = (coinElement === null || coinElement === void 0 || (_coinElement$dataset = coinElement.dataset) === null || _coinElement$dataset === void 0 ? void 0 : _coinElement$dataset.points) * multiplierRatio;
+      addPickupText(newElement, coinElement);
       coinElement.remove();
-      updateScoreWithPoints(points);
-      var fontSize = calculateFontSize(points);
-      newElement.style.fontSize = fontSize + 'px';
-      newElement.textContent = "+".concat(points);
       setTimeout(function () {
         newElement.remove();
       }, 600);
+
+      // Remove the coin and update points
+      _soundController.soundController.pickupCoin.play();
       return true;
     }
   });
+}
+function addPickupText(text, pickupElement) {
+  var _pickupElement$datase;
+  text.classList.add('plus-points', 'sans');
+  text.style.position = 'absolute';
+  text.style.left = pickupElement.offsetLeft + 'px';
+  text.style.top = pickupElement.offsetTop - 70 + 'px';
+  randomArc(text);
+  pickupElement.parentNode.insertBefore(text, pickupElement);
+  var points = (pickupElement === null || pickupElement === void 0 || (_pickupElement$datase = pickupElement.dataset) === null || _pickupElement$datase === void 0 ? void 0 : _pickupElement$datase.points) * multiplierRatio;
+  updateScoreWithPoints(points);
+  var fontSize = calculateFontSize(points);
+  text.style.fontSize = fontSize + 'px';
+  text.textContent = "+".concat(points);
 }
 function updateScoreWithPoints(delta) {
   var initialScore = score;
@@ -4621,14 +4715,14 @@ muteButton.addEventListener('click', function () {
     Object.keys(_soundController.soundController).forEach(function (key) {
       _soundController.soundController[key].mute(true);
     });
-    muteIconButton.src = _Mute.default;
+    muteIconButton.src = _SpeakerOff.default;
     soundControllerMuted = true;
     muteButton.blur();
   } else {
     Object.keys(_soundController.soundController).forEach(function (key) {
       _soundController.soundController[key].mute(false);
     });
-    muteIconButton.src = _Volume.default;
+    muteIconButton.src = _SpeakerOn.default;
     soundControllerMuted = false;
     muteButton.blur();
   }
@@ -4672,7 +4766,7 @@ function setUpElements() {
   (0, _groundLayerTwo.setupGroundLayerTwo)();
   (0, _groundLayerThree.setupGroundLayerThree)();
   (0, _dino.setupDino)();
-  (0, _cactus.setupCactus)();
+  // setupCactus();
   (0, _scoreMultiplier.setupMultiplier)();
   (0, _coin.setupCoin)();
 }
@@ -4964,7 +5058,7 @@ function typeLetters(index) {
     }, 200); // Adjust the delay as needed
   }
 }
-},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Mute.png":"imgs/icons/Mute.png","./public/imgs/icons/Volume.png":"imgs/icons/Volume.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -4989,7 +5083,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65357" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57787" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

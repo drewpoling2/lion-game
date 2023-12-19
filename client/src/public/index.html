@@ -51,28 +51,73 @@
 
       <div class="world" data-world>
         <div class="hud-container">
-          <div class="pixel-borders-inset">
-            <div class="flex-row inner-pixel-border-container">
-              <div class="flex-col">
-                <div class="high-score-label">HIGH</div>
-                <div class="high-score" data-high-score>000000</div>
-              </div>
-              <div class="flex-col">
-                <div class="score-label">SCORE</div>
-                <div class="score" data-score>000000</div>
-              </div>
-              <div class="flex-col">
-                <div class="lives-label uppercase">lives</div>
-                <div class="flex-row">
-                  <img class="lion-head" src="imgs/icons/Health-1.png" />
-                  <div class="lives-x">x</div>
-                  <div class="lives" data-lives>1</div>
+          <div class="hud-container-left">
+            <div class="pixel-borders-inset">
+              <div class="flex-row inner-pixel-border-container">
+                <div class="flex-col">
+                  <div class="high-score-label">HIGH</div>
+                  <div class="high-score" data-high-score>000000</div>
+                </div>
+                <div class="flex-col">
+                  <div class="score-label">SCORE</div>
+                  <div class="score" data-score>000000</div>
+                </div>
+                <div class="flex-col">
+                  <div class="lives-label uppercase">lives</div>
+                  <div class="flex-row">
+                    <img class="lion-head" src="imgs/icons/Health-1.png" />
+                    <div class="lives-x">x</div>
+                    <div class="lives" data-lives>1</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          <div class="hud-container-right">
+            <div class="flex-row" style="gap: 2px">
+              <div
+                class="icon-button pixel-borders-inset"
+                id="toggleLeaderboard"
+              >
+                <img
+                  class="top-50-image icon icon-filter"
+                  src="imgs/icons/Star.png"
+                />
+              </div>
+              <div class="icon-button pixel-borders-inset" id="pauseButton">
+                <img
+                  id="pause-icon-button"
+                  class="top-50-image icon icon-filter"
+                  src="imgs/icons/Pause.png"
+                />
+              </div>
+              <div class="icon-button pixel-borders-inset" id="muteButton">
+                <img
+                  id="mute-icon-button"
+                  class="top-50-image icon icon-filter"
+                  src="imgs/icons/Speaker-On.png"
+                />
+              </div>
+              <div class="icon-button tooltip pixel-borders-inset">
+                <img
+                  class="top-50-image icon-filter"
+                  src="imgs/icons/Question-Mark.png"
+                />
+                <span class="tooltiptext pixel-corners">
+                  <div class="tooltip-container">
+                    <b class="mono tooltip-heading">Controls</b>
+                    <span class="mono tooltip-item"
+                      >- Press space to jump!</span
+                    >
+                    <span class="mono tooltip-item"
+                      >- Press down to dive while in the air!</span
+                    >
+                  </div>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-
         <canvas id="snow"></canvas>
         <div id="spotlight" class="spotlight pixel-corners"></div>
 
@@ -120,37 +165,6 @@
             <div class="ticker-content2" data-ticker2></div>
             <div class="ticker-divider"></div>
             <div class="ticker-content3" data-ticker3></div>
-          </div>
-          <div class="flex-row" style="display: none">
-            <div class="icon-button" id="toggleLeaderboard">
-              <img class="top-50-image icon" src="imgs/icons/Leaderboard.png" />
-            </div>
-            <div class="icon-button" id="pauseButton">
-              <img
-                id="pause-icon-button"
-                class="top-50-image icon"
-                src="imgs/icons/Pause.png"
-              />
-            </div>
-            <div class="icon-button" id="muteButton">
-              <img
-                id="mute-icon-button"
-                class="top-50-image icon"
-                src="imgs/icons/Volume.png"
-              />
-            </div>
-            <div class="icon-button tooltip">
-              <img class="top-50-image icon" src="imgs/icons/help.png" />
-              <span class="tooltiptext pixel-corners">
-                <div class="tooltip-container">
-                  <b class="mono tooltip-heading">Controls</b>
-                  <span class="mono tooltip-item">- Press space to jump!</span>
-                  <span class="mono tooltip-item"
-                    >- Press down to dive while in the air!</span
-                  >
-                </div>
-              </span>
-            </div>
           </div>
         </div>
         <!-- <div class="multiplier">multiplier</div> -->
