@@ -4879,11 +4879,23 @@ function _handleSubmitNewScore() {
   }));
   return _handleSubmitNewScore.apply(this, arguments);
 }
+document.addEventListener('click', function (event) {
+  var shareContainer = document.getElementById('share-container');
+  var shareButton = document.getElementById('shareButton');
+  if (!shareContainer.contains(event.target) && !shareButton.contains(event.target)) {
+    shareContainer.classList.remove('show-share-container');
+  }
+});
+function handleOpenShareContainer() {
+  var shareContainer = document.getElementById('share-container');
+  shareContainer.classList.add('show-share-container');
+}
 if (document.getElementById('submit-button')) {
   document.getElementById('submit-button').addEventListener('click', handleSubmitNewScore);
 }
 document.getElementById('closeLeaderboard').addEventListener('click', handleToggleLeaderboard);
 document.getElementById('toggleLeaderboard').addEventListener('click', handleToggleLeaderboard);
+document.getElementById('shareButton').addEventListener('click', handleOpenShareContainer);
 var showLeaderboard = false;
 var loading;
 function stopLoading() {
@@ -5097,7 +5109,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57485" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61720" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

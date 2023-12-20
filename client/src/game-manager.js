@@ -548,6 +548,23 @@ async function handleSubmitNewScore() {
   }
 }
 
+document.addEventListener('click', function (event) {
+  const shareContainer = document.getElementById('share-container');
+  const shareButton = document.getElementById('shareButton');
+
+  if (
+    !shareContainer.contains(event.target) &&
+    !shareButton.contains(event.target)
+  ) {
+    shareContainer.classList.remove('show-share-container');
+  }
+});
+
+function handleOpenShareContainer() {
+  const shareContainer = document.getElementById('share-container');
+  shareContainer.classList.add('show-share-container');
+}
+
 if (document.getElementById('submit-button')) {
   document
     .getElementById('submit-button')
@@ -561,6 +578,10 @@ document
 document
   .getElementById('toggleLeaderboard')
   .addEventListener('click', handleToggleLeaderboard);
+
+document
+  .getElementById('shareButton')
+  .addEventListener('click', handleOpenShareContainer);
 
 let showLeaderboard = false;
 

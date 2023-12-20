@@ -730,9 +730,6 @@ td {
   width: 30px;
 }
 
-.top-50-image {
-}
-
 .icon-filter {
   filter: brightness(15%) sepia(100) saturate(20) hue-rotate(210deg);
 }
@@ -756,7 +753,6 @@ td {
   background-color: rgb(221, 221, 221) !important;
 }
 .icon-button:hover {
-  transform: scale(1.01);
   background-color: rgb(241, 241, 241);
 }
 
@@ -1072,6 +1068,34 @@ td {
   margin-bottom: 4px;
 }
 
+.share-item {
+  width: 100%;
+  padding: 5px 30px 5px 10px;
+  white-space: nowrap;
+}
+.share-item:hover {
+  background-color: #17181a;
+}
+
+.share-container {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.show-share-container {
+  transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  text-align: left;
+  font-size: 14px;
+  opacity: 1;
+  pointer-events: auto;
+  padding: 15px 20px;
+  top: 100%;
+  background-color: #202327;
+}
+
 .tooltip .tooltiptext {
   visibility: hidden;
   background-color: black;
@@ -1079,7 +1103,7 @@ td {
   text-align: center;
   border-radius: 6px;
   padding: 20px 30px;
-  width: 240px;
+  min-width: 240px;
   /* Position the tooltip */
   position: absolute;
   z-index: 1;
@@ -1088,7 +1112,7 @@ td {
   transition: opacity 0.3s ease-in-out;
   left: 50%;
   text-align: left;
-  margin-left: -120px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  margin-left: -210px; /* Use half of the width (120/2 = 60), to center the tooltip */
 }
 
 .tooltip:hover .tooltiptext {
@@ -1101,8 +1125,8 @@ td {
   position: absolute;
   top: 100%; /* At the bottom of the tooltip */
   left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
+  margin-left: -20px;
+  border-width: 40px;
   border-style: solid;
   border-color: black transparent transparent transparent;
 }
