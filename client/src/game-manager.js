@@ -41,6 +41,7 @@ import muteImg from './public/imgs/icons/Speaker-Off.png';
 import unmuteImg from './public/imgs/icons/Speaker-On.png';
 import pauseImg from './public/imgs/icons/Pause.png';
 import playImg from './public/imgs/icons/Play.png';
+import redoImg from './public/imgs/icons/Redo.png';
 import foregroundImg from './public/imgs/backgrounds/Foreground-Trees.png';
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 45;
@@ -51,6 +52,8 @@ const scoreElem = document.querySelector('[data-score]');
 const highScoreElem = document.querySelector('[data-high-score]');
 const startScreenElem = document.querySelector('[data-start-screen]');
 const endScreenElem = document.querySelector('[data-game-over-screen]');
+const gameOverTextElem = document.querySelector('[data-game-over-text]');
+const gameOverIconElem = document.getElementById('game-over-icon');
 const leaderboardElem = document.querySelector('[data-leaderboard-body]');
 const scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
 const scoreNewHighScoreElem = document.querySelector(
@@ -71,6 +74,8 @@ const currentMultiplierElem = document.querySelector(
 );
 const plusPointsElem = document.querySelector('[data-plus-points]');
 const tickerContainerElem = document.querySelector('[data-ticker-container]');
+const loadingTextElem = document.querySelector('[data-loading-text]');
+
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
@@ -79,8 +84,8 @@ const tickerContainerElem = document.querySelector('[data-ticker-container]');
 setPixelToWorldScale();
 createLeaderboard(leaderboardElem);
 window.addEventListener('resize', setPixelToWorldScale);
-document.addEventListener('keydown', handleStart, { once: true });
-document.addEventListener('touchstart', handleStart, { once: true });
+// document.addEventListener('keydown', handleStart, { once: true });
+// document.addEventListener('touchstart', handleStart, { once: true });
 let lastTime;
 let speedScale;
 let score;
@@ -95,6 +100,7 @@ let isPaused = false;
 let playerImmunity = false;
 let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
 scrollableTableElem.classList.add('hide-element');
+scrollableTableElem.style.display = 'none';
 worldElem.setAttribute('transition-style', 'in:circle:center');
 // tickerContainerElem.classList.add('hide-element');
 // tickerContainerElem.classList.remove('show-element');
@@ -157,7 +163,7 @@ function update(time) {
   updateGroundLayerThree(delta, speedScale);
   updateGroundLayerTwo(delta, speedScale);
   updateDino(delta, speedScale);
-  // updateCactus(delta, speedScale);
+  updateCactus(delta, speedScale);
   updateSpeedScale(delta);
   updateScore(delta);
   updateMultiplier(delta, speedScale);
@@ -241,66 +247,6 @@ function randomArc(element) {
 function calculateFontSize(points) {
   return Math.min(20 + points * 0.08, 46);
 }
-
-// function moveCoinTowardPlayer(coinElement) {
-//   const speed = 8; // Adjust the speed as needed
-
-//   function move() {
-//     const coinRect = coinElement.getBoundingClientRect();
-//     const dinoRect = getDinoRect();
-//     // Calculate the direction towards the player in each frame
-//     let deltaX = dinoRect.x - coinRect.x;
-//     let deltaY = dinoRect.bottom - coinRect.bottom;
-//     console.log('coin', coinRect);
-//     console.log('dino', dinoRect);
-//     const distanceToPlayer = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-//     // Check if the coin is close enough to the player
-//     if (distanceToPlayer < speed) {
-//       console.log('Hit and stopping coin movement.');
-//       // Create a pickup text element
-//       const newElement = document.createElement('div');
-//       addPickupText(newElement, coinElement);
-//       coinElement.remove();
-//       setTimeout(() => {
-//         newElement.remove();
-//       }, 600);
-
-//       // Remove the coin and update points
-//       soundController.pickupCoin.play();
-//       return;
-//     }
-
-//     // Calculate the angle and normalize it
-//     let angleTowardsPlayer = Math.atan2(deltaY, deltaX);
-//     let normalizedAngle =
-//       angleTowardsPlayer < 0
-//         ? angleTowardsPlayer + 2 * Math.PI
-//         : angleTowardsPlayer;
-
-//     // Calculate movement steps based on the normalized angle
-//     let moveStepX = Math.cos(normalizedAngle) * speed;
-//     let moveStepY = Math.sin(normalizedAngle) * speed;
-//     // Update the coin's position
-//     coinElement.style.left = coinRect.x + moveStepX + 'px';
-//     coinElement.style.bottom = coinRect.bottom + moveStepY + 'px';
-//     requestAnimationFrame(move);
-//   }
-
-//   move();
-// }
-
-// function checkCoinCollision() {
-//   const dinoRect = getDinoRect();
-
-//   getCoinRects().some((element) => {
-//     if (isCollision(element.rect, dinoRect)) {
-//       const coinElement = document.getElementById(element.id);
-//       moveCoinTowardPlayer(coinElement);
-//       return true;
-//     }
-//   });
-// }
 
 function checkCoinCollision() {
   const dinoRect = getDinoRect();
@@ -476,7 +422,7 @@ function setUpElements() {
   setupGroundLayerTwo();
   setupGroundLayerThree();
   setupDino();
-  // setupCactus();
+  setupCactus();
   setupMultiplier();
   setupCoin();
 }
@@ -618,20 +564,55 @@ document
 
 let showLeaderboard = false;
 
+let loading;
+function stopLoading() {
+  loading = false;
+}
+
 function handleToggleLeaderboard() {
+  const leaderboardContent = document.getElementById('leaderboard-content');
+
   if (!showLeaderboard) {
+    leaderboardContent.classList.remove('flicker-opacity-off');
+    loading = true;
+    runTypeLetters();
     showLeaderboard = !showLeaderboard;
-    scrollableTableElem.classList.add('show-element');
-    scrollableTableElem.classList.remove('hide-element');
+    worldElem.setAttribute('transition-style', 'out:wipe:right');
+    const randomTimeout = Math.random() * (2800 - 1500) + 1500; // Random timeout between 1500ms and 2800ms
+    setTimeout(() => {
+      stopLoading();
+      scrollableTableElem.setAttribute('transition-style', 'in:wipe:left');
+      scrollableTableElem.classList.add('show-element');
+      leaderboardContent.classList.add('translateX-right-to-left');
+      scrollableTableElem.classList.remove('hide-element');
+    }, randomTimeout);
   } else {
+    loading = true;
+    runTypeLetters();
     showLeaderboard = !showLeaderboard;
-    scrollableTableElem.classList.remove('show-element');
-    scrollableTableElem.classList.add('hide-element');
+    scrollableTableElem.setAttribute('transition-style', 'out:wipe:right');
+    leaderboardContent.classList.add('flicker-opacity-off');
+    setTimeout(() => {
+      stopLoading();
+      worldElem.setAttribute('transition-style', 'in:wipe:left');
+      scrollableTableElem.classList.remove('show-element');
+      scrollableTableElem.classList.add('hide-element');
+    }, 1500);
   }
 }
 
+function runTypeLetters() {
+  if (!loading) {
+    return;
+  }
+  loadingTextElem.textContent = '';
+  typeLettersAny(0, '...', loadingTextElem, 120);
+  const rerunDelay = 2700;
+  setTimeout(runTypeLetters, rerunDelay);
+}
+
 function handleLose() {
-  endScreenElem.textContent = '';
+  gameOverTextElem.textContent = '';
   // tickerContainerElem.classList.add('show-element');
   // tickerContainerElem.classList.remove('hide-element');
   handleCheckIfHighScore(score);
@@ -749,7 +730,27 @@ const textToType = 'Game Over';
 
 function typeLetters(index) {
   if (index < textToType.length) {
-    endScreenElem.textContent += textToType.charAt(index);
+    gameOverTextElem.textContent += textToType.charAt(index);
     setTimeout(() => typeLetters(index + 1), 200); // Adjust the delay as needed
+  } else {
+    gameOverIconElem.classList.remove('hide-element');
+    gameOverIconElem.classList.add('show-element');
+  }
+}
+
+function typeLettersAny(index, text, elem, timeout) {
+  if (index < text.length) {
+    elem.innerHTML += `<span>${text.charAt(index)}</span>`;
+    setTimeout(() => {
+      Array.from(elem.children).forEach((span, index) => {
+        setTimeout(() => {
+          span.classList.add('wavy');
+        }, index * 80);
+      });
+      typeLettersAny(index + 1, text, elem, timeout);
+    }, 250); // Adjust the delay as needed
+  } else {
+    elem.classList.remove('hide-element');
+    elem.classList.add('show-element');
   }
 }

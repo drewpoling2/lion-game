@@ -21,28 +21,89 @@
       <p>Please flip your phone sideways to view the content.</p>
     </div>
 
-    <div class="leaderboard" data-scrollable-table="">
-      <div class="flex-row justify-between">
-        <div class="leaderboard-title">TOP 50</div>
-        <button id="closeLeaderboard">close</button>
-      </div>
-      <div class="scrollable-table">
-        <table class="leaderboard-table" style="border-collapse: collapse">
-          <thead>
-            <tr>
-              <th class="leaderboard-item"></th>
-              <th class="leaderboard-item">Score</th>
-              <th class="leaderboard-name-item">Name</th>
-            </tr>
-          </thead>
-          <tbody data-leaderboard-body=""></tbody>
-        </table>
-      </div>
-    </div>
     <div class="flex-col world-container" style="background-color: #000">
-      <!-- <img src="imgs/typography/High-Score.png" class="high-score-label" /> -->
-      <div class="game-over-screen hide" data-game-over-screen=""></div>
+      <div class="leaderboard" data-scrollable-table="">
+        <div id="leaderboard-content" class="flex-row justify-between w-full">
+          <div class="sidebar-left flex-col">
+            <button id="closeLeaderboard" class="capitalize sidebar-button first-sidebar-item">
+              <span class="sidebar-icon-container">
+                <img class="sidebar-icon" src="/Left-Arrow.9e2bd32c.png">
+              </span>
+              back
+            </button>
+            <button class="capitalize sidebar-button">
+              <span class="sidebar-icon-container">
+                <img class="sidebar-icon" src="/Share.13d6da6f.png"></span>
+              share
+            </button>
+            <button class="capitalize sidebar-button">
+              <span class="sidebar-icon-container">
+                <img class="sidebar-icon" src="/Star.3e18d544.png"></span>
+              trophies
+            </button>
+            <button class="capitalize sidebar-button">
+              <span class="sidebar-icon-container">
+                <img class="sidebar-icon" src="/Question-Mark.677df592.png"></span>
+              help
+            </button>
+            <button class="capitalize sidebar-button">
+              <span class="sidebar-icon-container">
+                <img class="sidebar-icon" src="/Bulleted-List.64cc1891.png"></span>
+              Past seasons
+            </button>
+          </div>
+          <div class="menu-middle-container">
+            <div class="flex-col justify-center items-center">
+              <div class="star-icon-header-container">
+                <span class="star-icon-container">
+                  <img class="sidebar-icon" src="/Star.3e18d544.png">
+                </span>
+                <img style="width: 26px; height: 26px" src="/Star.3e18d544.png">
+                <span class="star-icon-container">
+                  <img class="sidebar-icon" src="/Star.3e18d544.png">
+                </span>
+              </div>
 
+              <div class="menu-title uppercase">Lion game</div>
+              <div class="leaderboard-label-text sans uppercase">
+                Leaderboard
+              </div>
+              <div class="season-title">Season 1</div>
+            </div>
+            <div class="scrollable-table">
+              <table class="leaderboard-table" style="border-collapse: collapse">
+                <thead>
+                  <tr>
+                    <th class="leaderboard-rank-item wave-animation">Rank</th>
+                    <th class="leaderboard-score-item">Score</th>
+                    <th class="leaderboard-name-item">Name</th>
+                  </tr>
+                </thead>
+                <tbody data-leaderboard-body=""></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="flex-col sidebar-right">
+            <div class="uppercase sans right-sidebar-title">Personal Bests</div>
+            <div class="flex-row sans best-item-container">
+              <span>LVL</span><span data-personal-best-lvl="">--</span>
+            </div>
+            <div class="flex-row sans best-item-container">
+              <span>Score</span><span data-personal-best-score="">--</span>
+            </div>
+            <div class="flex-row sans best-item-container">
+              <span>Combos</span><span data-personal-best-combo="">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-game-over-screen="" class="game-over-screen hide"></div>
+      <div class="game-over-screen items-center">
+        <!-- <img src="imgs/typography/High-Score.png" class="high-score-label" /> -->
+        <div class="game-over-text" data-game-over-text=""></div>
+        <div class="loading-text flex sans" data-loading-text=""></div>
+        <img class="game-over-icon hide-element transition-short" id="game-over-icon" src="/Redo.35a20d07.png">
+      </div>
       <div class="world" data-world="">
         <div class="hud-container">
           <div class="hud-container-left">
@@ -93,7 +154,6 @@
         </div>
         <canvas id="snow"></canvas>
         <div id="spotlight" class="spotlight pixel-corners"></div>
-
         <div class="timer test-text" data-multiplier-timer="">0</div>
         <div class="current-multiplier sans" data-current-multiplier=""></div>
         <div class="start-screen blink" data-start-screen="">

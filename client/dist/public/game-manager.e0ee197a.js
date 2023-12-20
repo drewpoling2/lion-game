@@ -4040,6 +4040,26 @@ Object.defineProperty(exports, "__esModule", {
 exports.createLeaderboard = createLeaderboard;
 var _apis = require("../apis");
 function createLeaderboard(leaderboardElem) {
+  //for right sidebar
+  var personalBestLvl = document.querySelector('[data-personal-best-lvl]');
+  var personalBestCombo = document.querySelector('[data-personal-best-combo]');
+  var personalBestScoreElem = document.querySelector('[data-personal-best-score]');
+
+  // Retrieve values from local storage
+  var storedPersonalBestLvl = localStorage.getItem('lion-best-lvl');
+  var storedPersonalBestCombo = localStorage.getItem('lion-best-combo');
+  var storedPersonalBestScore = localStorage.getItem('lion-high-score');
+
+  // Check if values exist in local storage before updating the elements
+  if (storedPersonalBestLvl !== null) {
+    personalBestLvl.textContent = storedPersonalBestLvl;
+  }
+  if (storedPersonalBestCombo !== null) {
+    personalBestCombo.textContent = storedPersonalBestCombo;
+  }
+  if (storedPersonalBestScore !== null) {
+    personalBestScoreElem.textContent = storedPersonalBestScore;
+  }
   (0, _apis.getAllHighScoreUsers)().then(function (data) {
     function getSuffix(number) {
       var lastDigit = number % 10;
@@ -4346,6 +4366,8 @@ module.exports = "/Speaker-On.4eca78fe.png";
 module.exports = "/Pause.af4380de.png";
 },{}],"imgs/icons/Play.png":[function(require,module,exports) {
 module.exports = "/Play.59a6ba15.png";
+},{}],"imgs/icons/Redo.png":[function(require,module,exports) {
+module.exports = "/Redo.35a20d07.png";
 },{}],"imgs/backgrounds/Foreground-Trees.png":[function(require,module,exports) {
 module.exports = "/Foreground-Trees.1c0db94f.png";
 },{}],"../game-manager.js":[function(require,module,exports) {
@@ -4366,6 +4388,7 @@ var _SpeakerOff = _interopRequireDefault(require("./public/imgs/icons/Speaker-Of
 var _SpeakerOn = _interopRequireDefault(require("./public/imgs/icons/Speaker-On.png"));
 var _Pause = _interopRequireDefault(require("./public/imgs/icons/Pause.png"));
 var _Play = _interopRequireDefault(require("./public/imgs/icons/Play.png"));
+var _Redo = _interopRequireDefault(require("./public/imgs/icons/Redo.png"));
 var _ForegroundTrees = _interopRequireDefault(require("./public/imgs/backgrounds/Foreground-Trees.png"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -4381,6 +4404,8 @@ var scoreElem = document.querySelector('[data-score]');
 var highScoreElem = document.querySelector('[data-high-score]');
 var startScreenElem = document.querySelector('[data-start-screen]');
 var endScreenElem = document.querySelector('[data-game-over-screen]');
+var gameOverTextElem = document.querySelector('[data-game-over-text]');
+var gameOverIconElem = document.getElementById('game-over-icon');
 var leaderboardElem = document.querySelector('[data-leaderboard-body]');
 var scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
 var scoreNewHighScoreElem = document.querySelector('[data-score-new-high-score]');
@@ -4395,6 +4420,8 @@ var scrollableTableElem = document.querySelector('[data-scrollable-table]');
 var currentMultiplierElem = document.querySelector('[data-current-multiplier]');
 var plusPointsElem = document.querySelector('[data-plus-points]');
 var tickerContainerElem = document.querySelector('[data-ticker-container]');
+var loadingTextElem = document.querySelector('[data-loading-text]');
+
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
@@ -4403,12 +4430,8 @@ var tickerContainerElem = document.querySelector('[data-ticker-container]');
 setPixelToWorldScale();
 (0, _leaderboard.createLeaderboard)(leaderboardElem);
 window.addEventListener('resize', setPixelToWorldScale);
-document.addEventListener('keydown', handleStart, {
-  once: true
-});
-document.addEventListener('touchstart', handleStart, {
-  once: true
-});
+// document.addEventListener('keydown', handleStart, { once: true });
+// document.addEventListener('touchstart', handleStart, { once: true });
 var lastTime;
 var speedScale;
 var score;
@@ -4421,6 +4444,7 @@ var isPaused = false;
 var playerImmunity = false;
 var immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
 scrollableTableElem.classList.add('hide-element');
+scrollableTableElem.style.display = 'none';
 worldElem.setAttribute('transition-style', 'in:circle:center');
 // tickerContainerElem.classList.add('hide-element');
 // tickerContainerElem.classList.remove('show-element');
@@ -4479,7 +4503,7 @@ function update(time) {
   (0, _groundLayerThree.updateGroundLayerThree)(delta, speedScale);
   (0, _groundLayerTwo.updateGroundLayerTwo)(delta, speedScale);
   (0, _dino.updateDino)(delta, speedScale);
-  // updateCactus(delta, speedScale);
+  (0, _cactus.updateCactus)(delta, speedScale);
   updateSpeedScale(delta);
   updateScore(delta);
   (0, _scoreMultiplier.updateMultiplier)(delta, speedScale);
@@ -4553,67 +4577,6 @@ function randomArc(element) {
 function calculateFontSize(points) {
   return Math.min(20 + points * 0.08, 46);
 }
-
-// function moveCoinTowardPlayer(coinElement) {
-//   const speed = 8; // Adjust the speed as needed
-
-//   function move() {
-//     const coinRect = coinElement.getBoundingClientRect();
-//     const dinoRect = getDinoRect();
-//     // Calculate the direction towards the player in each frame
-//     let deltaX = dinoRect.x - coinRect.x;
-//     let deltaY = dinoRect.bottom - coinRect.bottom;
-//     console.log('coin', coinRect);
-//     console.log('dino', dinoRect);
-//     const distanceToPlayer = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-//     // Check if the coin is close enough to the player
-//     if (distanceToPlayer < speed) {
-//       console.log('Hit and stopping coin movement.');
-//       // Create a pickup text element
-//       const newElement = document.createElement('div');
-//       addPickupText(newElement, coinElement);
-//       coinElement.remove();
-//       setTimeout(() => {
-//         newElement.remove();
-//       }, 600);
-
-//       // Remove the coin and update points
-//       soundController.pickupCoin.play();
-//       return;
-//     }
-
-//     // Calculate the angle and normalize it
-//     let angleTowardsPlayer = Math.atan2(deltaY, deltaX);
-//     let normalizedAngle =
-//       angleTowardsPlayer < 0
-//         ? angleTowardsPlayer + 2 * Math.PI
-//         : angleTowardsPlayer;
-
-//     // Calculate movement steps based on the normalized angle
-//     let moveStepX = Math.cos(normalizedAngle) * speed;
-//     let moveStepY = Math.sin(normalizedAngle) * speed;
-//     // Update the coin's position
-//     coinElement.style.left = coinRect.x + moveStepX + 'px';
-//     coinElement.style.bottom = coinRect.bottom + moveStepY + 'px';
-//     requestAnimationFrame(move);
-//   }
-
-//   move();
-// }
-
-// function checkCoinCollision() {
-//   const dinoRect = getDinoRect();
-
-//   getCoinRects().some((element) => {
-//     if (isCollision(element.rect, dinoRect)) {
-//       const coinElement = document.getElementById(element.id);
-//       moveCoinTowardPlayer(coinElement);
-//       return true;
-//     }
-//   });
-// }
-
 function checkCoinCollision() {
   var dinoRect = (0, _dino.getDinoRect)();
   (0, _coin.getCoinRects)().some(function (element) {
@@ -4766,7 +4729,7 @@ function setUpElements() {
   (0, _groundLayerTwo.setupGroundLayerTwo)();
   (0, _groundLayerThree.setupGroundLayerThree)();
   (0, _dino.setupDino)();
-  // setupCactus();
+  (0, _cactus.setupCactus)();
   (0, _scoreMultiplier.setupMultiplier)();
   (0, _coin.setupCoin)();
 }
@@ -4922,19 +4885,51 @@ if (document.getElementById('submit-button')) {
 document.getElementById('closeLeaderboard').addEventListener('click', handleToggleLeaderboard);
 document.getElementById('toggleLeaderboard').addEventListener('click', handleToggleLeaderboard);
 var showLeaderboard = false;
+var loading;
+function stopLoading() {
+  loading = false;
+}
 function handleToggleLeaderboard() {
+  var leaderboardContent = document.getElementById('leaderboard-content');
   if (!showLeaderboard) {
+    leaderboardContent.classList.remove('flicker-opacity-off');
+    loading = true;
+    runTypeLetters();
     showLeaderboard = !showLeaderboard;
-    scrollableTableElem.classList.add('show-element');
-    scrollableTableElem.classList.remove('hide-element');
+    worldElem.setAttribute('transition-style', 'out:wipe:right');
+    var randomTimeout = Math.random() * (2800 - 1500) + 1500; // Random timeout between 1500ms and 2800ms
+    setTimeout(function () {
+      stopLoading();
+      scrollableTableElem.setAttribute('transition-style', 'in:wipe:left');
+      scrollableTableElem.classList.add('show-element');
+      leaderboardContent.classList.add('translateX-right-to-left');
+      scrollableTableElem.classList.remove('hide-element');
+    }, randomTimeout);
   } else {
+    loading = true;
+    runTypeLetters();
     showLeaderboard = !showLeaderboard;
-    scrollableTableElem.classList.remove('show-element');
-    scrollableTableElem.classList.add('hide-element');
+    scrollableTableElem.setAttribute('transition-style', 'out:wipe:right');
+    leaderboardContent.classList.add('flicker-opacity-off');
+    setTimeout(function () {
+      stopLoading();
+      worldElem.setAttribute('transition-style', 'in:wipe:left');
+      scrollableTableElem.classList.remove('show-element');
+      scrollableTableElem.classList.add('hide-element');
+    }, 1500);
   }
 }
+function runTypeLetters() {
+  if (!loading) {
+    return;
+  }
+  loadingTextElem.textContent = '';
+  typeLettersAny(0, '...', loadingTextElem, 120);
+  var rerunDelay = 2700;
+  setTimeout(runTypeLetters, rerunDelay);
+}
 function handleLose() {
-  endScreenElem.textContent = '';
+  gameOverTextElem.textContent = '';
   // tickerContainerElem.classList.add('show-element');
   // tickerContainerElem.classList.remove('hide-element');
   handleCheckIfHighScore(score);
@@ -5052,13 +5047,32 @@ snow.init();
 var textToType = 'Game Over';
 function typeLetters(index) {
   if (index < textToType.length) {
-    endScreenElem.textContent += textToType.charAt(index);
+    gameOverTextElem.textContent += textToType.charAt(index);
     setTimeout(function () {
       return typeLetters(index + 1);
     }, 200); // Adjust the delay as needed
+  } else {
+    gameOverIconElem.classList.remove('hide-element');
+    gameOverIconElem.classList.add('show-element');
   }
 }
-},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+function typeLettersAny(index, text, elem, timeout) {
+  if (index < text.length) {
+    elem.innerHTML += "<span>".concat(text.charAt(index), "</span>");
+    setTimeout(function () {
+      Array.from(elem.children).forEach(function (span, index) {
+        setTimeout(function () {
+          span.classList.add('wavy');
+        }, index * 80);
+      });
+      typeLettersAny(index + 1, text, elem, timeout);
+    }, 250); // Adjust the delay as needed
+  } else {
+    elem.classList.remove('hide-element');
+    elem.classList.add('show-element');
+  }
+}
+},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -5083,7 +5097,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57787" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57485" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
