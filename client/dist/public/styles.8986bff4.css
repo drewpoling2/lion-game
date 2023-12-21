@@ -439,7 +439,7 @@ button {
   font-weight: 500;
   letter-spacing: 1px;
   font-family: 'bitcount-mono-single-square', sans-serif;
-  color: white;
+  color: rgb(255, 255, 255);
   outline: none;
   border: 0px;
   background-color: transparent;
@@ -1081,6 +1081,20 @@ td {
   pointer-events: none;
 }
 
+.disabled-item {
+  cursor: default;
+  color: #888;
+}
+
+.disabled-item:hover {
+  background-color: transparent !important;
+}
+
+.sidebar-button-selected {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .show-share-container {
   transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
   display: flex;
@@ -1093,6 +1107,10 @@ td {
   padding: 15px 20px;
   top: 100%;
   background-color: #202327;
+}
+
+#shareButton.transparent-background {
+  background-color: transparent;
 }
 
 .tooltip .tooltiptext {
@@ -1120,6 +1138,40 @@ td {
 }
 
 .tooltip .tooltiptext::after {
+  content: ' ';
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -20px;
+  border-width: 40px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.tooltip .tooltiptextnav {
+  visibility: hidden;
+  background-color: #202327;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  min-width: 200px;
+  padding: 20px 30px;
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: -10px;
+  left: 105%;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  text-align: left;
+}
+
+.tooltip:hover .tooltiptextnav {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip .tooltiptextnav::after {
   content: ' ';
   position: absolute;
   top: 100%; /* At the bottom of the tooltip */

@@ -4460,6 +4460,33 @@ function togglePause() {
     window.requestAnimationFrame(update);
   }
 }
+var shareContainer = document.getElementById('share-container');
+var shareButton = document.getElementById('shareButton');
+shareContainer.addEventListener('mouseenter', function () {
+  shareButton.classList.add('transparent-background');
+});
+shareContainer.addEventListener('mouseleave', function () {
+  shareButton.classList.remove('transparent-background');
+});
+function copyCurrentLink() {
+  var input = document.createElement('input');
+  input.value = window.location.href;
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand('copy');
+  document.body.removeChild(input);
+
+  // Change the button text to "Copied!"
+  document.getElementById('copy-link-button').textContent = 'Copied!';
+
+  // Change it back to "Copy link" after a delay (e.g., 2 seconds)
+  setTimeout(function () {
+    document.getElementById('copy-link-button').textContent = 'Copy link';
+  }, 2000);
+}
+if (document.getElementById('copy-link-button')) {
+  document.getElementById('copy-link-button').addEventListener('click', copyCurrentLink);
+}
 var pauseButton = document.getElementById('pauseButton');
 pauseButton.addEventListener('click', function () {
   togglePause();
@@ -5109,7 +5136,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61720" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53569" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

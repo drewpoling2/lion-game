@@ -31,31 +31,44 @@
               </span>
               back
             </button>
+
+            <button class="capitalize sidebar-button-selected sidebar-button">
+              <span class="sidebar-icon-container">
+                <img class="sidebar-icon" src="/Star.3e18d544.png"></span>
+              Leaderboard
+            </button>
+            <button class="capitalize sidebar-button">
+              <span class="sidebar-icon-container">
+                <img class="sidebar-icon" src="/Question-Mark.677df592.png"></span>
+              Wiki
+            </button>
+            <button class="disabled-item tooltip capitalize sidebar-button">
+              <span class="sidebar-icon-container">
+                <img style="opacity: 0.35" class="sidebar-icon" src="/People.b69a5be0.png"></span>
+              trophy room
+              <span class="tooltiptextnav sans pixel-corners">
+                <div class="tooltip-container">
+                  <span class="tooltip-heading">Coming in the future</span>
+                </div>
+              </span>
+            </button>
+
+            <!-- will get added if we launch another season -->
+            <!-- <button class="capitalize sidebar-button">
+              <span class="sidebar-icon-container">
+                <img class="sidebar-icon" src="imgs/icons/Bulleted-List.png"
+              /></span>
+              Hall of fame
+            </button> -->
             <button id="shareButton" class="capitalize sidebar-button relative">
               <span class="sidebar-icon-container">
                 <img class="sidebar-icon" src="/Share.13d6da6f.png"></span>
               share
               <span id="share-container" class="share-container sans pixel-corners absolute">
-                <span class="share-item">Twitter</span>
-                <span class="share-item">Facebook</span>
-                <span class="share-item">Copy link</span>
+                <!-- <span class="share-item">Twitter</span>
+                <span class="share-item">Facebook</span> -->
+                <span id="copy-link-button" class="share-item">Copy link</span>
               </span>
-            </button>
-
-            <button class="capitalize sidebar-button">
-              <span class="sidebar-icon-container">
-                <img class="sidebar-icon" src="/Star.3e18d544.png"></span>
-              trophies
-            </button>
-            <button class="capitalize sidebar-button">
-              <span class="sidebar-icon-container">
-                <img class="sidebar-icon" src="/Question-Mark.677df592.png"></span>
-              help
-            </button>
-            <button class="capitalize sidebar-button">
-              <span class="sidebar-icon-container">
-                <img class="sidebar-icon" src="/Bulleted-List.64cc1891.png"></span>
-              Past seasons
             </button>
           </div>
           <div class="menu-middle-container">
@@ -137,7 +150,7 @@
           <div class="hud-container-right">
             <div class="flex-row" style="gap: 2px">
               <div class="icon-button pixel-borders-inset" id="toggleLeaderboard">
-                <img class="top-50-image icon icon-filter" src="/Star.3e18d544.png">
+                <img class="top-50-image icon icon-filter" src="/Home.bee5960c.png">
               </div>
               <div class="icon-button pixel-borders-inset" id="pauseButton">
                 <img id="pause-icon-button" class="top-50-image icon icon-filter" src="/Pause.af4380de.png">

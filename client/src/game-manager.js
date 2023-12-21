@@ -117,6 +117,40 @@ function togglePause() {
   }
 }
 
+const shareContainer = document.getElementById('share-container');
+const shareButton = document.getElementById('shareButton');
+
+shareContainer.addEventListener('mouseenter', () => {
+  shareButton.classList.add('transparent-background');
+});
+
+shareContainer.addEventListener('mouseleave', () => {
+  shareButton.classList.remove('transparent-background');
+});
+
+function copyCurrentLink() {
+  var input = document.createElement('input');
+  input.value = window.location.href;
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand('copy');
+  document.body.removeChild(input);
+
+  // Change the button text to "Copied!"
+  document.getElementById('copy-link-button').textContent = 'Copied!';
+
+  // Change it back to "Copy link" after a delay (e.g., 2 seconds)
+  setTimeout(function () {
+    document.getElementById('copy-link-button').textContent = 'Copy link';
+  }, 2000);
+}
+
+if (document.getElementById('copy-link-button')) {
+  document
+    .getElementById('copy-link-button')
+    .addEventListener('click', copyCurrentLink);
+}
+
 const pauseButton = document.getElementById('pauseButton');
 pauseButton.addEventListener('click', function () {
   togglePause();
