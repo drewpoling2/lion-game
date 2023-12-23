@@ -13,6 +13,6 @@ mongoose.connect(
   'mongodb+srv://drewpoling2:5Uu4NNRWb4zf6HmM@cluster0.lmegfru.mongodb.net/?retryWrites=true&w=majority'
 );
 
-app.listen(3001, () => console.log('Server is listening on port 3001'));
+app.listen(3001, () => console.log('Server is now listening on port 3001'));
 
 app.get('/', (req, res) => res.json('lion-game api is running'));
