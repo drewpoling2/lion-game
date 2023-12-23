@@ -14,3 +14,5 @@ mongoose.connect(
 );
 
 app.listen(3001, () => console.log('Server is listening on port 3001'));
+
+app.get('/', (req, res) => res.json('lion-game api is running'));
