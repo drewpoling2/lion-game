@@ -5,8 +5,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "start": "node ./build/index.js",
-    "build": "tsc -p .",
+    "start": "node ./index.js",
+    "build": "npm install && echo 'Build complete'",
     "dev": "nodemon ./index.js"
   },
   "dependencies": {
