@@ -1,6 +1,33 @@
 import { getAllHighScoreUsers } from '../apis';
 
 export function createLeaderboard(leaderboardElem) {
+  //for right sidebar
+  const personalBestLvl = document.querySelector('[data-personal-best-lvl]');
+  const personalBestCombo = document.querySelector(
+    '[data-personal-best-combo]'
+  );
+  const personalBestScoreElem = document.querySelector(
+    '[data-personal-best-score]'
+  );
+
+  // Retrieve values from local storage
+  const storedPersonalBestLvl = localStorage.getItem('lion-best-lvl');
+  const storedPersonalBestCombo = localStorage.getItem('lion-best-combo');
+  const storedPersonalBestScore = localStorage.getItem('lion-high-score');
+
+  // Check if values exist in local storage before updating the elements
+  if (storedPersonalBestLvl !== null) {
+    personalBestLvl.textContent = storedPersonalBestLvl;
+  }
+
+  if (storedPersonalBestCombo !== null) {
+    personalBestCombo.textContent = storedPersonalBestCombo;
+  }
+
+  if (storedPersonalBestScore !== null) {
+    personalBestScoreElem.textContent = storedPersonalBestScore;
+  }
+
   getAllHighScoreUsers().then((data) => {
     function getSuffix(number) {
       const lastDigit = number % 10;

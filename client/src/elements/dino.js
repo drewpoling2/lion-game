@@ -3,18 +3,26 @@ import {
   setCustomProperty,
   getCustomProperty,
 } from '../utility/updateCustomProperty.js';
-import dinoStationaryImg from '../public/imgs/dino-stationary.png';
-import dinoLoseImg from '../public/imgs/dino-lose.png';
-import dinoRun0Img from '../public/imgs/dino-run-0.png';
-import dinoRun1Img from '../public/imgs/dino-run-1.png';
+import lionJumpImg1 from '../public/imgs/nittany-lion/jump-animation/Jump-1.png';
+import lionJumpImg2 from '../public/imgs/nittany-lion/jump-animation/Jump-2.png';
+import lionJumpImg3 from '../public/imgs/nittany-lion/jump-animation/Jump-3.png';
+import lionLoseImg from '../public/imgs/nittany-lion/jump-animation/Jump-1.png';
+import lionRunImg1 from '../public/imgs/nittany-lion/run-cycle/Run-1.png';
+import lionRunImg2 from '../public/imgs/nittany-lion/run-cycle/Run-2.png';
+import lionRunImg3 from '../public/imgs/nittany-lion/run-cycle/Run-3.png';
+import lionRunImg4 from '../public/imgs/nittany-lion/run-cycle/Run-4.png';
+import lionRunImg5 from '../public/imgs/nittany-lion/run-cycle/Run-5.png';
+import lionRunImg6 from '../public/imgs/nittany-lion/run-cycle/Run-6.png';
 import { soundController } from '../utility/sound-controller.js';
 
 const dinoElem = document.querySelector('[data-dino]');
 const JUMP_SPEED = 0.21;
 const DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
 const GRAVITY = 0.00075;
-const DINO_FRAME_COUNT = 2;
+const DINO_FRAME_COUNT = 6;
+const JUMP_FRAME_COUNT = 3;
 const FRAME_TIME = 100;
+const BOTTOM_ANCHOR = 17.5;
 
 let isJumping;
 let canDoubleJump;
@@ -22,6 +30,7 @@ let jumpCount;
 let dinoFrame;
 let currentFrameTime;
 let yVelocity;
+let jumpAnimationInProgress;
 
 function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -31,12 +40,13 @@ function isMobileDevice() {
 
 export function setupDino() {
   isJumping = false;
+  jumpAnimationInProgress = false;
   canDoubleJump = true;
   jumpCount = 0;
   dinoFrame = 0;
   currentFrameTime = 0;
   yVelocity = 0;
-  setCustomProperty(dinoElem, '--bottom', 0);
+  setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
 
   // Function to check if the device is a mobile device
   if (isMobileDevice()) {
@@ -61,19 +71,65 @@ export function getDinoRect() {
 }
 
 export function setDinoLose() {
-  dinoElem.src = dinoLoseImg;
+  dinoElem.src = lionLoseImg;
+  dinoElem.classList.add('leap');
   dinoElem.classList.remove('flash-animation');
+  const spotlight = document.getElementById('spotlight');
+  spotlight.classList.add('close-spotlight');
+}
+
+function startJump() {
+  if (!jumpAnimationInProgress) {
+    jumpAnimationInProgress = true;
+    dinoElem.src = lionJumpImg1;
+
+    setTimeout(function () {
+      dinoElem.src = lionJumpImg2;
+    }, 320); // Adjust the delay as needed
+
+    setTimeout(function () {
+      dinoElem.src = lionJumpImg3;
+    }, 400); // Adjust the delay as needed
+  }
+}
+
+function endJump() {
+  isJumping = false;
+  jumpAnimationInProgress = false;
 }
 
 function handleRun(delta, speedScale) {
   if (isJumping) {
-    dinoElem.src = dinoStationaryImg;
+    startJump();
     return;
   }
 
   if (currentFrameTime >= FRAME_TIME) {
     dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT;
-    dinoElem.src = dinoFrame === 1 ? dinoRun1Img : dinoRun0Img;
+
+    // Use a switch statement to set the image source based on the current frame
+    switch (dinoFrame) {
+      case 0:
+        dinoElem.src = lionRunImg1;
+        break;
+      case 1:
+        dinoElem.src = lionRunImg2;
+        break;
+      case 2:
+        dinoElem.src = lionRunImg3;
+        break;
+      case 3:
+        dinoElem.src = lionRunImg4;
+        break;
+      case 4:
+        dinoElem.src = lionRunImg5;
+        break;
+      case 5:
+        dinoElem.src = lionRunImg6;
+        break;
+      // Add more cases if you have more frames
+    }
+
     currentFrameTime -= FRAME_TIME;
   }
   currentFrameTime += delta * speedScale;
@@ -83,9 +139,9 @@ function handleJump(delta) {
   if (!isJumping) return;
   incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
 
-  if (getCustomProperty(dinoElem, '--bottom') <= 0) {
-    setCustomProperty(dinoElem, '--bottom', 0);
-    isJumping = false;
+  if (getCustomProperty(dinoElem, '--bottom') <= BOTTOM_ANCHOR) {
+    setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
+    endJump();
     canDoubleJump = true;
     jumpCount = 0;
   }
@@ -104,7 +160,8 @@ function onJump(e) {
     (isJumping && jumpCount >= 2)
   )
     return;
-
+  endJump();
+  startJump();
   soundController.jump.play();
   yVelocity = JUMP_SPEED;
   isJumping = true;
@@ -118,8 +175,8 @@ function handleDive(delta) {
   if (!isDiving) return;
   incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
 
-  if (getCustomProperty(dinoElem, '--bottom') <= 0) {
-    setCustomProperty(dinoElem, '--bottom', 0);
+  if (getCustomProperty(dinoElem, '--bottom') <= BOTTOM_ANCHOR) {
+    setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
     isDiving = false;
     jumpCount = 0;
   }

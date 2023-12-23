@@ -168,11 +168,15 @@ function reloadCSS() {
   }, 50);
 }
 module.exports = reloadCSS;
-},{"./bundle-url":"../../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"styles.css":[function(require,module,exports) {
+},{"./bundle-url":"../../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../../node_modules/transition-style/transition.min.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"../../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"_css_loader":"../../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"styles.css":[function(require,module,exports) {
+var reloadCSS = require('_css_loader');
+module.hot.dispose(reloadCSS);
+module.hot.accept(reloadCSS);
+},{"transition-style":"../../node_modules/transition-style/transition.min.css","./imgs/gold-coin/Gold-Coin-1.png":[["Gold-Coin-1.a8490cc4.png","imgs/gold-coin/Gold-Coin-1.png"],"imgs/gold-coin/Gold-Coin-1.png"],"./imgs/gold-coin/Gold-Coin-2.png":[["Gold-Coin-2.b15e0a8b.png","imgs/gold-coin/Gold-Coin-2.png"],"imgs/gold-coin/Gold-Coin-2.png"],"./imgs/gold-coin/Gold-Coin-3.png":[["Gold-Coin-3.44763c14.png","imgs/gold-coin/Gold-Coin-3.png"],"imgs/gold-coin/Gold-Coin-3.png"],"./imgs/gold-coin/Gold-Coin-4.png":[["Gold-Coin-4.21f1c8e7.png","imgs/gold-coin/Gold-Coin-4.png"],"imgs/gold-coin/Gold-Coin-4.png"],"./imgs/gold-coin/Gold-Coin-5.png":[["Gold-Coin-5.cd1d6297.png","imgs/gold-coin/Gold-Coin-5.png"],"imgs/gold-coin/Gold-Coin-5.png"],"./imgs/silver-coin/Silver-Coin-1.png":[["Silver-Coin-1.55569516.png","imgs/silver-coin/Silver-Coin-1.png"],"imgs/silver-coin/Silver-Coin-1.png"],"./imgs/silver-coin/Silver-Coin-2.png":[["Silver-Coin-2.240a17ad.png","imgs/silver-coin/Silver-Coin-2.png"],"imgs/silver-coin/Silver-Coin-2.png"],"./imgs/silver-coin/Silver-Coin-3.png":[["Silver-Coin-3.3cc8a9a3.png","imgs/silver-coin/Silver-Coin-3.png"],"imgs/silver-coin/Silver-Coin-3.png"],"./imgs/silver-coin/Silver-Coin-4.png":[["Silver-Coin-4.18cd606f.png","imgs/silver-coin/Silver-Coin-4.png"],"imgs/silver-coin/Silver-Coin-4.png"],"./imgs/silver-coin/Silver-Coin-5.png":[["Silver-Coin-5.4dd7a779.png","imgs/silver-coin/Silver-Coin-5.png"],"imgs/silver-coin/Silver-Coin-5.png"],"./imgs/red-gem/Red-Gem-1.png":[["Red-Gem-1.17c0dba0.png","imgs/red-gem/Red-Gem-1.png"],"imgs/red-gem/Red-Gem-1.png"],"./imgs/red-gem/Red-Gem-2.png":[["Red-Gem-2.287ee36b.png","imgs/red-gem/Red-Gem-2.png"],"imgs/red-gem/Red-Gem-2.png"],"./imgs/red-gem/Red-Gem-3.png":[["Red-Gem-3.c4623f2f.png","imgs/red-gem/Red-Gem-3.png"],"imgs/red-gem/Red-Gem-3.png"],"./imgs/red-gem/Red-Gem-4.png":[["Red-Gem-4.4aacaaca.png","imgs/red-gem/Red-Gem-4.png"],"imgs/red-gem/Red-Gem-4.png"],"_css_loader":"../../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -197,7 +201,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59087" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60747" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

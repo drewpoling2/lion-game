@@ -148,24 +148,80 @@ var SPEED = 0.05;
 var groundElems = document.querySelectorAll('[data-ground]');
 function setupGround() {
   (0, _updateCustomProperty.setCustomProperty)(groundElems[0], '--left', 0);
-  (0, _updateCustomProperty.setCustomProperty)(groundElems[1], '--left', 300);
+  (0, _updateCustomProperty.setCustomProperty)(groundElems[1], '--left', 250);
 }
 function updateGround(delta, speedScale) {
   groundElems.forEach(function (ground) {
     (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
-    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -300) {
-      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 600);
+    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -250) {
+      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 500);
     }
   });
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"imgs/dino-stationary.png":[function(require,module,exports) {
-module.exports = "/dino-stationary.68563e8d.png";
-},{}],"imgs/dino-lose.png":[function(require,module,exports) {
-module.exports = "/dino-lose.e95d406c.png";
-},{}],"imgs/dino-run-0.png":[function(require,module,exports) {
-module.exports = "/dino-run-0.f3aadbbf.png";
-},{}],"imgs/dino-run-1.png":[function(require,module,exports) {
-module.exports = "/dino-run-1.96d589ba.png";
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"../elements/groundLayerTwo.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setupGroundLayerTwo = setupGroundLayerTwo;
+exports.updateGroundLayerTwo = updateGroundLayerTwo;
+var _updateCustomProperty = require("../utility/updateCustomProperty.js");
+var SPEED = 0.022;
+var groundLayerTwoElems = document.querySelectorAll('[data-ground-layer-two]');
+function setupGroundLayerTwo() {
+  (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[0], '--left', 0);
+  (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[1], '--left', 260);
+}
+function updateGroundLayerTwo(delta, speedScale) {
+  groundLayerTwoElems.forEach(function (ground) {
+    (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -260) {
+      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 520);
+    }
+  });
+}
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"../elements/groundLayerThree.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setupGroundLayerThree = setupGroundLayerThree;
+exports.updateGroundLayerThree = updateGroundLayerThree;
+var _updateCustomProperty = require("../utility/updateCustomProperty.js");
+var SPEED = 0.007;
+var groundLayerThreeElems = document.querySelectorAll('[data-ground-layer-three]');
+function setupGroundLayerThree() {
+  (0, _updateCustomProperty.setCustomProperty)(groundLayerThreeElems[0], '--left', 0);
+  (0, _updateCustomProperty.setCustomProperty)(groundLayerThreeElems[1], '--left', 200);
+}
+function updateGroundLayerThree(delta, speedScale) {
+  groundLayerThreeElems.forEach(function (ground) {
+    (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -200) {
+      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 400);
+    }
+  });
+}
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"imgs/nittany-lion/jump-animation/Jump-1.png":[function(require,module,exports) {
+module.exports = "/Jump-1.75f1a3cd.png";
+},{}],"imgs/nittany-lion/jump-animation/Jump-2.png":[function(require,module,exports) {
+module.exports = "/Jump-2.6da28d8f.png";
+},{}],"imgs/nittany-lion/jump-animation/Jump-3.png":[function(require,module,exports) {
+module.exports = "/Jump-3.37993b63.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-1.png":[function(require,module,exports) {
+module.exports = "/Run-1.46a06f1c.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-2.png":[function(require,module,exports) {
+module.exports = "/Run-2.3a155b76.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-3.png":[function(require,module,exports) {
+module.exports = "/Run-3.ae5640e0.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-4.png":[function(require,module,exports) {
+module.exports = "/Run-4.920d82db.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-5.png":[function(require,module,exports) {
+module.exports = "/Run-5.cda810b2.png";
+},{}],"imgs/nittany-lion/run-cycle/Run-6.png":[function(require,module,exports) {
+module.exports = "/Run-6.e2d461ae.png";
 },{}],"../node_modules/howler/dist/howler.js":[function(require,module,exports) {
 var define;
 var global = arguments[3];
@@ -3429,19 +3485,23 @@ var _howler = require("howler");
 var soundController = exports.soundController = {
   die: new _howler.Howl({
     src: ['sounds/die.wav'],
-    volume: 0.075
+    volume: 0
   }),
   jump: new _howler.Howl({
     src: ['sounds/jump.wav'],
-    volume: 0.075
+    volume: 0
   }),
   beatScore: new _howler.Howl({
     src: ['sounds/beatScore.wav'],
-    volume: 0.075
+    volume: 0
   }),
   pickupCoin: new _howler.Howl({
     src: ['sounds/pickupCoin.wav'],
-    volume: 0.075
+    volume: 0
+  }),
+  takeDamage: new _howler.Howl({
+    src: ['sounds/takeDamage.wav'],
+    volume: 0
   })
 };
 },{"howler":"../node_modules/howler/dist/howler.js"}],"../elements/dino.js":[function(require,module,exports) {
@@ -3455,35 +3515,44 @@ exports.setDinoLose = setDinoLose;
 exports.setupDino = setupDino;
 exports.updateDino = updateDino;
 var _updateCustomProperty = require("../utility/updateCustomProperty.js");
-var _dinoStationary = _interopRequireDefault(require("../public/imgs/dino-stationary.png"));
-var _dinoLose = _interopRequireDefault(require("../public/imgs/dino-lose.png"));
-var _dinoRun = _interopRequireDefault(require("../public/imgs/dino-run-0.png"));
-var _dinoRun2 = _interopRequireDefault(require("../public/imgs/dino-run-1.png"));
+var _Jump = _interopRequireDefault(require("../public/imgs/nittany-lion/jump-animation/Jump-1.png"));
+var _Jump2 = _interopRequireDefault(require("../public/imgs/nittany-lion/jump-animation/Jump-2.png"));
+var _Jump3 = _interopRequireDefault(require("../public/imgs/nittany-lion/jump-animation/Jump-3.png"));
+var _Run = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-1.png"));
+var _Run2 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-2.png"));
+var _Run3 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-3.png"));
+var _Run4 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-4.png"));
+var _Run5 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-5.png"));
+var _Run6 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-6.png"));
 var _soundController = require("../utility/sound-controller.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 var dinoElem = document.querySelector('[data-dino]');
 var JUMP_SPEED = 0.21;
 var DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
 var GRAVITY = 0.00075;
-var DINO_FRAME_COUNT = 2;
+var DINO_FRAME_COUNT = 6;
+var JUMP_FRAME_COUNT = 3;
 var FRAME_TIME = 100;
+var BOTTOM_ANCHOR = 17.5;
 var isJumping;
 var canDoubleJump;
 var jumpCount;
 var dinoFrame;
 var currentFrameTime;
 var yVelocity;
+var jumpAnimationInProgress;
 function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 function setupDino() {
   isJumping = false;
+  jumpAnimationInProgress = false;
   canDoubleJump = true;
   jumpCount = 0;
   dinoFrame = 0;
   currentFrameTime = 0;
   yVelocity = 0;
-  (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', 0);
+  (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
 
   // Function to check if the device is a mobile device
   if (isMobileDevice()) {
@@ -3505,17 +3574,61 @@ function getDinoRect() {
   return dinoElem.getBoundingClientRect();
 }
 function setDinoLose() {
-  dinoElem.src = _dinoLose.default;
+  dinoElem.src = _Jump.default;
+  dinoElem.classList.add('leap');
   dinoElem.classList.remove('flash-animation');
+  var spotlight = document.getElementById('spotlight');
+  spotlight.classList.add('close-spotlight');
+}
+function startJump() {
+  if (!jumpAnimationInProgress) {
+    jumpAnimationInProgress = true;
+    dinoElem.src = _Jump.default;
+    setTimeout(function () {
+      dinoElem.src = _Jump2.default;
+    }, 320); // Adjust the delay as needed
+
+    setTimeout(function () {
+      dinoElem.src = _Jump3.default;
+    }, 400); // Adjust the delay as needed
+  }
+}
+
+function endJump() {
+  isJumping = false;
+  jumpAnimationInProgress = false;
 }
 function handleRun(delta, speedScale) {
   if (isJumping) {
-    dinoElem.src = _dinoStationary.default;
+    startJump();
     return;
   }
   if (currentFrameTime >= FRAME_TIME) {
     dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT;
-    dinoElem.src = dinoFrame === 1 ? _dinoRun2.default : _dinoRun.default;
+
+    // Use a switch statement to set the image source based on the current frame
+    switch (dinoFrame) {
+      case 0:
+        dinoElem.src = _Run.default;
+        break;
+      case 1:
+        dinoElem.src = _Run2.default;
+        break;
+      case 2:
+        dinoElem.src = _Run3.default;
+        break;
+      case 3:
+        dinoElem.src = _Run4.default;
+        break;
+      case 4:
+        dinoElem.src = _Run5.default;
+        break;
+      case 5:
+        dinoElem.src = _Run6.default;
+        break;
+      // Add more cases if you have more frames
+    }
+
     currentFrameTime -= FRAME_TIME;
   }
   currentFrameTime += delta * speedScale;
@@ -3523,9 +3636,9 @@ function handleRun(delta, speedScale) {
 function handleJump(delta) {
   if (!isJumping) return;
   (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
-  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= 0) {
-    (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', 0);
-    isJumping = false;
+  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= BOTTOM_ANCHOR) {
+    (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
+    endJump();
     canDoubleJump = true;
     jumpCount = 0;
   }
@@ -3537,6 +3650,8 @@ function handleJump(delta) {
 }
 function onJump(e) {
   if (e.code !== 'Space' && e.type !== 'touchstart' || isJumping && jumpCount >= 2) return;
+  endJump();
+  startJump();
   _soundController.soundController.jump.play();
   yVelocity = JUMP_SPEED;
   isJumping = true;
@@ -3547,8 +3662,8 @@ var isDiving = false;
 function handleDive(delta) {
   if (!isDiving) return;
   (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
-  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= 0) {
-    (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', 0);
+  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= BOTTOM_ANCHOR) {
+    (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
     isDiving = false;
     jumpCount = 0;
   }
@@ -3565,8 +3680,14 @@ function onDive(e) {
   isJumping = false;
   jumpCount = 0;
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/dino-stationary.png":"imgs/dino-stationary.png","../public/imgs/dino-lose.png":"imgs/dino-lose.png","../public/imgs/dino-run-0.png":"imgs/dino-run-0.png","../public/imgs/dino-run-1.png":"imgs/dino-run-1.png","../utility/sound-controller.js":"../utility/sound-controller.js"}],"imgs/cactus.png":[function(require,module,exports) {
-module.exports = "/cactus.ec72be49.png";
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/nittany-lion/jump-animation/Jump-1.png":"imgs/nittany-lion/jump-animation/Jump-1.png","../public/imgs/nittany-lion/jump-animation/Jump-2.png":"imgs/nittany-lion/jump-animation/Jump-2.png","../public/imgs/nittany-lion/jump-animation/Jump-3.png":"imgs/nittany-lion/jump-animation/Jump-3.png","../public/imgs/nittany-lion/run-cycle/Run-1.png":"imgs/nittany-lion/run-cycle/Run-1.png","../public/imgs/nittany-lion/run-cycle/Run-2.png":"imgs/nittany-lion/run-cycle/Run-2.png","../public/imgs/nittany-lion/run-cycle/Run-3.png":"imgs/nittany-lion/run-cycle/Run-3.png","../public/imgs/nittany-lion/run-cycle/Run-4.png":"imgs/nittany-lion/run-cycle/Run-4.png","../public/imgs/nittany-lion/run-cycle/Run-5.png":"imgs/nittany-lion/run-cycle/Run-5.png","../public/imgs/nittany-lion/run-cycle/Run-6.png":"imgs/nittany-lion/run-cycle/Run-6.png","../utility/sound-controller.js":"../utility/sound-controller.js"}],"imgs/trees/Bush-Tree.png":[function(require,module,exports) {
+module.exports = "/Bush-Tree.609b3d8f.png";
+},{}],"imgs/trees/Round-Tree.png":[function(require,module,exports) {
+module.exports = "/Round-Tree.9c40ea34.png";
+},{}],"imgs/trees/Pine-Tree.png":[function(require,module,exports) {
+module.exports = "/Pine-Tree.447fc010.png";
+},{}],"imgs/Obstacles/Snowball-Small.png":[function(require,module,exports) {
+module.exports = "/Snowball-Small.68bfe430.png";
 },{}],"../elements/cactus.js":[function(require,module,exports) {
 "use strict";
 
@@ -3577,8 +3698,12 @@ exports.getCactusRects = getCactusRects;
 exports.setupCactus = setupCactus;
 exports.updateCactus = updateCactus;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
-var _cactus = _interopRequireDefault(require("../public/imgs/cactus.png"));
+var _BushTree = _interopRequireDefault(require("../public/imgs/trees/Bush-Tree.png"));
+var _RoundTree = _interopRequireDefault(require("../public/imgs/trees/Round-Tree.png"));
+var _PineTree = _interopRequireDefault(require("../public/imgs/trees/Pine-Tree.png"));
+var _SnowballSmall = _interopRequireDefault(require("../public/imgs/Obstacles/Snowball-Small.png"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -3635,11 +3760,56 @@ function getCactusRects() {
     return cactus.getBoundingClientRect();
   });
 }
+
+// Array of possible cactus images with associated weights
+var cactusImages = [{
+  src: _BushTree.default,
+  weight: 5
+}, {
+  src: _RoundTree.default,
+  weight: 1
+}, {
+  src: _PineTree.default,
+  weight: 2
+}, {
+  src: _SnowballSmall.default,
+  weight: 3
+}
+// Add more image sources with corresponding weights
+];
+
 function createCactus(newPosition) {
+  // Calculate the total weight
+  var totalWeight = cactusImages.reduce(function (sum, image) {
+    return sum + image.weight;
+  }, 0);
+
+  // Generate a random number between 0 and totalWeight
+  var randomWeight = Math.random() * totalWeight;
+
+  // Select a random cactus image based on the weighted probabilities
+  var cumulativeWeight = 0;
+  var selectedImage;
+  var _iterator = _createForOfIteratorHelper(cactusImages),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var image = _step.value;
+      cumulativeWeight += image.weight;
+      if (randomWeight <= cumulativeWeight) {
+        selectedImage = image;
+        break;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
   var cactus = document.createElement('img');
   cactus.dataset.cactus = true;
-  cactus.src = _cactus.default;
-  cactus.classList.add('cactus');
+  cactus.src = selectedImage.src;
+  cactus.classList.add('cactus', 'game-element');
   (0, _updateCustomProperty.setCustomProperty)(cactus, '--left', newPosition);
   (0, _updateCustomProperty.setCustomProperty)(cactus, 'height', "".concat(randomNumberBetween(13, 17), "%"));
   worldElem.append(cactus);
@@ -3647,7 +3817,7 @@ function createCactus(newPosition) {
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/cactus.png":"imgs/cactus.png"}],"../../../server/common/errors.ts":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/trees/Bush-Tree.png":"imgs/trees/Bush-Tree.png","../public/imgs/trees/Round-Tree.png":"imgs/trees/Round-Tree.png","../public/imgs/trees/Pine-Tree.png":"imgs/trees/Pine-Tree.png","../public/imgs/Obstacles/Snowball-Small.png":"imgs/Obstacles/Snowball-Small.png"}],"../../../server/common/errors.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3870,6 +4040,26 @@ Object.defineProperty(exports, "__esModule", {
 exports.createLeaderboard = createLeaderboard;
 var _apis = require("../apis");
 function createLeaderboard(leaderboardElem) {
+  //for right sidebar
+  var personalBestLvl = document.querySelector('[data-personal-best-lvl]');
+  var personalBestCombo = document.querySelector('[data-personal-best-combo]');
+  var personalBestScoreElem = document.querySelector('[data-personal-best-score]');
+
+  // Retrieve values from local storage
+  var storedPersonalBestLvl = localStorage.getItem('lion-best-lvl');
+  var storedPersonalBestCombo = localStorage.getItem('lion-best-combo');
+  var storedPersonalBestScore = localStorage.getItem('lion-high-score');
+
+  // Check if values exist in local storage before updating the elements
+  if (storedPersonalBestLvl !== null) {
+    personalBestLvl.textContent = storedPersonalBestLvl;
+  }
+  if (storedPersonalBestCombo !== null) {
+    personalBestCombo.textContent = storedPersonalBestCombo;
+  }
+  if (storedPersonalBestScore !== null) {
+    personalBestScoreElem.textContent = storedPersonalBestScore;
+  }
   (0, _apis.getAllHighScoreUsers)().then(function (data) {
     function getSuffix(number) {
       var lastDigit = number % 10;
@@ -4043,6 +4233,8 @@ exports.getCoinRects = getCoinRects;
 exports.setupCoin = setupCoin;
 exports.updateCoin = updateCoin;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
+var _dino = require("./dino");
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -4063,7 +4255,32 @@ function setupCoin() {
 }
 function updateCoin(delta, speedScale) {
   document.querySelectorAll('[data-coin]').forEach(function (coin) {
-    (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', delta * speedScale * SPEED * -1);
+    // Get positions of the dinosaur and coin
+    var dinoRect = (0, _dino.getDinoRect)();
+    var coinRect = coin.getBoundingClientRect();
+    // Calculate distance
+    var distance = Math.sqrt(Math.pow(dinoRect.x - coinRect.x, 2) + Math.pow(dinoRect.y - coinRect.y, 2));
+
+    // If the distance is less than 40px, move the coin towards the dinosaur
+    if (coin.dataset.locked === 'true' || distance < 225) {
+      //lock the coin on the player
+      coin.dataset.locked = 'true';
+      var angle = Math.atan2(dinoRect.y - coinRect.y, dinoRect.x - coinRect.x);
+      var speed = SPEED * delta * speedScale;
+
+      // Calculate incremental movement based on angle and speed
+      var deltaX = Math.cos(angle) * speed * 1.75;
+      var deltaY = Math.sin(angle) * speed * 1.75;
+
+      // Update coin position incrementally
+      (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', deltaX);
+      (0, _updateCustomProperty.incrementCustomProperty)(coin, '--bottom', deltaY * -1);
+    } else {
+      // Move the coin to the left if not close to the dinosaur
+      (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', delta * speedScale * SPEED * -1);
+    }
+
+    // Remove the coin if it goes off the screen
     if ((0, _updateCustomProperty.getCustomProperty)(coin, '--left') <= -100) {
       coin.remove();
     }
@@ -4082,22 +4299,83 @@ function getCoinRects() {
     };
   });
 }
+var collectableOptions = [{
+  type: 'gold-coin',
+  weight: 0.3,
+  points: 82
+}, {
+  type: 'red-gem',
+  weight: 0.1,
+  points: 325
+}, {
+  type: 'silver-coin',
+  weight: 0.6,
+  points: 46
+}];
 function createCoins() {
-  var coin = document.createElement('div');
-  coin.dataset.coin = true;
-  coin.textContent = 'c';
-  coin.classList.add('coin', 'floating-item');
-  coin.id = Math.random().toString(16).slice(2);
-  (0, _updateCustomProperty.setCustomProperty)(coin, '--left', 100);
-  worldElem.append(coin);
+  // Calculate the total weight
+  var totalWeight = collectableOptions.reduce(function (sum, item) {
+    return sum + item.weight;
+  }, 0);
+
+  // Generate a random number between 0 and totalWeight
+  var randomWeight = Math.random() * totalWeight;
+
+  // Select a random collectable based on the weighted probabilities
+  var cumulativeWeight = 0;
+  var selectedCollectable;
+  var _iterator = _createForOfIteratorHelper(collectableOptions),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var item = _step.value;
+      cumulativeWeight += item.weight;
+      if (randomWeight <= cumulativeWeight) {
+        selectedCollectable = item;
+        break;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+  var element = document.createElement('div');
+  element.dataset.coin = true;
+  element.dataset.locked = 'false';
+  element.dataset.points = selectedCollectable.points;
+  element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
+  element.id = Math.random().toString(16).slice(2);
+  (0, _updateCustomProperty.setCustomProperty)(element, '--left', 100);
+  var initialKeyframe = getRandomKeyframe();
+  element.style.animationDelay = "-".concat(initialKeyframe, "%");
+  worldElem.append(element);
 }
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"../game-manager.js":[function(require,module,exports) {
+function getRandomKeyframe() {
+  // Return a random number between 0 and 100 (percentage)
+  return Math.floor(Math.random() * 101);
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./dino":"../elements/dino.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
+module.exports = "/Speaker-Off.c6acac34.png";
+},{}],"imgs/icons/Speaker-On.png":[function(require,module,exports) {
+module.exports = "/Speaker-On.4eca78fe.png";
+},{}],"imgs/icons/Pause.png":[function(require,module,exports) {
+module.exports = "/Pause.af4380de.png";
+},{}],"imgs/icons/Play.png":[function(require,module,exports) {
+module.exports = "/Play.59a6ba15.png";
+},{}],"imgs/icons/Redo.png":[function(require,module,exports) {
+module.exports = "/Redo.35a20d07.png";
+},{}],"imgs/backgrounds/Foreground-Trees.png":[function(require,module,exports) {
+module.exports = "/Foreground-Trees.1c0db94f.png";
+},{}],"../game-manager.js":[function(require,module,exports) {
 "use strict";
 
 var _ground = require("./elements/ground.js");
+var _groundLayerTwo = require("./elements/groundLayerTwo");
+var _groundLayerThree = require("./elements/groundLayerThree");
 var _dino = require("./elements/dino.js");
 var _cactus = require("./elements/cactus.js");
 var _leaderboard = require("./elements/leaderboard.js");
@@ -4106,12 +4384,19 @@ var _apis = require("./apis.js");
 var _validateInput = require("./utility/validate-input.js");
 var _scoreMultiplier = require("./elements/score-multiplier.js");
 var _coin = require("./elements/coin.js");
+var _SpeakerOff = _interopRequireDefault(require("./public/imgs/icons/Speaker-Off.png"));
+var _SpeakerOn = _interopRequireDefault(require("./public/imgs/icons/Speaker-On.png"));
+var _Pause = _interopRequireDefault(require("./public/imgs/icons/Pause.png"));
+var _Play = _interopRequireDefault(require("./public/imgs/icons/Play.png"));
+var _Redo = _interopRequireDefault(require("./public/imgs/icons/Redo.png"));
+var _ForegroundTrees = _interopRequireDefault(require("./public/imgs/backgrounds/Foreground-Trees.png"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-var WORLD_WIDTH = 95;
-var WORLD_HEIGHT = 32;
+var WORLD_WIDTH = 100;
+var WORLD_HEIGHT = 45;
 var SPEED_SCALE_INCREASE = 0.00001;
 var multiplierRatio = 1;
 var worldElem = document.querySelector('[data-world]');
@@ -4119,6 +4404,8 @@ var scoreElem = document.querySelector('[data-score]');
 var highScoreElem = document.querySelector('[data-high-score]');
 var startScreenElem = document.querySelector('[data-start-screen]');
 var endScreenElem = document.querySelector('[data-game-over-screen]');
+var gameOverTextElem = document.querySelector('[data-game-over-text]');
+var gameOverIconElem = document.getElementById('game-over-icon');
 var leaderboardElem = document.querySelector('[data-leaderboard-body]');
 var scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
 var scoreNewHighScoreElem = document.querySelector('[data-score-new-high-score]');
@@ -4133,42 +4420,72 @@ var scrollableTableElem = document.querySelector('[data-scrollable-table]');
 var currentMultiplierElem = document.querySelector('[data-current-multiplier]');
 var plusPointsElem = document.querySelector('[data-plus-points]');
 var tickerContainerElem = document.querySelector('[data-ticker-container]');
+var loadingTextElem = document.querySelector('[data-loading-text]');
+
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
 // playAgainButtonElem.addEventListener('click', function () {
 //   handleStart(); // Add any other actions you want to perform on button click
 // });
-
 setPixelToWorldScale();
 (0, _leaderboard.createLeaderboard)(leaderboardElem);
 window.addEventListener('resize', setPixelToWorldScale);
-document.addEventListener('keydown', handleStart, {
-  once: true
-});
-document.addEventListener('touchstart', handleStart, {
-  once: true
-});
+// document.addEventListener('keydown', handleStart, { once: true });
+// document.addEventListener('touchstart', handleStart, { once: true });
 var lastTime;
 var speedScale;
 var score;
 var collisionOccurred = false; // Flag to track collision
-
+var milestone = 10000;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score') ? localStorage.getItem('lion-high-score') : Math.floor('0').toString().padStart(6, 0);
 var hasBeatenScore = false;
 var isPaused = false;
 var playerImmunity = false;
 var immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
-scrollableTableElem.classList.add('hide-element');
-tickerContainerElem.classList.add('hide-element');
-tickerContainerElem.classList.remove('show-element');
+// scrollableTableElem.classList.add('hide-element');
+// scrollableTableElem.style.display = 'none';
+// worldElem.setAttribute('transition-style', 'in:circle:center');
+// tickerContainerElem.classList.add('hide-element');
+// tickerContainerElem.classList.remove('show-element');
+var pauseIconButton = document.getElementById('pause-icon-button');
 
 // Function to toggle the pause state
 function togglePause() {
   isPaused = !isPaused;
-  if (isPaused) {} else {
+  if (isPaused) {
+    pauseIconButton.src = _Play.default;
+  } else {
+    pauseIconButton.src = _Pause.default;
     window.requestAnimationFrame(update);
   }
+}
+var shareContainer = document.getElementById('share-container');
+var shareButton = document.getElementById('shareButton');
+shareContainer.addEventListener('mouseenter', function () {
+  shareButton.classList.add('transparent-background');
+});
+shareContainer.addEventListener('mouseleave', function () {
+  shareButton.classList.remove('transparent-background');
+});
+function copyCurrentLink() {
+  var input = document.createElement('input');
+  input.value = window.location.href;
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand('copy');
+  document.body.removeChild(input);
+
+  // Change the button text to "Copied!"
+  document.getElementById('copy-link-button').textContent = 'Copied!';
+
+  // Change it back to "Copy link" after a delay (e.g., 2 seconds)
+  setTimeout(function () {
+    document.getElementById('copy-link-button').textContent = 'Copy link';
+  }, 2000);
+}
+if (document.getElementById('copy-link-button')) {
+  document.getElementById('copy-link-button').addEventListener('click', copyCurrentLink);
 }
 var pauseButton = document.getElementById('pauseButton');
 pauseButton.addEventListener('click', function () {
@@ -4185,6 +4502,7 @@ function setPlayerImmunity() {
     playerImmunity = false;
   }, immunityDuration);
 }
+function updateElements() {}
 function update(time) {
   if (isPaused) {
     // Do nothing if the game is paused
@@ -4197,7 +4515,7 @@ function update(time) {
   }
 
   // let delta = time - lastTime;
-  var delta = 8;
+  var delta = 30;
   if (collisionOccurred) {
     setPlayerImmunity();
     togglePause();
@@ -4209,6 +4527,8 @@ function update(time) {
   }
 
   (0, _ground.updateGround)(delta, speedScale);
+  (0, _groundLayerThree.updateGroundLayerThree)(delta, speedScale);
+  (0, _groundLayerTwo.updateGroundLayerTwo)(delta, speedScale);
   (0, _dino.updateDino)(delta, speedScale);
   (0, _cactus.updateCactus)(delta, speedScale);
   updateSpeedScale(delta);
@@ -4220,6 +4540,20 @@ function update(time) {
   if (checkCoinCollision()) ;
   lastTime = time;
   window.requestAnimationFrame(update);
+}
+function createOneUpText() {
+  _soundController.soundController.beatScore.play();
+  var newElement = document.createElement('div');
+  newElement.classList.add('one-up', 'sans');
+  newElement.style.position = 'absolute';
+  newElement.style.left = livesElem.offsetLeft + 'px';
+  newElement.style.top = '20%';
+  livesElem.parentNode.insertBefore(newElement, livesElem);
+  newElement.textContent = '1UP';
+  setTimeout(function () {
+    newElement.remove();
+  }, 600);
+  return true;
 }
 var multiplierTimer = 5;
 var timerInterval;
@@ -4234,7 +4568,6 @@ function startMultiplierTimer() {
     multiplierTimer--;
     if (multiplierTimer === 0) {
       clearInterval(timerInterval);
-      console.log('hit');
       multiplierTimerElem.textContent = '';
       // Reset the timer and multiplier when the countdown ends
       multiplierTimer = 5;
@@ -4266,37 +4599,44 @@ var updateInterval = 50;
 function randomArc(element) {
   // Set random horizontal movement values
   var randomXEnd = Math.random() * 100 - 50; // Adjust the range based on your preference
-  console.log(randomXEnd);
   document.documentElement.style.setProperty('--random-x-end', randomXEnd + 'px');
 }
 function calculateFontSize(points) {
-  return Math.min(17 + points * 0.05, 35);
+  return Math.min(20 + points * 0.08, 46);
 }
 function checkCoinCollision() {
   var dinoRect = (0, _dino.getDinoRect)();
   (0, _coin.getCoinRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
-      _soundController.soundController.pickupCoin.play();
       var coinElement = document.getElementById(element.id);
+      // Create a pickup text element
+      console.log('picked up');
       var newElement = document.createElement('div');
-      newElement.classList.add('plus-points', 'sans');
-      newElement.style.position = 'absolute';
-      newElement.style.left = coinElement.offsetLeft + 'px';
-      newElement.style.top = coinElement.offsetTop - 70 + 'px';
-      randomArc(newElement);
-      coinElement.parentNode.insertBefore(newElement, coinElement);
+      addPickupText(newElement, coinElement);
       coinElement.remove();
-      var points = 100 * multiplierRatio;
-      updateScoreWithPoints(points);
-      var fontSize = calculateFontSize(points);
-      newElement.style.fontSize = fontSize + 'px';
-      newElement.textContent = "+".concat(points);
       setTimeout(function () {
         newElement.remove();
       }, 600);
+
+      // Remove the coin and update points
+      _soundController.soundController.pickupCoin.play();
       return true;
     }
   });
+}
+function addPickupText(text, pickupElement) {
+  var _pickupElement$datase;
+  text.classList.add('plus-points', 'sans');
+  text.style.position = 'absolute';
+  text.style.left = pickupElement.offsetLeft + 'px';
+  text.style.top = pickupElement.offsetTop - 70 + 'px';
+  randomArc(text);
+  pickupElement.parentNode.insertBefore(text, pickupElement);
+  var points = (pickupElement === null || pickupElement === void 0 || (_pickupElement$datase = pickupElement.dataset) === null || _pickupElement$datase === void 0 ? void 0 : _pickupElement$datase.points) * multiplierRatio;
+  updateScoreWithPoints(points);
+  var fontSize = calculateFontSize(points);
+  text.style.fontSize = fontSize + 'px';
+  text.textContent = "+".concat(points);
 }
 function updateScoreWithPoints(delta) {
   var initialScore = score;
@@ -4322,18 +4662,18 @@ function checkLose() {
 
   //if no lives remain then lose
   if (livesElem.textContent === '0') {
+    worldElem.setAttribute('transition-style', 'out:circle:hesitate');
     return true;
   } //check if enemy and player are in colliding
   else if (isEnemyAndPlayerCollision && !playerImmunity) {
     //check if player is not in previous collision state
     if (!collisionOccurred) {
       // decrement lives elem by 1
-      if (livesElem) {
-        var currentLives = parseInt(livesElem.textContent, 10);
-        if (!isNaN(currentLives)) {
-          currentLives -= 1;
-          livesElem.textContent = currentLives;
-        }
+      _soundController.soundController.takeDamage.play();
+      var currentLives = parseInt(livesElem.textContent, 10);
+      if (!isNaN(currentLives)) {
+        currentLives -= 1;
+        livesElem.textContent = currentLives;
       }
       //switch player collision state to true
       collisionOccurred = true;
@@ -4358,21 +4698,21 @@ function checkLose() {
 }
 var muteButton = document.getElementById('muteButton');
 var soundControllerMuted = false;
-
+var muteIconButton = document.getElementById('mute-icon-button');
 //mute/unmute function
 muteButton.addEventListener('click', function () {
   if (!soundControllerMuted) {
     Object.keys(_soundController.soundController).forEach(function (key) {
       _soundController.soundController[key].mute(true);
     });
-    muteButton.textContent = 'Unmute';
+    muteIconButton.src = _SpeakerOff.default;
     soundControllerMuted = true;
     muteButton.blur();
   } else {
     Object.keys(_soundController.soundController).forEach(function (key) {
       _soundController.soundController[key].mute(false);
     });
-    muteButton.textContent = 'Mute';
+    muteIconButton.src = _SpeakerOn.default;
     soundControllerMuted = false;
     muteButton.blur();
   }
@@ -4383,12 +4723,25 @@ function isCollision(rect1, rect2) {
 function updateSpeedScale(delta) {
   speedScale += delta * SPEED_SCALE_INCREASE;
 }
+function calculateNextMilestone(currentMilestone) {
+  // You can customize the growth rate based on your requirements
+  var growthRate = 1.5; // Adjust this as needed
+  return Math.floor(currentMilestone * growthRate);
+}
 function updateScore(delta) {
   score += delta * 0.01;
   scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
   if (score > highScoreElem.textContent && !hasBeatenScore && highScoreElem.textContent !== '000000') {
     _soundController.soundController.beatScore.play();
     hasBeatenScore = true;
+  }
+  if (score > milestone) {
+    createOneUpText();
+    var currentLives = parseInt(livesElem.textContent, 10);
+    currentLives += 1;
+    livesElem.textContent = currentLives;
+    milestone = calculateNextMilestone(milestone);
+    console.log(milestone);
   }
 }
 function handleCheckIfHighScore(score) {
@@ -4398,20 +4751,26 @@ function handleCheckIfHighScore(score) {
     handleCheckLeaderboardHighScore(highScoreElem.textContent);
   }
 }
+function setUpElements() {
+  (0, _ground.setupGround)();
+  (0, _groundLayerTwo.setupGroundLayerTwo)();
+  (0, _groundLayerThree.setupGroundLayerThree)();
+  (0, _dino.setupDino)();
+  (0, _cactus.setupCactus)();
+  (0, _scoreMultiplier.setupMultiplier)();
+  (0, _coin.setupCoin)();
+}
 function handleStart() {
+  worldElem.setAttribute('transition-style', 'in:circle:center');
   lastTime = null;
   hasBeatenScore = false;
   speedScale = 0.9;
   score = 0;
   multiplierRatio = 1;
-  console.log(multiplierRatio);
+  setUpElements();
+  dinoElem.classList.remove('leap');
   currentMultiplierElem.textContent = multiplierRatio;
   livesElem.textContent = 2;
-  (0, _ground.setupGround)();
-  (0, _dino.setupDino)();
-  (0, _cactus.setupCactus)();
-  (0, _scoreMultiplier.setupMultiplier)();
-  (0, _coin.setupCoin)();
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
   // Get the container element where the ticker items will be appended
@@ -4494,8 +4853,9 @@ function handleStart() {
       tickerElem3.appendChild(tickerDivider);
     }
   });
-  tickerContainerElem.classList.add('hide-element');
-  tickerContainerElem.classList.remove('show-element');
+  // tickerContainerElem.classList.add('hide-element');
+  // tickerContainerElem.classList.remove('show-element');
+
   window.requestAnimationFrame(update);
 }
 function handleCheckLeaderboardHighScore(score) {
@@ -4546,26 +4906,103 @@ function _handleSubmitNewScore() {
   }));
   return _handleSubmitNewScore.apply(this, arguments);
 }
+document.addEventListener('click', function (event) {
+  var shareContainer = document.getElementById('share-container');
+  var shareButton = document.getElementById('shareButton');
+  if (!shareContainer.contains(event.target) && !shareButton.contains(event.target)) {
+    shareContainer.classList.remove('show-share-container');
+  }
+});
+function handleOpenShareContainer() {
+  var shareContainer = document.getElementById('share-container');
+  shareContainer.classList.add('show-share-container');
+}
 if (document.getElementById('submit-button')) {
   document.getElementById('submit-button').addEventListener('click', handleSubmitNewScore);
 }
+var currentPage = 'leaderboard-page';
+function handleOpenWiki() {
+  underlineCurrentPageButton('wiki-page');
+}
+function handleOpenControls() {
+  underlineCurrentPageButton('controls-page');
+}
+function handleOpenLeaderboard() {
+  underlineCurrentPageButton('leaderboard-page');
+}
+function underlineCurrentPageButton(page) {
+  var oldPage = document.getElementById(currentPage);
+  oldPage.classList.add('hide-page');
+  oldPage.classList.remove('show-page');
+  var currentButton = document.getElementById(pageButtons[currentPage]);
+  currentButton.classList.remove('sidebar-button-selected');
+  currentPage = page;
+  var newPage = document.getElementById(currentPage);
+  newPage.classList.add('show-page');
+  newPage.classList.remove('hide-page');
+  var newButton = document.getElementById(pageButtons[newPage.id]);
+  newButton.classList.add('sidebar-button-selected');
+}
 document.getElementById('closeLeaderboard').addEventListener('click', handleToggleLeaderboard);
 document.getElementById('toggleLeaderboard').addEventListener('click', handleToggleLeaderboard);
+document.getElementById('shareButton').addEventListener('click', handleOpenShareContainer);
+document.getElementById('show-wiki-page-button').addEventListener('click', handleOpenWiki);
+document.getElementById('show-controls-page-button').addEventListener('click', handleOpenControls);
+document.getElementById('show-leaderboard-page-button').addEventListener('click', handleOpenLeaderboard);
+var pageButtons = {
+  'wiki-page': 'show-wiki-page-button',
+  'leaderboard-page': 'show-leaderboard-page-button',
+  'controls-page': 'show-controls-page-button'
+};
+underlineCurrentPageButton('leaderboard-page');
 var showLeaderboard = false;
+var loading;
+function stopLoading() {
+  loading = false;
+}
 function handleToggleLeaderboard() {
+  var leaderboardContent = document.getElementById('leaderboard-content');
   if (!showLeaderboard) {
+    leaderboardContent.classList.remove('flicker-opacity-off');
+    loading = true;
+    runTypeLetters();
     showLeaderboard = !showLeaderboard;
-    scrollableTableElem.classList.add('show-element');
-    scrollableTableElem.classList.remove('hide-element');
+    worldElem.setAttribute('transition-style', 'out:wipe:right');
+    var randomTimeout = Math.random() * (2800 - 1500) + 1500; // Random timeout between 1500ms and 2800ms
+    setTimeout(function () {
+      stopLoading();
+      scrollableTableElem.setAttribute('transition-style', 'in:wipe:left');
+      scrollableTableElem.classList.add('show-element');
+      leaderboardContent.classList.add('translateX-right-to-left');
+      scrollableTableElem.classList.remove('hide-element');
+    }, randomTimeout);
   } else {
+    loading = true;
+    runTypeLetters();
     showLeaderboard = !showLeaderboard;
-    scrollableTableElem.classList.remove('show-element');
-    scrollableTableElem.classList.add('hide-element');
+    scrollableTableElem.setAttribute('transition-style', 'out:wipe:right');
+    leaderboardContent.classList.add('flicker-opacity-off');
+    setTimeout(function () {
+      stopLoading();
+      worldElem.setAttribute('transition-style', 'in:wipe:left');
+      scrollableTableElem.classList.remove('show-element');
+      scrollableTableElem.classList.add('hide-element');
+    }, 1500);
   }
 }
+function runTypeLetters() {
+  if (!loading) {
+    return;
+  }
+  loadingTextElem.textContent = '';
+  typeLettersAny(0, '...', loadingTextElem, 120);
+  var rerunDelay = 2700;
+  setTimeout(runTypeLetters, rerunDelay);
+}
 function handleLose() {
-  tickerContainerElem.classList.add('show-element');
-  tickerContainerElem.classList.remove('hide-element');
+  gameOverTextElem.textContent = '';
+  // tickerContainerElem.classList.add('show-element');
+  // tickerContainerElem.classList.remove('hide-element');
   handleCheckIfHighScore(score);
   _soundController.soundController.die.play();
   (0, _dino.setDinoLose)();
@@ -4578,18 +5015,135 @@ function handleLose() {
     });
     endScreenElem.classList.remove('hide');
   }, 100);
+  setTimeout(function () {
+    typeLetters(0);
+  }, 1500);
 }
 function setPixelToWorldScale() {
   var worldToPixelScale;
   if (window.innerWidth / window.innerHeight < WORLD_WIDTH / WORLD_HEIGHT) {
-    worldToPixelScale = window.innerWidth / WORLD_WIDTH / 1.25;
+    worldToPixelScale = window.innerWidth / WORLD_WIDTH;
   } else {
     worldToPixelScale = window.innerHeight / WORLD_HEIGHT;
   }
   worldElem.style.width = "".concat(WORLD_WIDTH * worldToPixelScale, "px");
   worldElem.style.height = "".concat(WORLD_HEIGHT * worldToPixelScale, "px");
 }
-},{"./elements/ground.js":"../elements/ground.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+function handleOrientationChange() {
+  var blackScreen = document.getElementById('blackScreen');
+  if (isMobile() && window.orientation === 0 || window.orientation === 180) {
+    // Portrait orientation on mobile
+    blackScreen.style.display = 'flex';
+  } else {
+    // Hide black screen in other cases
+    blackScreen.style.display = 'none';
+  }
+}
+function isMobile() {
+  return /Mobi|Android/i.test(navigator.userAgent);
+}
+
+// Initial check
+handleOrientationChange();
+
+// Listen for orientation changes
+window.addEventListener('orientationchange', handleOrientationChange);
+var snow = {
+  el: '#snow',
+  density: 12500,
+  // higher = fewer bits
+  maxHSpeed: 1,
+  // How much do you want them to move horizontally
+  minFallSpeed: 0.5,
+  canvas: null,
+  ctx: null,
+  particles: [],
+  colors: [],
+  mp: 1,
+  quit: false,
+  init: function init() {
+    this.canvas = document.querySelector(this.el);
+    this.ctx = this.canvas.getContext('2d');
+    this.reset();
+    requestAnimationFrame(this.render.bind(this));
+    window.addEventListener('resize', this.reset.bind(this));
+  },
+  reset: function reset() {
+    this.w = window.innerWidth;
+    this.h = window.innerHeight;
+    this.canvas.width = this.w;
+    this.canvas.height = this.h;
+    this.particles = [];
+    this.mp = Math.ceil(this.w * this.h / this.density);
+    for (var i = 0; i < this.mp; i++) {
+      var size = Math.random() * 1.7 + 3;
+      this.particles.push({
+        x: Math.random() * this.w,
+        //x-coordinate
+        y: Math.random() * this.h,
+        //y-coordinate
+        w: size,
+        h: size,
+        vy: this.minFallSpeed + Math.random(),
+        //density
+        vx: Math.random() * this.maxHSpeed - this.maxHSpeed / 2,
+        fill: '#ffffff',
+        s: Math.random() * 0.2 - 0.1
+      });
+    }
+  },
+  render: function render() {
+    var _this = this;
+    this.ctx.clearRect(0, 0, this.w, this.h);
+    this.particles.forEach(function (p, i) {
+      p.y += p.vy;
+      p.x += p.vx;
+      _this.ctx.fillStyle = p.fill;
+      _this.ctx.fillRect(p.x, p.y, p.w, p.h);
+      if (p.x > _this.w + 5 || p.x < -5 || p.y > _this.h) {
+        p.x = Math.random() * _this.w;
+        p.y = -10;
+      }
+    });
+    if (this.quit) {
+      return;
+    }
+    requestAnimationFrame(this.render.bind(this));
+  },
+  destroy: function destroy() {
+    this.quit = true;
+  }
+};
+snow.init();
+var textToType = 'Game Over';
+function typeLetters(index) {
+  if (index < textToType.length) {
+    gameOverTextElem.textContent += textToType.charAt(index);
+    setTimeout(function () {
+      return typeLetters(index + 1);
+    }, 200); // Adjust the delay as needed
+  } else {
+    gameOverIconElem.classList.remove('hide-element');
+    gameOverIconElem.classList.add('show-element');
+  }
+}
+function typeLettersAny(index, text, elem, timeout) {
+  if (index < text.length) {
+    elem.innerHTML += "<span>".concat(text.charAt(index), "</span>");
+    setTimeout(function () {
+      Array.from(elem.children).forEach(function (span, index) {
+        setTimeout(function () {
+          span.classList.add('wavy');
+        }, index * 80);
+      });
+      typeLettersAny(index + 1, text, elem, timeout);
+    }, 250); // Adjust the delay as needed
+  } else {
+    elem.classList.remove('hide-element');
+    elem.classList.add('show-element');
+  }
+}
+},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -4614,7 +5168,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59087" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60747" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
