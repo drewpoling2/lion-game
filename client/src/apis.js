@@ -1,9 +1,7 @@
-import { UserErrors } from '../../server/common/errors';
-
 //gets all users from collection
 const getAllHighScoreUsers = async () => {
   try {
-    const response = await fetch('http://localhost:3001/scores/users');
+    const response = await fetch('http://3.12.120.102:3001/scores/users');
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -20,7 +18,7 @@ const getAllHighScoreUsers = async () => {
 const handleDeleteEntry = async (entryField) => {
   try {
     const response = await fetch(
-      `http://localhost:3001/scores/delete-entry/${entryField}`,
+      `http://3.12.120.102:3001/scores/delete-entry/${entryField}`,
       {
         method: 'DELETE',
         headers: {
@@ -32,7 +30,7 @@ const handleDeleteEntry = async (entryField) => {
     if (!response.ok) {
       // Check if the response status is not OK (e.g., 4xx or 5xx)
       const errorData = await response.json();
-      if (errorData.type === UserErrors.NO_USER_FOUND) {
+      if (errorData.type === 'no user found') {
         alert('ERROR: No entry found with the specified ID');
       } else {
         alert('ERROR: Something went wrong');
@@ -57,7 +55,7 @@ const handleSortAndDeleteLastEntry = async () => {
 //adds new high score
 const handleNewHighScore = async (username, score) => {
   try {
-    const response = await fetch('http://localhost:3001/scores/new-high', {
+    const response = await fetch('http://3.12.120.102:3001/scores/new-high', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,8 +69,8 @@ const handleNewHighScore = async (username, score) => {
     if (!response.ok) {
       // Check if the response status is not OK (e.g., 4xx or 5xx)
       const errorData = await response.json();
-      if (errorData.type === UserErrors.USERNAME_ALREADY_EXISTS) {
-        return UserErrors.USERNAME_ALREADY_EXISTS;
+      if (errorData.type === 'username already exists') {
+        return 'username already exists';
       } else {
         alert('ERROR: Something went wrong');
       }
