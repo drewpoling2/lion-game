@@ -83,6 +83,7 @@ const loadingTextElem = document.querySelector('[data-loading-text]');
 // });
 setPixelToWorldScale();
 createLeaderboard(leaderboardElem);
+
 window.addEventListener('resize', setPixelToWorldScale);
 // document.addEventListener('keydown', handleStart, { once: true });
 // document.addEventListener('touchstart', handleStart, { once: true });
@@ -99,9 +100,9 @@ let hasBeatenScore = false;
 let isPaused = false;
 let playerImmunity = false;
 let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
-scrollableTableElem.classList.add('hide-element');
-scrollableTableElem.style.display = 'none';
-worldElem.setAttribute('transition-style', 'in:circle:center');
+// scrollableTableElem.classList.add('hide-element');
+// scrollableTableElem.style.display = 'none';
+// worldElem.setAttribute('transition-style', 'in:circle:center');
 // tickerContainerElem.classList.add('hide-element');
 // tickerContainerElem.classList.remove('show-element');
 const pauseIconButton = document.getElementById('pause-icon-button');
@@ -182,7 +183,7 @@ function update(time) {
   }
 
   // let delta = time - lastTime;
-  let delta = 8;
+  let delta = 30;
   if (collisionOccurred) {
     setPlayerImmunity();
     togglePause();
@@ -605,6 +606,32 @@ if (document.getElementById('submit-button')) {
     .addEventListener('click', handleSubmitNewScore);
 }
 
+let currentPage = 'leaderboard-page';
+
+function handleOpenWiki() {
+  underlineCurrentPageButton('wiki-page');
+}
+function handleOpenControls() {
+  underlineCurrentPageButton('controls-page');
+}
+function handleOpenLeaderboard() {
+  underlineCurrentPageButton('leaderboard-page');
+}
+
+function underlineCurrentPageButton(page) {
+  const oldPage = document.getElementById(currentPage);
+  oldPage.classList.add('hide-page');
+  oldPage.classList.remove('show-page');
+  const currentButton = document.getElementById(pageButtons[currentPage]);
+  currentButton.classList.remove('sidebar-button-selected');
+  currentPage = page;
+  const newPage = document.getElementById(currentPage);
+  newPage.classList.add('show-page');
+  newPage.classList.remove('hide-page');
+  const newButton = document.getElementById(pageButtons[newPage.id]);
+  newButton.classList.add('sidebar-button-selected');
+}
+
 document
   .getElementById('closeLeaderboard')
   .addEventListener('click', handleToggleLeaderboard);
@@ -616,6 +643,26 @@ document
 document
   .getElementById('shareButton')
   .addEventListener('click', handleOpenShareContainer);
+
+document
+  .getElementById('show-wiki-page-button')
+  .addEventListener('click', handleOpenWiki);
+
+document
+  .getElementById('show-controls-page-button')
+  .addEventListener('click', handleOpenControls);
+
+document
+  .getElementById('show-leaderboard-page-button')
+  .addEventListener('click', handleOpenLeaderboard);
+
+const pageButtons = {
+  'wiki-page': 'show-wiki-page-button',
+  'leaderboard-page': 'show-leaderboard-page-button',
+  'controls-page': 'show-controls-page-button',
+};
+
+underlineCurrentPageButton('leaderboard-page');
 
 let showLeaderboard = false;
 

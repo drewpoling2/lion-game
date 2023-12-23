@@ -23,28 +23,33 @@
 
     <div class="flex-col world-container" style="background-color: #000">
       <div class="leaderboard" data-scrollable-table="">
-        <div id="leaderboard-content" class="flex-row justify-between w-full">
+        <div id="leaderboard-content" class="menu-container flex-row justify-between w-full">
           <div class="sidebar-left flex-col">
             <button id="closeLeaderboard" class="capitalize sidebar-button first-sidebar-item">
               <span class="sidebar-icon-container">
-                <img class="sidebar-icon" src="/Left-Arrow.9e2bd32c.png">
+                <img alt="" class="sidebar-icon" src="/Left-Arrow.9e2bd32c.png">
               </span>
               back
             </button>
 
-            <button class="capitalize sidebar-button-selected sidebar-button">
+            <button id="show-leaderboard-page-button" class="capitalize sidebar-button">
               <span class="sidebar-icon-container">
-                <img class="sidebar-icon" src="/Star.3e18d544.png"></span>
+                <img alt="" class="sidebar-icon" src="/Star.3e18d544.png"></span>
               Leaderboard
             </button>
-            <button class="capitalize sidebar-button">
+            <button id="show-wiki-page-button" class="capitalize sidebar-button">
               <span class="sidebar-icon-container">
-                <img class="sidebar-icon" src="/Question-Mark.677df592.png"></span>
+                <img alt="" class="sidebar-icon" src="/Question-Mark.677df592.png"></span>
               Wiki
+            </button>
+            <button id="show-controls-page-button" class="capitalize sidebar-button">
+              <span class="sidebar-icon-container flex items-center">
+                <img alt="" class="sidebar-icon" src="/Gear.c4a9fe2c.png"></span>
+              Controls
             </button>
             <button class="disabled-item tooltip capitalize sidebar-button">
               <span class="sidebar-icon-container">
-                <img style="opacity: 0.35" class="sidebar-icon" src="/People.b69a5be0.png"></span>
+                <img alt="" style="opacity: 0.35" class="sidebar-icon" src="/People.b69a5be0.png"></span>
               trophy room
               <span class="tooltiptextnav sans pixel-corners">
                 <div class="tooltip-container">
@@ -62,7 +67,7 @@
             </button> -->
             <button id="shareButton" class="capitalize sidebar-button relative">
               <span class="sidebar-icon-container">
-                <img class="sidebar-icon" src="/Share.13d6da6f.png"></span>
+                <img alt="" class="sidebar-icon" src="/Share.13d6da6f.png"></span>
               share
               <span id="share-container" class="share-container sans pixel-corners absolute">
                 <!-- <span class="share-item">Twitter</span>
@@ -75,31 +80,249 @@
             <div class="flex-col justify-center items-center">
               <div class="star-icon-header-container">
                 <span class="star-icon-container">
-                  <img class="sidebar-icon" src="/Star.3e18d544.png">
+                  <img alt="..." class="sidebar-icon" src="/Star.3e18d544.png">
                 </span>
-                <img style="width: 26px; height: 26px" src="/Star.3e18d544.png">
+                <img alt="..." style="width: 26px; height: 26px" src="/Star.3e18d544.png">
                 <span class="star-icon-container">
-                  <img class="sidebar-icon" src="/Star.3e18d544.png">
+                  <img alt="..." class="sidebar-icon" src="/Star.3e18d544.png">
                 </span>
               </div>
 
               <div class="menu-title uppercase">Lion game</div>
-              <div class="leaderboard-label-text sans uppercase">
-                Leaderboard
-              </div>
-              <div class="season-title">Season 1</div>
             </div>
-            <div class="scrollable-table">
-              <table class="leaderboard-table" style="border-collapse: collapse">
-                <thead>
-                  <tr>
-                    <th class="leaderboard-rank-item wave-animation">Rank</th>
-                    <th class="leaderboard-score-item">Score</th>
-                    <th class="leaderboard-name-item">Name</th>
-                  </tr>
-                </thead>
-                <tbody data-leaderboard-body=""></tbody>
-              </table>
+
+            <!-- leaderboard page -->
+            <div id="leaderboard-page" class="show-page">
+              <div class="flex-col items-center justify-center">
+                <div class="leaderboard-label-text sans uppercase">
+                  Leaderboard
+                </div>
+                <div class="season-title">Season 1</div>
+              </div>
+              <div class="scrollable-table flex justify-center">
+                <table class="leaderboard-table" style="border-collapse: collapse">
+                  <thead>
+                    <tr>
+                      <th class="leaderboard-rank-item wave-animation">Rank</th>
+                      <th class="leaderboard-score-item">Score</th>
+                      <th class="leaderboard-name-item">Name</th>
+                    </tr>
+                  </thead>
+                  <tbody data-leaderboard-body=""></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- wiki page -->
+            <div id="wiki-page" class="hide-page">
+              <div class="flex-col items-center justify-center">
+                <div class="leaderboard-label-text sans uppercase">Wiki</div>
+              </div>
+              <div class="wiki-container top-mask">
+                <div class="flex-col wiki-block">
+                  <div class="wiki-title sans uppercase">Collectables</div>
+                  <div class="sans">
+                    Collect coins & gem tokens to boost your score. Different
+                    coins have varying rarities, with rarer ones offering higher
+                    point increases. When you have a high combo, keep an eye out
+                    for the rare & epic tokens to maximize your score and climb
+                    the leaderboard.
+                  </div>
+                </div>
+
+                <div class="flex-col wiki-block">
+                  <div class="wiki-item-block-title sans uppercase">
+                    Collectable Items
+                  </div>
+                  <div class="wiki-item-block-grid">
+                    <div class="flex-row wiki-item-block">
+                      <img class="wiki-item-image" alt="" src="/Silver-Coin-1.55569516.png">
+                      <div class="sans w-full">
+                        <div class="uppercase">Silver coin</div>
+
+                        <div>Points: +46</div>
+                        <div>Rarity: common</div>
+                      </div>
+                    </div>
+
+                    <div class="flex-row wiki-item-block">
+                      <img class="wiki-item-image" alt="" src="/Gold-Coin-1.a8490cc4.png">
+                      <div class="sans w-full">
+                        <div class="uppercase">Gold coin</div>
+                        <div>Points: +82</div>
+                        <div>Rarity: uncommon</div>
+                      </div>
+                    </div>
+                    <div class="flex-row wiki-item-block">
+                      <img class="wiki-item-image" alt="" src="/Red-Gem-1.17c0dba0.png">
+                      <div class="sans w-full">
+                        <div class="uppercase">Red gem</div>
+                        <div>Points: +325</div>
+                        <div>Rarity: rare</div>
+                      </div>
+                    </div>
+                    <div class="flex-row wiki-item-block">
+                      <img class="wiki-item-image" alt="" src="/Blue-Gem-1.2692fa0a.png">
+                      <div class="sans w-full">
+                        <div class="uppercase">Blue gem</div>
+                        <div>Points: +954</div>
+                        <div>Rarity: epic</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex-col wiki-block">
+                  <div class="wiki-title sans">COMBOS</div>
+                  <div class="sans">
+                    When activated, combos multiply the points you earn,
+                    allowing you to accumulate higher scores during the
+                    specified duration. Use it strategically to boost your
+                    performance and achieve a temporary scoring advantage. Keep
+                    in mind that the effect is time-limited, so plan your moves
+                    wisely to make the most of this valuable power-up.
+                    <br>
+                    <br>
+                    Combos can also be stacked. Each combo item has a specified
+                    duration. If you already have a combo, and get another one
+                    before the current duration runs out, then your current
+                    duration timer gets reset to the new combo’s duration limit.
+                  </div>
+                </div>
+
+                <div class="flex-col wiki-block">
+                  <div class="wiki-item-block-title sans">COMBO ITEMS</div>
+                  <div class="wiki-item-block-grid">
+                    <div class="flex-row wiki-item-block">
+                      <img class="wiki-item-image" alt="" src="/Blue-Gem-1.2692fa0a.png">
+                      <div class="sans w-full">
+                        <div class="uppercase">COWBELL</div>
+                        <div>Combo: x2</div>
+                        <div>Rarity: common</div>
+                        <div>Duration: 5s</div>
+                      </div>
+                    </div>
+                    <div class="flex-row wiki-item-block">
+                      <img class="wiki-item-image" alt="" src="/Blue-Gem-1.2692fa0a.png">
+                      <div class="sans w-full">
+                        <div class="uppercase">CREAMERY CONE</div>
+                        <div>Combo: x5</div>
+                        <div>Rarity: uncommon</div>
+                        <div>Duration: 4s</div>
+                      </div>
+                    </div>
+                    <div class="flex-row wiki-item-block">
+                      <img class="wiki-item-image" alt="" src="/Blue-Gem-1.2692fa0a.png">
+                      <div class="sans w-full">
+                        <div class="uppercase">GOLDEN SPATULA</div>
+                        <div>Combo: x10</div>
+                        <div>Rarity: rare</div>
+                        <div>Duration: 3s</div>
+                      </div>
+                    </div>
+                    <div class="flex-row wiki-item-block">
+                      <img class="wiki-item-image" alt="" src="/Blue-Gem-1.2692fa0a.png">
+                      <div class="sans w-full">
+                        <div class="uppercase">LUCKY MITTENS</div>
+                        <div>Combo: x100</div>
+                        <div>Rarity: epic</div>
+                        <div>Duration: 1s</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex-col wiki-block">
+                  <div class="wiki-title sans">Milestones</div>
+                  <div class="sans">
+                    The longer you endure, the higher your level climbs, marking
+                    each milestone with a corresponding score. Level progression
+                    is directly tied to your survival time, where hitting the
+                    1-minute mark propels you to level 2, 2 minutes advances you
+                    to level 2, and so on.
+                    <br>
+                    <br>
+                    At every milestone, you’ll earn a "1 Up," granting you an
+                    extra life to extend your gameplay.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- controls page -->
+            <div id="controls-page" class="hide-page">
+              <div class="flex-col items-center justify-center">
+                <div class="leaderboard-label-text sans uppercase">
+                  Controls
+                </div>
+              </div>
+              <div class="controls-container top-mask">
+                <div class="flex-col controls-block">
+                  <div class="controls-title sans uppercase">Desktop</div>
+                  <div class="flex-col controls-block-container">
+                    <div class="flex-row controls-title-block items-center">
+                      <div class="controls-item-block-title sans uppercase">
+                        JUMP
+                      </div>
+                      <img class="controls-image-item" alt="" src="/Spacebar-Not-Pressed.ec13f48a.png">
+                    </div>
+                    <div class="sans">
+                      Press the space bar key to jump in the air and avoid
+                      obstacles, or collect items. When in the air, press it
+                      again to perform a double jump.
+                    </div>
+                  </div>
+                  <div class="flex-col controls-block-container">
+                    <div class="flex-row controls-title-block items-center">
+                      <div class="controls-item-block-title sans uppercase">
+                        Duck or dive
+                      </div>
+                      <img style="width: 40px" alt="" src="/Down-Arrow-Not-Pressed.934dcf81.png">
+                    </div>
+                    <div class="sans">
+                      Press the down arrow key to duck when on the ground. This
+                      will reduce your vertical hit box and help you avoid air
+                      obstacles.
+                    </div>
+                    <div class="sans controls-block-divider">-Or-</div>
+                    <div class="sans">
+                      Press the down arrow key to dive when in the air. This
+                      will increase your fall speed.
+                    </div>
+                  </div>
+                </div>
+                <div class="flex-col controls-block">
+                  <div class="controls-title sans uppercase">Mobile</div>
+                  <div class="flex-col controls-block-container">
+                    <div class="flex-row controls-title-block items-center">
+                      <div class="controls-item-block-title sans uppercase">
+                        JUMP
+                      </div>
+                    </div>
+                    <div class="sans">
+                      Tap the screen to jump in the air and avoid obstacles, or
+                      collect items. When in the air, tap again to perform a
+                      double jump.
+                    </div>
+                  </div>
+                  <div class="flex-col controls-block-container">
+                    <div class="flex-row controls-title-block items-center">
+                      <div class="controls-item-block-title sans uppercase">
+                        Duck or dive
+                      </div>
+                    </div>
+                    <div class="sans">
+                      Drag your finger downward on the screen to duck when on
+                      the ground. This will reduce your vertical hit box and
+                      help you avoid air obstacles.
+                    </div>
+                    <div class="sans controls-block-divider">-Or-</div>
+                    <div class="sans">
+                      Drag your finger downward on the screen to dive when in
+                      the air. This will increase your fall speed.
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="flex-col sidebar-right">
@@ -118,10 +341,9 @@
       </div>
       <div data-game-over-screen="" class="game-over-screen hide"></div>
       <div class="game-over-screen items-center">
-        <!-- <img src="imgs/typography/High-Score.png" class="high-score-label" /> -->
         <div class="game-over-text" data-game-over-text=""></div>
         <div class="loading-text flex sans" data-loading-text=""></div>
-        <img class="game-over-icon hide-element transition-short" id="game-over-icon" src="/Redo.35a20d07.png">
+        <img alt="" class="game-over-icon hide-element transition-short" id="game-over-icon" src="/Redo.35a20d07.png">
       </div>
       <div class="world" data-world="">
         <div class="hud-container">
@@ -139,7 +361,7 @@
                 <div class="flex-col">
                   <div class="lives-label uppercase">lives</div>
                   <div class="flex-row">
-                    <img class="lion-head" src="/Health-1.2142179e.png">
+                    <img alt="" class="lion-head" src="/Health-1.2142179e.png">
                     <div class="lives-x">x</div>
                     <div class="lives" data-lives="">1</div>
                   </div>
@@ -150,16 +372,16 @@
           <div class="hud-container-right">
             <div class="flex-row" style="gap: 2px">
               <div class="icon-button pixel-borders-inset" id="toggleLeaderboard">
-                <img class="top-50-image icon icon-filter" src="/Home.bee5960c.png">
+                <img alt="" class="top-50-image icon icon-filter" src="/Home.bee5960c.png">
               </div>
               <div class="icon-button pixel-borders-inset" id="pauseButton">
-                <img id="pause-icon-button" class="top-50-image icon icon-filter" src="/Pause.af4380de.png">
+                <img alt="" id="pause-icon-button" class="top-50-image icon icon-filter" src="/Pause.af4380de.png">
               </div>
               <div class="icon-button pixel-borders-inset" id="muteButton">
-                <img id="mute-icon-button" class="top-50-image icon icon-filter" src="/Speaker-On.4eca78fe.png">
+                <img alt="" id="mute-icon-button" class="top-50-image icon icon-filter" src="/Speaker-On.4eca78fe.png">
               </div>
               <div class="icon-button tooltip sans pixel-borders-inset">
-                <img class="top-50-image icon-filter" src="/Question-Mark.677df592.png">
+                <img alt="" class="top-50-image icon-filter" src="/Question-Mark.677df592.png">
                 <span class="tooltiptext sans pixel-corners">
                   <div class="tooltip-container">
                     <span class="tooltip-heading">CONTROLS</span>
@@ -178,15 +400,14 @@
         <div class="start-screen blink" data-start-screen="">
           Press Any Key To Start
         </div>
-        <!-- <img src="imgs/backgrounds/Mountain.png" class="foreground" /> -->
-        <img src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
-        <img src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
-        <img src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
-        <img src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
-        <img src="/ground.efe81358.png" class="ground" data-ground="">
+        <img alt="" src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
+        <img alt="" src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
+        <img alt="" src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
+        <img alt="" src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
+        <img alt="" src="/ground.efe81358.png" class="ground" data-ground="">
 
-        <img src="/ground.efe81358.png" class="ground" data-ground="">
-        <img src="/Rest-1.d9294cd3.png" class="dino" data-dino="">
+        <img alt="" src="/ground.efe81358.png" class="ground" data-ground="">
+        <img alt="" src="/Rest-1.d9294cd3.png" class="dino" data-dino="">
         <div class="">1000</div>
         <div class="absolute flex-row justify-between bottom-interface-container">
           <div class="ticker-container" data-ticker-container="">
@@ -197,9 +418,11 @@
             <div class="ticker-content3" data-ticker3=""></div>
           </div>
         </div>
-        <!-- <div class="multiplier">multiplier</div> -->
-        <!-- new high score form -->
-        <!-- <div class="flex-col w-fit enter-initials-form">
+      </div>
+
+      <!-- <div class="multiplier">multiplier</div> -->
+      <!-- new high score form -->
+      <!-- <div class="flex-col w-fit enter-initials-form">
           <div class="uppercase sans" style="margin-bottom: 5px">
             Enter your initials!
           </div>
@@ -237,20 +460,19 @@
             Submit
           </button>
         </div> -->
-        <!-- end -->
+      <!-- end -->
 
-        <script>function handleInput(input) {
-  var maxLength = parseInt(input.getAttribute('maxlength'));
-  var value = input.value;
-  if (value.length >= maxLength) {
-    // Focus on the submit button
-    document.getElementById('submit-button').focus();
-  }
-}</script>
+      <!-- <script>
+          function handleInput(input) {
+            const maxLength = parseInt(input.getAttribute('maxlength'));
+            const value = input.value;
 
-        <!-- leaderboard -->
-        <!-- <button class="pixel2" data-play-again>Play Again</button> -->
-      </div>
+            if (value.length >= maxLength) {
+              // Focus on the submit button
+              document.getElementById('submit-button').focus();
+            }
+          }
+        </script> -->
     </div>
   </body>
 </html>

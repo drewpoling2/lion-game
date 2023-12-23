@@ -145,6 +145,18 @@ button {
   width: 100%;
 }
 
+.show-page {
+  opacity: 1;
+  height: auto;
+  pointer-events: all;
+}
+
+.hide-page {
+  opacity: 0;
+  height: 0px;
+  pointer-events: none;
+}
+
 .hide-element {
   opacity: 0;
   pointer-events: none;
@@ -484,6 +496,10 @@ button {
   letter-spacing: 10px;
 }
 
+.menu-container {
+  height: 900px;
+}
+
 .leaderboard-item {
   color: white;
   width: fit-content;
@@ -637,6 +653,7 @@ td {
 }
 
 .menu-middle-container {
+  padding-inline: 120px;
   padding-top: 40px;
   padding-bottom: 40px;
 }
@@ -674,6 +691,10 @@ td {
 
 .flicker-opacity-off {
   animation: flickerOpacityOff 1s;
+}
+
+.top-mask {
+  mask-image: linear-gradient(to top, black 95%, transparent 100%);
 }
 
 .scrollable-table {
@@ -895,6 +916,10 @@ td {
   left: calc(var(--left) * 1%);
 }
 
+.controls-image-item {
+  width: 70px;
+}
+
 .gold-coin {
   width: 38px;
   height: 38px;
@@ -1109,8 +1134,93 @@ td {
   background-color: #202327;
 }
 
+.controls-item-image {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+}
+
+.controls-container {
+  max-height: 600px;
+  padding-top: 20px;
+  overflow: scroll;
+}
+
+.controls-block {
+  margin-bottom: 80px;
+}
+
+.controls-item-block {
+  grid-column: span 2;
+}
+
+.controls-item-block-title {
+  margin-right: 20px;
+}
+
+.controls-block-container {
+  margin-bottom: 40px;
+}
+
+.controls-title-block {
+  margin-bottom: 20px;
+}
+
+.controls-block-divider {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.controls-title {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #555;
+  margin-bottom: 40px;
+}
+
+.controls-item-block-grid {
+  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.wiki-item-image {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+}
+
+.wiki-container {
+  max-height: 600px;
+  padding-top: 20px;
+  overflow: scroll;
+}
+
 #shareButton.transparent-background {
   background-color: transparent;
+}
+
+.wiki-block {
+  margin-bottom: 80px;
+}
+
+.wiki-item-block {
+  grid-column: span 2;
+}
+
+.wiki-item-block-title {
+  margin-bottom: 40px;
+}
+
+.wiki-title {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #555;
+  margin-bottom: 40px;
+}
+
+.wiki-item-block-grid {
+  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .tooltip .tooltiptext {
