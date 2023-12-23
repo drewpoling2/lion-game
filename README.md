@@ -25,3 +25,6 @@ yarn dev
 ```
 
 https://www.transition.style/#out:circle:hesitate
+
+keeps server running all the time
+ubuntu@ip-172-31-9-56:~/lion-game/server$ pm2 start index.js
