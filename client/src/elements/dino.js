@@ -14,13 +14,13 @@ import lionRunImg4 from '../public/imgs/nittany-lion/run-cycle/Run-4.png';
 import lionRunImg5 from '../public/imgs/nittany-lion/run-cycle/Run-5.png';
 import lionRunImg6 from '../public/imgs/nittany-lion/run-cycle/Run-6.png';
 import { soundController } from '../utility/sound-controller.js';
-
+import { collectableOptions } from '../game-manager.js';
 const dinoElem = document.querySelector('[data-dino]');
+const dinoImg = document.querySelector('.dino-img');
 const JUMP_SPEED = 0.21;
 const DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
 const GRAVITY = 0.00075;
 const DINO_FRAME_COUNT = 6;
-const JUMP_FRAME_COUNT = 3;
 const FRAME_TIME = 100;
 const BOTTOM_ANCHOR = 17.5;
 
@@ -31,7 +31,7 @@ let dinoFrame;
 let currentFrameTime;
 let yVelocity;
 let jumpAnimationInProgress;
-
+let newSelectedStarter;
 function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
@@ -60,9 +60,17 @@ export function setupDino() {
   }
 }
 
-export function updateDino(delta, speedScale) {
-  handleRun(delta, speedScale);
-  handleJump(delta);
+export function updateDino(
+  delta,
+  speedScale,
+  gravityFallAdjustment,
+  selectedStarter
+) {
+  if (!newSelectedStarter) {
+    newSelectedStarter = selectedStarter;
+  }
+  handleRun(delta, speedScale, newSelectedStarter);
+  handleJump(delta, gravityFallAdjustment);
   handleDive(delta);
 }
 
@@ -71,24 +79,27 @@ export function getDinoRect() {
 }
 
 export function setDinoLose() {
-  dinoElem.src = lionLoseImg;
-  dinoElem.classList.add('leap');
-  dinoElem.classList.remove('flash-animation');
+  dinoImg.src = lionLoseImg;
+  dinoImg.classList.add('leap');
+  dinoImg.classList.remove('flash-animation');
   const spotlight = document.getElementById('spotlight');
   spotlight.classList.add('close-spotlight');
 }
 
-function startJump() {
+function startJump(selectedStarter) {
   if (!jumpAnimationInProgress) {
     jumpAnimationInProgress = true;
-    dinoElem.src = lionJumpImg1;
+    dinoImg.src = lionJumpImg1;
+    if (selectedStarter === 'Coins') {
+      createCoinAboveDino();
+    }
 
     setTimeout(function () {
-      dinoElem.src = lionJumpImg2;
+      dinoImg.src = lionJumpImg2;
     }, 320); // Adjust the delay as needed
 
     setTimeout(function () {
-      dinoElem.src = lionJumpImg3;
+      dinoImg.src = lionJumpImg3;
     }, 400); // Adjust the delay as needed
   }
 }
@@ -98,34 +109,33 @@ function endJump() {
   jumpAnimationInProgress = false;
 }
 
-function handleRun(delta, speedScale) {
+function handleRun(delta, speedScale, selectedStarter) {
   if (isJumping) {
-    startJump();
+    startJump(selectedStarter);
     return;
   }
-
   if (currentFrameTime >= FRAME_TIME) {
     dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT;
 
     // Use a switch statement to set the image source based on the current frame
     switch (dinoFrame) {
       case 0:
-        dinoElem.src = lionRunImg1;
+        dinoImg.src = lionRunImg1;
         break;
       case 1:
-        dinoElem.src = lionRunImg2;
+        dinoImg.src = lionRunImg2;
         break;
       case 2:
-        dinoElem.src = lionRunImg3;
+        dinoImg.src = lionRunImg3;
         break;
       case 3:
-        dinoElem.src = lionRunImg4;
+        dinoImg.src = lionRunImg4;
         break;
       case 4:
-        dinoElem.src = lionRunImg5;
+        dinoImg.src = lionRunImg5;
         break;
       case 5:
-        dinoElem.src = lionRunImg6;
+        dinoImg.src = lionRunImg6;
         break;
       // Add more cases if you have more frames
     }
@@ -135,11 +145,22 @@ function handleRun(delta, speedScale) {
   currentFrameTime += delta * speedScale;
 }
 
-function handleJump(delta) {
+function handleJump(delta, gravityFallAdjustment = 0.01) {
   if (!isJumping) return;
+
+  // Adjusting fall speed when jumping on the way down
+  if (yVelocity <= 0) {
+    // Set interval to adjust fall speed every 5 seconds (adjust the interval as needed)
+    yVelocity -= GRAVITY * delta + gravityFallAdjustment; // Increase or decrease gravityAdjustment as needed
+  } else {
+    yVelocity -= GRAVITY * delta;
+  }
+
   incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
 
-  if (getCustomProperty(dinoElem, '--bottom') <= BOTTOM_ANCHOR) {
+  const currentBottom = getCustomProperty(dinoElem, '--bottom');
+
+  if (currentBottom <= BOTTOM_ANCHOR) {
     setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
     endJump();
     canDoubleJump = true;
@@ -150,8 +171,6 @@ function handleJump(delta) {
     yVelocity = DOUBLE_JUMP_SPEED;
     canDoubleJump = false;
   }
-
-  yVelocity -= GRAVITY * delta;
 }
 
 function onJump(e) {
@@ -161,7 +180,7 @@ function onJump(e) {
   )
     return;
   endJump();
-  startJump();
+  startJump(newSelectedStarter);
   soundController.jump.play();
   yVelocity = JUMP_SPEED;
   isJumping = true;
@@ -194,4 +213,25 @@ function onDive(e) {
   // Optional: You might want to reset isJumping and jumpCount here if needed
   isJumping = false;
   jumpCount = 0;
+}
+
+function createCoinAboveDino() {
+  const coinElement = document.createElement('div');
+
+  let selectedCollectable = collectableOptions[0];
+
+  coinElement.dataset.coin = true;
+  coinElement.dataset.type = selectedCollectable.type;
+  coinElement.dataset.locked = 'false';
+  coinElement.dataset.points = selectedCollectable.points;
+  coinElement.classList.add('pop-up-gold-coin', 'collectable');
+  coinElement.id = Math.random().toString(16).slice(2);
+
+  // Set the initial position of the coin above the dino
+  coinElement.style.position = 'absolute';
+  coinElement.style.top = dinoElem.offsetTop - 50 + 'px'; // Adjust the vertical position as needed
+  coinElement.style.left = dinoElem.offsetLeft + 50 + 'px'; // Center above the dino
+  // Append the coin element to the document body or another container
+  const worldElem = document.querySelector('[data-world]');
+  worldElem.appendChild(coinElement);
 }

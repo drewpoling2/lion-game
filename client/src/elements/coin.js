@@ -4,6 +4,7 @@ import {
   getCustomProperty,
 } from '../utility/updateCustomProperty';
 import { getDinoRect } from './dino';
+import { collectableOptions } from '../game-manager';
 
 const coinPositions = [];
 
@@ -77,12 +78,6 @@ export function getCoinRects() {
   });
 }
 
-const collectableOptions = [
-  { type: 'gold-coin', weight: 0.3, points: 82 },
-  { type: 'red-gem', weight: 0.1, points: 325 },
-  { type: 'silver-coin', weight: 0.6, points: 46 },
-];
-
 function createCoins() {
   // Calculate the total weight
   const totalWeight = collectableOptions.reduce(
@@ -103,9 +98,9 @@ function createCoins() {
       break;
     }
   }
-
   const element = document.createElement('div');
   element.dataset.coin = true;
+  element.dataset.type = selectedCollectable.type;
   element.dataset.locked = 'false';
   element.dataset.points = selectedCollectable.points;
   element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');

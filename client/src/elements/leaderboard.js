@@ -1,5 +1,26 @@
 import { getAllHighScoreUsers } from '../apis';
 
+export function sortLeaderboard(data) {
+  return data.users.sort((a, b) => {
+    return parseInt(b.score, 10) - parseInt(a.score, 10);
+  });
+}
+
+export function getSuffix(number) {
+  const lastDigit = number % 10;
+  if (number === 11 || number === 12 || number === 13) {
+    return 'th';
+  } else if (lastDigit === 1) {
+    return 'st';
+  } else if (lastDigit === 2) {
+    return 'nd';
+  } else if (lastDigit === 3) {
+    return 'rd';
+  } else {
+    return 'th';
+  }
+}
+
 export function createLeaderboard(leaderboardElem) {
   //for right sidebar
   const personalBestLvl = document.querySelector('[data-personal-best-lvl]');
@@ -29,25 +50,13 @@ export function createLeaderboard(leaderboardElem) {
   }
 
   getAllHighScoreUsers().then((data) => {
-    function getSuffix(number) {
-      const lastDigit = number % 10;
-      if (number === 11 || number === 12 || number === 13) {
-        return 'th';
-      } else if (lastDigit === 1) {
-        return 'st';
-      } else if (lastDigit === 2) {
-        return 'nd';
-      } else if (lastDigit === 3) {
-        return 'rd';
-      } else {
-        return 'th';
-      }
-    }
+    const sortedData = sortLeaderboard(data);
 
     // Map data to HTML elements and append to container
-    data.users.forEach((item, index) => {
+    sortedData.forEach((item, index) => {
       const rowElement = document.createElement('tr');
       rowElement.classList.add('leaderboard-row');
+      rowElement.id = `leaderboard-row-${index + 1}`;
 
       // Create and append the "Rank" cell
       const rankCell = document.createElement('td');

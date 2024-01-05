@@ -3525,13 +3525,14 @@ var _Run4 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycl
 var _Run5 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-5.png"));
 var _Run6 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-6.png"));
 var _soundController = require("../utility/sound-controller.js");
+var _gameManager = require("../game-manager.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 var dinoElem = document.querySelector('[data-dino]');
+var dinoImg = document.querySelector('.dino-img');
 var JUMP_SPEED = 0.21;
 var DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
 var GRAVITY = 0.00075;
 var DINO_FRAME_COUNT = 6;
-var JUMP_FRAME_COUNT = 3;
 var FRAME_TIME = 100;
 var BOTTOM_ANCHOR = 17.5;
 var isJumping;
@@ -3541,6 +3542,7 @@ var dinoFrame;
 var currentFrameTime;
 var yVelocity;
 var jumpAnimationInProgress;
+var newSelectedStarter;
 function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
@@ -3565,31 +3567,37 @@ function setupDino() {
     document.addEventListener('keydown', onDive);
   }
 }
-function updateDino(delta, speedScale) {
-  handleRun(delta, speedScale);
-  handleJump(delta);
+function updateDino(delta, speedScale, gravityFallAdjustment, selectedStarter) {
+  if (!newSelectedStarter) {
+    newSelectedStarter = selectedStarter;
+  }
+  handleRun(delta, speedScale, newSelectedStarter);
+  handleJump(delta, gravityFallAdjustment);
   handleDive(delta);
 }
 function getDinoRect() {
   return dinoElem.getBoundingClientRect();
 }
 function setDinoLose() {
-  dinoElem.src = _Jump.default;
-  dinoElem.classList.add('leap');
-  dinoElem.classList.remove('flash-animation');
+  dinoImg.src = _Jump.default;
+  dinoImg.classList.add('leap');
+  dinoImg.classList.remove('flash-animation');
   var spotlight = document.getElementById('spotlight');
   spotlight.classList.add('close-spotlight');
 }
-function startJump() {
+function startJump(selectedStarter) {
   if (!jumpAnimationInProgress) {
     jumpAnimationInProgress = true;
-    dinoElem.src = _Jump.default;
+    dinoImg.src = _Jump.default;
+    if (selectedStarter === 'Coins') {
+      createCoinAboveDino();
+    }
     setTimeout(function () {
-      dinoElem.src = _Jump2.default;
+      dinoImg.src = _Jump2.default;
     }, 320); // Adjust the delay as needed
 
     setTimeout(function () {
-      dinoElem.src = _Jump3.default;
+      dinoImg.src = _Jump3.default;
     }, 400); // Adjust the delay as needed
   }
 }
@@ -3598,9 +3606,9 @@ function endJump() {
   isJumping = false;
   jumpAnimationInProgress = false;
 }
-function handleRun(delta, speedScale) {
+function handleRun(delta, speedScale, selectedStarter) {
   if (isJumping) {
-    startJump();
+    startJump(selectedStarter);
     return;
   }
   if (currentFrameTime >= FRAME_TIME) {
@@ -3609,22 +3617,22 @@ function handleRun(delta, speedScale) {
     // Use a switch statement to set the image source based on the current frame
     switch (dinoFrame) {
       case 0:
-        dinoElem.src = _Run.default;
+        dinoImg.src = _Run.default;
         break;
       case 1:
-        dinoElem.src = _Run2.default;
+        dinoImg.src = _Run2.default;
         break;
       case 2:
-        dinoElem.src = _Run3.default;
+        dinoImg.src = _Run3.default;
         break;
       case 3:
-        dinoElem.src = _Run4.default;
+        dinoImg.src = _Run4.default;
         break;
       case 4:
-        dinoElem.src = _Run5.default;
+        dinoImg.src = _Run5.default;
         break;
       case 5:
-        dinoElem.src = _Run6.default;
+        dinoImg.src = _Run6.default;
         break;
       // Add more cases if you have more frames
     }
@@ -3634,9 +3642,19 @@ function handleRun(delta, speedScale) {
   currentFrameTime += delta * speedScale;
 }
 function handleJump(delta) {
+  var gravityFallAdjustment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.01;
   if (!isJumping) return;
+
+  // Adjusting fall speed when jumping on the way down
+  if (yVelocity <= 0) {
+    // Set interval to adjust fall speed every 5 seconds (adjust the interval as needed)
+    yVelocity -= GRAVITY * delta + gravityFallAdjustment; // Increase or decrease gravityAdjustment as needed
+  } else {
+    yVelocity -= GRAVITY * delta;
+  }
   (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
-  if ((0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom') <= BOTTOM_ANCHOR) {
+  var currentBottom = (0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom');
+  if (currentBottom <= BOTTOM_ANCHOR) {
     (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
     endJump();
     canDoubleJump = true;
@@ -3646,12 +3664,11 @@ function handleJump(delta) {
     yVelocity = DOUBLE_JUMP_SPEED;
     canDoubleJump = false;
   }
-  yVelocity -= GRAVITY * delta;
 }
 function onJump(e) {
   if (e.code !== 'Space' && e.type !== 'touchstart' || isJumping && jumpCount >= 2) return;
   endJump();
-  startJump();
+  startJump(newSelectedStarter);
   _soundController.soundController.jump.play();
   yVelocity = JUMP_SPEED;
   isJumping = true;
@@ -3680,7 +3697,25 @@ function onDive(e) {
   isJumping = false;
   jumpCount = 0;
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/nittany-lion/jump-animation/Jump-1.png":"imgs/nittany-lion/jump-animation/Jump-1.png","../public/imgs/nittany-lion/jump-animation/Jump-2.png":"imgs/nittany-lion/jump-animation/Jump-2.png","../public/imgs/nittany-lion/jump-animation/Jump-3.png":"imgs/nittany-lion/jump-animation/Jump-3.png","../public/imgs/nittany-lion/run-cycle/Run-1.png":"imgs/nittany-lion/run-cycle/Run-1.png","../public/imgs/nittany-lion/run-cycle/Run-2.png":"imgs/nittany-lion/run-cycle/Run-2.png","../public/imgs/nittany-lion/run-cycle/Run-3.png":"imgs/nittany-lion/run-cycle/Run-3.png","../public/imgs/nittany-lion/run-cycle/Run-4.png":"imgs/nittany-lion/run-cycle/Run-4.png","../public/imgs/nittany-lion/run-cycle/Run-5.png":"imgs/nittany-lion/run-cycle/Run-5.png","../public/imgs/nittany-lion/run-cycle/Run-6.png":"imgs/nittany-lion/run-cycle/Run-6.png","../utility/sound-controller.js":"../utility/sound-controller.js"}],"imgs/trees/Bush-Tree.png":[function(require,module,exports) {
+function createCoinAboveDino() {
+  var coinElement = document.createElement('div');
+  var selectedCollectable = _gameManager.collectableOptions[0];
+  coinElement.dataset.coin = true;
+  coinElement.dataset.type = selectedCollectable.type;
+  coinElement.dataset.locked = 'false';
+  coinElement.dataset.points = selectedCollectable.points;
+  coinElement.classList.add('pop-up-gold-coin', 'collectable');
+  coinElement.id = Math.random().toString(16).slice(2);
+
+  // Set the initial position of the coin above the dino
+  coinElement.style.position = 'absolute';
+  coinElement.style.top = dinoElem.offsetTop - 50 + 'px'; // Adjust the vertical position as needed
+  coinElement.style.left = dinoElem.offsetLeft + 50 + 'px'; // Center above the dino
+  // Append the coin element to the document body or another container
+  var worldElem = document.querySelector('[data-world]');
+  worldElem.appendChild(coinElement);
+}
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/nittany-lion/jump-animation/Jump-1.png":"imgs/nittany-lion/jump-animation/Jump-1.png","../public/imgs/nittany-lion/jump-animation/Jump-2.png":"imgs/nittany-lion/jump-animation/Jump-2.png","../public/imgs/nittany-lion/jump-animation/Jump-3.png":"imgs/nittany-lion/jump-animation/Jump-3.png","../public/imgs/nittany-lion/run-cycle/Run-1.png":"imgs/nittany-lion/run-cycle/Run-1.png","../public/imgs/nittany-lion/run-cycle/Run-2.png":"imgs/nittany-lion/run-cycle/Run-2.png","../public/imgs/nittany-lion/run-cycle/Run-3.png":"imgs/nittany-lion/run-cycle/Run-3.png","../public/imgs/nittany-lion/run-cycle/Run-4.png":"imgs/nittany-lion/run-cycle/Run-4.png","../public/imgs/nittany-lion/run-cycle/Run-5.png":"imgs/nittany-lion/run-cycle/Run-5.png","../public/imgs/nittany-lion/run-cycle/Run-6.png":"imgs/nittany-lion/run-cycle/Run-6.png","../utility/sound-controller.js":"../utility/sound-controller.js","../game-manager.js":"../game-manager.js"}],"imgs/trees/Bush-Tree.png":[function(require,module,exports) {
 module.exports = "/Bush-Tree.609b3d8f.png";
 },{}],"imgs/trees/Round-Tree.png":[function(require,module,exports) {
 module.exports = "/Round-Tree.9c40ea34.png";
@@ -3961,40 +3996,43 @@ var handleNewHighScore = exports.handleNewHighScore = /*#__PURE__*/function () {
           });
         case 3:
           response = _context4.sent;
+          console.log(response);
           if (response.ok) {
-            _context4.next = 15;
+            _context4.next = 17;
             break;
           }
-          _context4.next = 7;
+          console.log('not ok');
+          // Check if the response status is not OK (e.g., 4xx or 5xx)
+          _context4.next = 9;
           return response.json();
-        case 7:
+        case 9:
           errorData = _context4.sent;
           if (!(errorData.type === 'username already exists')) {
-            _context4.next = 12;
+            _context4.next = 14;
             break;
           }
-          return _context4.abrupt("return", 'username already exists');
-        case 12:
+          return _context4.abrupt("return", console.log('username already exists'));
+        case 14:
           alert('ERROR: Something went wrong');
-        case 13:
-          _context4.next = 17;
-          break;
         case 15:
-          _context4.next = 17;
-          return handleSortAndDeleteLastEntry();
-        case 17:
-          _context4.next = 22;
+          _context4.next = 19;
           break;
+        case 17:
+          _context4.next = 19;
+          return handleSortAndDeleteLastEntry();
         case 19:
-          _context4.prev = 19;
+          _context4.next = 24;
+          break;
+        case 21:
+          _context4.prev = 21;
           _context4.t0 = _context4["catch"](0);
           // Handle other errors (e.g., network issues)
           console.log('handleNewHighScore error', _context4.t0);
-        case 22:
+        case 24:
         case "end":
           return _context4.stop();
       }
-    }, _callee4, null, [[0, 19]]);
+    }, _callee4, null, [[0, 21]]);
   }));
   return function handleNewHighScore(_x2, _x3) {
     return _ref4.apply(this, arguments);
@@ -4021,7 +4059,28 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.createLeaderboard = createLeaderboard;
+exports.getSuffix = getSuffix;
+exports.sortLeaderboard = sortLeaderboard;
 var _apis = require("../apis");
+function sortLeaderboard(data) {
+  return data.users.sort(function (a, b) {
+    return parseInt(b.score, 10) - parseInt(a.score, 10);
+  });
+}
+function getSuffix(number) {
+  var lastDigit = number % 10;
+  if (number === 11 || number === 12 || number === 13) {
+    return 'th';
+  } else if (lastDigit === 1) {
+    return 'st';
+  } else if (lastDigit === 2) {
+    return 'nd';
+  } else if (lastDigit === 3) {
+    return 'rd';
+  } else {
+    return 'th';
+  }
+}
 function createLeaderboard(leaderboardElem) {
   //for right sidebar
   var personalBestLvl = document.querySelector('[data-personal-best-lvl]');
@@ -4044,25 +4103,13 @@ function createLeaderboard(leaderboardElem) {
     personalBestScoreElem.textContent = storedPersonalBestScore;
   }
   (0, _apis.getAllHighScoreUsers)().then(function (data) {
-    function getSuffix(number) {
-      var lastDigit = number % 10;
-      if (number === 11 || number === 12 || number === 13) {
-        return 'th';
-      } else if (lastDigit === 1) {
-        return 'st';
-      } else if (lastDigit === 2) {
-        return 'nd';
-      } else if (lastDigit === 3) {
-        return 'rd';
-      } else {
-        return 'th';
-      }
-    }
+    var sortedData = sortLeaderboard(data);
 
     // Map data to HTML elements and append to container
-    data.users.forEach(function (item, index) {
+    sortedData.forEach(function (item, index) {
       var rowElement = document.createElement('tr');
       rowElement.classList.add('leaderboard-row');
+      rowElement.id = "leaderboard-row-".concat(index + 1);
 
       // Create and append the "Rank" cell
       var rankCell = document.createElement('td');
@@ -4142,8 +4189,8 @@ function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symb
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 var SPEED = 0.05;
-var MULTIPLIER_INTERVAL_MIN = 2000;
-var MULTIPLIER_INTERVAL_MAX = 4000;
+var MULTIPLIER_INTERVAL_MIN = 500;
+var MULTIPLIER_INTERVAL_MAX = 1000;
 var worldElem = document.querySelector('[data-world]');
 var nextMultiplierTime;
 function setupMultiplier() {
@@ -4217,6 +4264,7 @@ exports.setupCoin = setupCoin;
 exports.updateCoin = updateCoin;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
 var _dino = require("./dino");
+var _gameManager = require("../game-manager");
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -4282,22 +4330,9 @@ function getCoinRects() {
     };
   });
 }
-var collectableOptions = [{
-  type: 'gold-coin',
-  weight: 0.3,
-  points: 82
-}, {
-  type: 'red-gem',
-  weight: 0.1,
-  points: 325
-}, {
-  type: 'silver-coin',
-  weight: 0.6,
-  points: 46
-}];
 function createCoins() {
   // Calculate the total weight
-  var totalWeight = collectableOptions.reduce(function (sum, item) {
+  var totalWeight = _gameManager.collectableOptions.reduce(function (sum, item) {
     return sum + item.weight;
   }, 0);
 
@@ -4307,7 +4342,7 @@ function createCoins() {
   // Select a random collectable based on the weighted probabilities
   var cumulativeWeight = 0;
   var selectedCollectable;
-  var _iterator = _createForOfIteratorHelper(collectableOptions),
+  var _iterator = _createForOfIteratorHelper(_gameManager.collectableOptions),
     _step;
   try {
     for (_iterator.s(); !(_step = _iterator.n()).done;) {
@@ -4325,6 +4360,7 @@ function createCoins() {
   }
   var element = document.createElement('div');
   element.dataset.coin = true;
+  element.dataset.type = selectedCollectable.type;
   element.dataset.locked = 'false';
   element.dataset.points = selectedCollectable.points;
   element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
@@ -4341,7 +4377,7 @@ function getRandomKeyframe() {
   // Return a random number between 0 and 100 (percentage)
   return Math.floor(Math.random() * 101);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./dino":"../elements/dino.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./dino":"../elements/dino.js","../game-manager":"../game-manager.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
 module.exports = "/Speaker-Off.c6acac34.png";
 },{}],"imgs/icons/Speaker-On.png":[function(require,module,exports) {
 module.exports = "/Speaker-On.4eca78fe.png";
@@ -4349,13 +4385,520 @@ module.exports = "/Speaker-On.4eca78fe.png";
 module.exports = "/Pause.af4380de.png";
 },{}],"imgs/icons/Play.png":[function(require,module,exports) {
 module.exports = "/Play.59a6ba15.png";
+},{}],"imgs/buffs/glasses.png":[function(require,module,exports) {
+module.exports = "/glasses.73339926.png";
 },{}],"imgs/icons/Redo.png":[function(require,module,exports) {
 module.exports = "/Redo.35a20d07.png";
 },{}],"imgs/backgrounds/Foreground-Trees.png":[function(require,module,exports) {
 module.exports = "/Foreground-Trees.1c0db94f.png";
-},{}],"../game-manager.js":[function(require,module,exports) {
+},{}],"imgs/buffs/filet.png":[function(require,module,exports) {
+module.exports = "/filet.120468c3.png";
+},{}],"imgs/buffs/lucky-mittens.png":[function(require,module,exports) {
+module.exports = "/lucky-mittens.430fec99.png";
+},{}],"imgs/buffs/trusty-pocket-watch.png":[function(require,module,exports) {
+module.exports = "/trusty-pocket-watch.4cd4b74a.png";
+},{}],"imgs/buffs/watermelon.png":[function(require,module,exports) {
+module.exports = "/watermelon.76a83d58.png";
+},{}],"imgs/buffs/suspiciously-plain-chest.png":[function(require,module,exports) {
+module.exports = "/suspiciously-plain-chest.e290c4a2.png";
+},{}],"imgs/buffs/emotional-support-water-bottle.png":[function(require,module,exports) {
+module.exports = "/emotional-support-water-bottle.f4b3cab8.png";
+},{}],"imgs/buffs/pouch.png":[function(require,module,exports) {
+module.exports = "/pouch.d2326106.png";
+},{}],"imgs/buffs/moms-cookies.png":[function(require,module,exports) {
+module.exports = "/moms-cookies.0c330767.png";
+},{}],"imgs/buffs/feather.png":[function(require,module,exports) {
+module.exports = "/feather.e53f1f5f.png";
+},{}],"imgs/buffs/cape.png":[function(require,module,exports) {
+module.exports = "/cape.922da988.png";
+},{}],"imgs/buffs/amulet.png":[function(require,module,exports) {
+module.exports = "/amulet.e627f87d.png";
+},{}],"imgs/buffs/book.png":[function(require,module,exports) {
+module.exports = "/book.8e749379.png";
+},{}],"imgs/buffs/coins.png":[function(require,module,exports) {
+module.exports = "/coins.7d15c922.png";
+},{}],"../elements/buff.js":[function(require,module,exports) {
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createBuffs = createBuffs;
+exports.createStarterBuffs = createStarterBuffs;
+var _filet = _interopRequireDefault(require("../public/imgs/buffs/filet.png"));
+var _luckyMittens = _interopRequireDefault(require("../public/imgs/buffs/lucky-mittens.png"));
+var _trustyPocketWatch = _interopRequireDefault(require("../public/imgs/buffs/trusty-pocket-watch.png"));
+var _watermelon = _interopRequireDefault(require("../public/imgs/buffs/watermelon.png"));
+var _suspiciouslyPlainChest = _interopRequireDefault(require("../public/imgs/buffs/suspiciously-plain-chest.png"));
+var _emotionalSupportWaterBottle = _interopRequireDefault(require("../public/imgs/buffs/emotional-support-water-bottle.png"));
+var _pouch = _interopRequireDefault(require("../public/imgs/buffs/pouch.png"));
+var _momsCookies = _interopRequireDefault(require("../public/imgs/buffs/moms-cookies.png"));
+var _feather = _interopRequireDefault(require("../public/imgs/buffs/feather.png"));
+var _cape = _interopRequireDefault(require("../public/imgs/buffs/cape.png"));
+var _amulet = _interopRequireDefault(require("../public/imgs/buffs/amulet.png"));
+var _book = _interopRequireDefault(require("../public/imgs/buffs/book.png"));
+var _glasses = _interopRequireDefault(require("../public/imgs/buffs/glasses.png"));
+var _coins = _interopRequireDefault(require("../public/imgs/buffs/coins.png"));
+var _gameManager = require("../game-manager");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var modalContent = document.querySelector('.modal-content');
+var buffOptionsContainer = document.querySelector('.buff-options');
+var modal = document.getElementById('level-up-modal');
+function getRandomBuffWeighted(buffs) {
+  var keys = Object.keys(buffs);
+  var probabilities = keys.map(function (key) {
+    return buffs[key].weight;
+  });
+  var randomValue = Math.random();
+  var cumulativeProbability = 0;
+  for (var i = 0; i < keys.length; i++) {
+    cumulativeProbability += probabilities[i];
+    if (randomValue <= cumulativeProbability) {
+      return keys[i];
+    }
+  }
+
+  // Default case (fallback)
+  return keys[keys.length - 1];
+}
+function applyBuff(buffName) {
+  // Get all power-up divs
+  var powerUpDivs = document.querySelectorAll('.power-up');
+
+  // Check if the user already has the selected power-up
+  var existingPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
+    return powerUpDiv.querySelector('img') && powerUpDiv.querySelector('img').alt.includes(buffName);
+  });
+  if (existingPowerUp) {
+    // User already has the power-up, increment the rank
+    var existingRank = existingPowerUp.querySelector('.power-up-rank');
+    var existingRankValue = parseInt(existingRank.textContent);
+    existingRank.textContent = "".concat(existingRankValue + 1);
+
+    // Implement logic to apply the selected buff (if needed)
+    console.log("Applying ".concat(buffName));
+    buffs[buffName].effect();
+  } else {
+    // Find the first available power-up div without a power-up
+    var lastEmptyPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
+      return !powerUpDiv.querySelector('img');
+    });
+    if (lastEmptyPowerUp) {
+      // Implement logic to apply the selected buff
+      console.log("Applying ".concat(buffName));
+      buffs[buffName].effect();
+
+      // Add the icon to the power-up div
+      var icon = document.createElement('img');
+      icon.src = buffs[buffName].icon;
+      icon.alt = "".concat(buffName);
+      icon.classList.add('w-full');
+      lastEmptyPowerUp.appendChild(icon);
+
+      // Add the rank to the power-up div
+      var rank = document.createElement('div');
+      rank.classList.add('power-up-rank', 'sans');
+      rank.textContent = '1';
+      lastEmptyPowerUp.appendChild(rank);
+    }
+  }
+  // Close the modal
+  modal.style.display = 'none';
+  buffOptionsContainer.innerHTML = '';
+  (0, _gameManager.togglePause)();
+}
+function applySackOfCoins() {
+  alwaysBuffs['Sack of Coins'].effect();
+  // Close the modal
+  modal.style.display = 'none';
+  buffOptionsContainer.innerHTML = '';
+  (0, _gameManager.togglePause)();
+}
+function applyStarterBuff(buffName) {
+  // Get all power-up divs
+  var powerUpDivs = document.querySelectorAll('.starter-power-up');
+
+  // Check if the user already has the selected power-up
+  var existingPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
+    return powerUpDiv.querySelector('img') && powerUpDiv.querySelector('img').alt.includes(buffName);
+  });
+  if (existingPowerUp) {
+    // User already has the power-up, increment the rank
+    var existingRank = existingPowerUp.querySelector('.power-up-rank');
+    var existingRankValue = parseInt(existingRank.textContent);
+    existingRank.textContent = "".concat(existingRankValue + 1);
+
+    // Implement logic to apply the selected buff (if needed)
+    console.log("Applying ".concat(buffName));
+    starterBuffs[buffName].effect();
+  } else {
+    // Find the first available power-up div without a power-up
+    var lastEmptyPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
+      return !powerUpDiv.querySelector('img');
+    });
+    if (lastEmptyPowerUp) {
+      // Implement logic to apply the selected buff
+      console.log("Applying ".concat(buffName));
+      starterBuffs[buffName].effect();
+
+      // Add the icon to the power-up div
+      var icon = document.createElement('img');
+      icon.src = starterBuffs[buffName].icon;
+      icon.alt = "".concat(buffName);
+      icon.classList.add('w-full');
+      lastEmptyPowerUp.appendChild(icon);
+
+      // Add the rank to the power-up div
+      var rank = document.createElement('div');
+      rank.classList.add('power-up-rank', 'sans');
+      rank.textContent = '1';
+      lastEmptyPowerUp.appendChild(rank);
+    }
+  }
+  // Close the modal
+  modal.style.display = 'none';
+  buffOptionsContainer.innerHTML = '';
+  (0, _gameManager.togglePause)();
+}
+function createStarterBuffs() {
+  (0, _gameManager.togglePause)();
+  // Show the modal
+  var modal = document.getElementById('level-up-modal');
+  modal.style.display = 'flex';
+
+  // Keep track of selected buffs
+  var selectedBuffs = new Set();
+
+  // Generate 3 unique buffs
+  var _loop = function _loop() {
+    var randomBuffKey = getRandomBuffWeighted(starterBuffs);
+
+    // Check if the buff is not already selected
+    if (!selectedBuffs.has(randomBuffKey)) {
+      selectedBuffs.add(randomBuffKey);
+
+      // Create buff container (use a div as a clickable area)
+      var buffContainer = document.createElement('div');
+      buffContainer.classList.add('buff-container');
+      buffContainer.addEventListener('click', function () {
+        return applyStarterBuff(randomBuffKey);
+      });
+
+      // Create flex container for icon and title
+      var flexContainer = document.createElement('div');
+      flexContainer.classList.add('flex-row', 'items-center');
+
+      // Create div to wrap the icon
+      var iconWrapper = document.createElement('div');
+      iconWrapper.classList.add('buff-icon-wrapper');
+
+      // Create icon (adjust the path accordingly)
+      var icon = document.createElement('img');
+      icon.classList.add('buff-icon');
+      icon.src = starterBuffs[randomBuffKey].icon;
+      icon.alt = "".concat(randomBuffKey, " Icon");
+
+      // Create title
+      var title = document.createElement('div');
+      title.classList.add('buff-title', 'uppercase');
+      title.textContent = randomBuffKey;
+
+      // Determine rarity and set title color
+      var rarity = assignRarity(starterBuffs[randomBuffKey]);
+      title.style.color = getColorForRarity(rarity);
+
+      // Append icon to icon wrapper
+      iconWrapper.appendChild(icon);
+
+      // Append icon wrapper and title to flex container
+      flexContainer.appendChild(iconWrapper);
+      flexContainer.appendChild(title);
+
+      // Create description
+      var description = document.createElement('p');
+      description.classList.add('buff-description', 'body');
+      description.textContent = starterBuffs[randomBuffKey].description;
+
+      // Append flex container and description to buff container
+      buffContainer.appendChild(flexContainer);
+      buffContainer.appendChild(description);
+
+      // Append buff container to modal content
+      buffOptionsContainer.appendChild(buffContainer);
+    }
+  };
+  while (selectedBuffs.size < 4) {
+    _loop();
+  }
+}
+function createBuffs() {
+  (0, _gameManager.togglePause)();
+  // Show the modal
+  var modal = document.getElementById('level-up-modal');
+  modal.style.display = 'flex';
+
+  // Keep track of selected buffs
+  var selectedBuffs = new Set();
+
+  // Generate 3 unique buffs
+  var _loop2 = function _loop2() {
+    var randomBuffKey = getRandomBuffWeighted(buffs);
+
+    // Check if the buff is not already selected
+    if (!selectedBuffs.has(randomBuffKey)) {
+      selectedBuffs.add(randomBuffKey);
+
+      // Create buff container (use a div as a clickable area)
+      var buffContainer = document.createElement('div');
+      buffContainer.classList.add('buff-container');
+      buffContainer.addEventListener('click', function () {
+        return applyBuff(randomBuffKey);
+      });
+
+      // Create flex container for icon and title
+      var flexContainer = document.createElement('div');
+      flexContainer.classList.add('flex-row', 'items-center');
+
+      // Create div to wrap the icon
+      var iconWrapper = document.createElement('div');
+      iconWrapper.classList.add('buff-icon-wrapper');
+
+      // Create icon (adjust the path accordingly)
+      var icon = document.createElement('img');
+      icon.classList.add('buff-icon');
+      icon.src = buffs[randomBuffKey].icon;
+      icon.alt = "".concat(randomBuffKey, " Icon");
+
+      // Create title
+      var title = document.createElement('div');
+      title.classList.add('buff-title', 'uppercase');
+      title.textContent = randomBuffKey;
+
+      // Determine rarity and set title color
+      var _rarity = assignRarity(buffs[randomBuffKey]);
+      title.style.color = getColorForRarity(_rarity);
+
+      // Append icon to icon wrapper
+      iconWrapper.appendChild(icon);
+
+      // Append icon wrapper and title to flex container
+      flexContainer.appendChild(iconWrapper);
+      flexContainer.appendChild(title);
+
+      // Create description
+      var description = document.createElement('p');
+      description.classList.add('buff-description', 'body');
+      description.textContent = buffs[randomBuffKey].description;
+
+      // Append flex container and description to buff container
+      buffContainer.appendChild(flexContainer);
+      buffContainer.appendChild(description);
+
+      // Append buff container to modal content
+      buffOptionsContainer.appendChild(buffContainer);
+    }
+  };
+  while (selectedBuffs.size < 3) {
+    _loop2();
+  }
+
+  // Add the "Sack of Coins" power-up as the 4th option
+  var sackOfCoinsContainer = document.createElement('div');
+  sackOfCoinsContainer.classList.add('buff-container');
+  sackOfCoinsContainer.addEventListener('click', function () {
+    return applySackOfCoins();
+  });
+  var sackOfCoinsFlexContainer = document.createElement('div');
+  sackOfCoinsFlexContainer.classList.add('flex-row', 'items-center');
+  var sackOfCoinsIconWrapper = document.createElement('div');
+  sackOfCoinsIconWrapper.classList.add('buff-icon-wrapper');
+  var sackOfCoinsIcon = document.createElement('img');
+  sackOfCoinsIcon.classList.add('buff-icon');
+  sackOfCoinsIcon.src = alwaysBuffs['Sack of Coins'].icon;
+  sackOfCoinsIcon.alt = 'Sack of Coins Icon';
+  var sackOfCoinsTitle = document.createElement('div');
+  sackOfCoinsTitle.classList.add('buff-title', 'uppercase');
+  sackOfCoinsTitle.textContent = 'Sack of Coins';
+
+  // Determine rarity and set title color
+  var rarity = assignRarity(alwaysBuffs['Sack of Coins']);
+  sackOfCoinsTitle.style.color = getColorForRarity(rarity);
+
+  // Append icon to icon wrapper
+  sackOfCoinsIconWrapper.appendChild(sackOfCoinsIcon);
+
+  // Append icon wrapper and title to flex container
+  sackOfCoinsFlexContainer.appendChild(sackOfCoinsIconWrapper);
+  sackOfCoinsFlexContainer.appendChild(sackOfCoinsTitle);
+
+  // Create description
+  var sackOfCoinsDescription = document.createElement('p');
+  sackOfCoinsDescription.classList.add('buff-description', 'body');
+  sackOfCoinsDescription.textContent = alwaysBuffs['Sack of Coins'].description;
+
+  // Append flex container and description to buff container
+  sackOfCoinsContainer.appendChild(sackOfCoinsFlexContainer);
+  sackOfCoinsContainer.appendChild(sackOfCoinsDescription);
+
+  // Append sack of coins container to modal content
+  buffOptionsContainer.appendChild(sackOfCoinsContainer);
+}
+function getColorForRarity(rarity) {
+  switch (rarity) {
+    case 'Legendary':
+      return '#FFDB5D';
+    // Adjust the color as needed
+    case 'Epic':
+      return '#EA59E4';
+    // Adjust the color as needed
+    case 'Rare':
+      return '#3199F9';
+    // Adjust the color as needed
+    case 'Uncommon':
+      return '#61E955';
+    // Adjust the color as needed
+    case 'Common':
+      return 'white';
+    // Adjust the color as needed
+    default:
+      return 'black';
+    // Default color
+  }
+}
+
+function assignRarity(buff) {
+  var weight = buff.weight;
+  if (weight >= 0 && weight < 0.01) {
+    return 'Legendary';
+  } else if (weight >= 0.01 && weight < 0.2) {
+    return 'Epic';
+  } else if (weight >= 0.2 && weight < 0.4) {
+    return 'Rare';
+  } else if (weight >= 0.4 && weight < 0.6) {
+    return 'Uncommon';
+  } else if (weight >= 0.6 && weight <= 1.0) {
+    return 'Common';
+  } else {
+    // Handle weights outside the defined ranges
+    return 'Unknown Rarity';
+  }
+}
+var alwaysBuffs = {
+  'Sack of Coins': {
+    description: 'Miners fortune. Gain 25 random coins toward your score.',
+    weight: 1,
+    icon: _pouch.default,
+    effect: _gameManager.sackOfCoinsEffect
+  }
+};
+var buffs = {
+  'Filet Mignon': {
+    description: 'Enjoy a tasty meal. Gain 1 life',
+    weight: 0.2,
+    icon: _filet.default,
+    effect: _gameManager.filetMignonEffect
+  },
+  'Silver Feather': {
+    description: 'Silver coins are now worth 20% more (base value)',
+    weight: 0.4,
+    icon: _feather.default,
+    effect: _gameManager.silverFeatherEffect
+  },
+  Amulet: {
+    description: 'Gold coins are now worth 20% more (base value)',
+    weight: 0.4,
+    icon: _amulet.default,
+    effect: _gameManager.amuletEffect
+  },
+  'Moms Cookies': {
+    description: 'Mom sends her love. Gain 1 level.',
+    weight: 0.6,
+    icon: _momsCookies.default,
+    effect: _gameManager.momsCookiesEffect
+  },
+  'Slow Fall': {
+    description: 'Slow falling speed by 5%',
+    weight: 0.4,
+    icon: _cape.default,
+    effect: _gameManager.slowFallEffect
+  },
+  'Suspiciously Plain Chest': {
+    description: 'buff 4 description',
+    weight: 0.4,
+    icon: _suspiciouslyPlainChest.default,
+    effect: _gameManager.filetMignonEffect
+  },
+  'Trusty Pocket Watch': {
+    description: 'Slow time briefly by 60%, rapidly increasing to a permanent 5%',
+    weight: 0.8,
+    icon: _trustyPocketWatch.default,
+    effect: _gameManager.trustyPocketWatchEffect
+  },
+  'Emotional Support Water Bottle': {
+    description: 'buff 1 description',
+    weight: 0.2,
+    icon: _emotionalSupportWaterBottle.default,
+    effect: _gameManager.filetMignonEffect
+  },
+  Watermelon: {
+    description: 'Every time you pick up a silver coin, the next Red gem pick up value increases by 2x. Stacks up to 50 times.',
+    weight: 0.5,
+    icon: _watermelon.default,
+    effect: _gameManager.filetMignonEffect
+  },
+  'Lucky Mittens': {
+    description: 'buff 3 description',
+    weight: 0.3,
+    icon: _luckyMittens.default,
+    effect: _gameManager.filetMignonEffect
+  }
+};
+var starterBuffs = {
+  'Book Smart': {
+    description: 'Every time you get a level, your passives scale by %.',
+    weight: 0.009,
+    icon: _book.default,
+    effect: _gameManager.booksSmartEffect
+  },
+  'Starter 2': {
+    description: 'You spawn 1 gold coin above you when you jump, but your all gold coins you pick up are worth 50% less',
+    weight: 0.009,
+    icon: _coins.default,
+    effect: _gameManager.coinsEffect
+  },
+  'Starter 3': {
+    description: 'Every time you get a level, your passives scale by %.',
+    weight: 0.009,
+    icon: _book.default,
+    effect: _gameManager.booksSmartEffect
+  },
+  Glasses: {
+    description: 'Every gold coin you pick up increases the next red gem score by 1x stacks up to 14. Getting a red gem resets this back to 1x.',
+    weight: 0.009,
+    icon: _glasses.default,
+    effect: _gameManager.glassesEffect
+  }
+};
+},{"../public/imgs/buffs/filet.png":"imgs/buffs/filet.png","../public/imgs/buffs/lucky-mittens.png":"imgs/buffs/lucky-mittens.png","../public/imgs/buffs/trusty-pocket-watch.png":"imgs/buffs/trusty-pocket-watch.png","../public/imgs/buffs/watermelon.png":"imgs/buffs/watermelon.png","../public/imgs/buffs/suspiciously-plain-chest.png":"imgs/buffs/suspiciously-plain-chest.png","../public/imgs/buffs/emotional-support-water-bottle.png":"imgs/buffs/emotional-support-water-bottle.png","../public/imgs/buffs/pouch.png":"imgs/buffs/pouch.png","../public/imgs/buffs/moms-cookies.png":"imgs/buffs/moms-cookies.png","../public/imgs/buffs/feather.png":"imgs/buffs/feather.png","../public/imgs/buffs/cape.png":"imgs/buffs/cape.png","../public/imgs/buffs/amulet.png":"imgs/buffs/amulet.png","../public/imgs/buffs/book.png":"imgs/buffs/book.png","../public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","../public/imgs/buffs/coins.png":"imgs/buffs/coins.png","../game-manager":"../game-manager.js"}],"../game-manager.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SPEED_SCALE_INCREASE = void 0;
+exports.amuletEffect = amuletEffect;
+exports.booksSmartEffect = booksSmartEffect;
+exports.coinsEffect = coinsEffect;
+exports.collectableOptions = void 0;
+exports.filetMignonEffect = filetMignonEffect;
+exports.glassesEffect = glassesEffect;
+exports.livesElem = void 0;
+exports.momsCookiesEffect = momsCookiesEffect;
+exports.sackOfCoinsEffect = sackOfCoinsEffect;
+exports.silverFeatherEffect = silverFeatherEffect;
+exports.slowFallEffect = slowFallEffect;
+exports.togglePause = togglePause;
+exports.trustyPocketWatchEffect = trustyPocketWatchEffect;
 var _ground = require("./elements/ground.js");
 var _groundLayerTwo = require("./elements/groundLayerTwo");
 var _groundLayerThree = require("./elements/groundLayerThree");
@@ -4371,16 +4914,21 @@ var _SpeakerOff = _interopRequireDefault(require("./public/imgs/icons/Speaker-Of
 var _SpeakerOn = _interopRequireDefault(require("./public/imgs/icons/Speaker-On.png"));
 var _Pause = _interopRequireDefault(require("./public/imgs/icons/Pause.png"));
 var _Play = _interopRequireDefault(require("./public/imgs/icons/Play.png"));
+var _glasses = _interopRequireDefault(require("./public/imgs/buffs/glasses.png"));
 var _Redo = _interopRequireDefault(require("./public/imgs/icons/Redo.png"));
 var _ForegroundTrees = _interopRequireDefault(require("./public/imgs/backgrounds/Foreground-Trees.png"));
+var _buff = require("./elements/buff.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 var WORLD_WIDTH = 100;
 var WORLD_HEIGHT = 45;
-var SPEED_SCALE_INCREASE = 0.00001;
+var SPEED_SCALE_INCREASE = exports.SPEED_SCALE_INCREASE = 0.00001;
 var multiplierRatio = 1;
 var worldElem = document.querySelector('[data-world]');
 var scoreElem = document.querySelector('[data-score]');
@@ -4397,13 +4945,18 @@ var multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
 var tickerElem = document.querySelector('[data-ticker]');
 var tickerElem2 = document.querySelector('[data-ticker2]');
 var tickerElem3 = document.querySelector('[data-ticker3]');
-var livesElem = document.querySelector('[data-lives]');
+var livesElem = exports.livesElem = document.querySelector('[data-lives]');
 var dinoElem = document.querySelector('[data-dino]');
 var scrollableTableElem = document.querySelector('[data-scrollable-table]');
 var currentMultiplierElem = document.querySelector('[data-current-multiplier]');
 var plusPointsElem = document.querySelector('[data-plus-points]');
 var tickerContainerElem = document.querySelector('[data-ticker-container]');
 var loadingTextElem = document.querySelector('[data-loading-text]');
+var submitNewScoreFormElem = document.querySelector('[data-submit-new-score-form]');
+var interfaceComboContainer = document.getElementById('interface-combo-container');
+var currentMultiplierScoreElem = document.querySelector('[data-current-multiplier-score]');
+var currentComboScoreContainer = document.getElementById('current-combo-score-container');
+var showLeaderboard = false;
 
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
@@ -4413,24 +4966,28 @@ var loadingTextElem = document.querySelector('[data-loading-text]');
 setPixelToWorldScale();
 (0, _leaderboard.createLeaderboard)(leaderboardElem);
 window.addEventListener('resize', setPixelToWorldScale);
-// document.addEventListener('keydown', handleStart, { once: true });
-// document.addEventListener('touchstart', handleStart, { once: true });
+document.addEventListener('keydown', handleStart, {
+  once: true
+});
+document.addEventListener('touchstart', handleStart, {
+  once: true
+});
 var lastTime;
 var speedScale;
 var score;
 var collisionOccurred = false; // Flag to track collision
-var milestone = 10000;
+var milestone = 500;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score') ? localStorage.getItem('lion-high-score') : Math.floor('0').toString().padStart(6, 0);
 var hasBeatenScore = false;
 var isPaused = false;
 var playerImmunity = false;
 var immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
-// scrollableTableElem.classList.add('hide-element');
-// scrollableTableElem.style.display = 'none';
-// worldElem.setAttribute('transition-style', 'in:circle:center');
-// tickerContainerElem.classList.add('hide-element');
-// tickerContainerElem.classList.remove('show-element');
+scrollableTableElem.classList.add('hide-element');
+scrollableTableElem.style.display = 'none';
+worldElem.setAttribute('transition-style', 'in:circle:center');
+tickerContainerElem.classList.add('hide-element');
+tickerContainerElem.classList.remove('show-element');
 var pauseIconButton = document.getElementById('pause-icon-button');
 
 // Function to toggle the pause state
@@ -4486,6 +5043,7 @@ function setPlayerImmunity() {
   }, immunityDuration);
 }
 function updateElements() {}
+var deltaAdjustment = 1;
 function update(time) {
   if (isPaused) {
     // Do nothing if the game is paused
@@ -4496,9 +5054,10 @@ function update(time) {
     window.requestAnimationFrame(update);
     return;
   }
+  var baseDelta = 5;
 
   // let delta = time - lastTime;
-  var delta = 30;
+  var delta = baseDelta;
   if (collisionOccurred) {
     setPlayerImmunity();
     togglePause();
@@ -4512,7 +5071,7 @@ function update(time) {
   (0, _ground.updateGround)(delta, speedScale);
   (0, _groundLayerThree.updateGroundLayerThree)(delta, speedScale);
   (0, _groundLayerTwo.updateGroundLayerTwo)(delta, speedScale);
-  (0, _dino.updateDino)(delta, speedScale);
+  (0, _dino.updateDino)(delta, speedScale, gravityFallAdjustment, selectedStarter);
   (0, _cactus.updateCactus)(delta, speedScale);
   updateSpeedScale(delta);
   updateScore(delta);
@@ -4526,53 +5085,79 @@ function update(time) {
 }
 function createOneUpText() {
   _soundController.soundController.beatScore.play();
+  var playerContainer = document.querySelector('.player-container'); // Adjust the selector accordingly
+
   var newElement = document.createElement('div');
   newElement.classList.add('one-up', 'sans');
   newElement.style.position = 'absolute';
-  newElement.style.left = livesElem.offsetLeft + 'px';
-  newElement.style.top = '20%';
-  livesElem.parentNode.insertBefore(newElement, livesElem);
+  playerContainer.appendChild(newElement);
   newElement.textContent = '1UP';
   setTimeout(function () {
-    newElement.remove();
+    // newElement.remove();
   }, 600);
   return true;
 }
-var multiplierTimer = 5;
+function toggleElemOn(elem) {
+  var classList = elem.classList;
+  classList.remove('hide-element');
+  classList.add('show-element');
+}
+function toggleElemOff(elem) {
+  var classList = elem.classList;
+  classList.add('hide-element');
+  classList.remove('show-element');
+}
 var timerInterval;
-function startMultiplierTimer() {
-  //reset the old timer
-  clearInterval(timerInterval);
-  multiplierTimer = 5;
-  multiplierTimerElem.textContent = multiplierTimer;
 
-  //start new interval
+// Get the timer elements
+var timerProgress = document.getElementById('timerProgress');
+var multiplierTimer = 5000; // Set the initial time in milliseconds
+var currentComboScore = 0; // Initialize the current combo score variable
+
+function resetMultiplier() {
+  toggleElemOff(interfaceComboContainer);
+  toggleElemOff(currentComboScoreContainer);
+  clearInterval(timerInterval);
+  currentComboScore = 0;
+  timerProgress.style.width = '100%'; // Set the progress bar to full width
+  multiplierTimer = 5000; // Reset timer when it reaches 0
+  currentMultiplierElem.textContent = 'x1';
+  currentMultiplierScoreElem.textContent = '0';
+  multiplierRatio = 1;
+}
+function startMultiplierTimer() {
+  clearInterval(timerInterval);
+  multiplierTimer = 5000; // Reset the timer to its initial value
+
   timerInterval = setInterval(function () {
-    multiplierTimer--;
-    if (multiplierTimer === 0) {
-      clearInterval(timerInterval);
-      multiplierTimerElem.textContent = '';
-      // Reset the timer and multiplier when the countdown ends
-      multiplierTimer = 5;
-      multiplierRatio = 1;
-      currentMultiplierElem.textContent = 1;
+    multiplierTimer -= 100; // Subtract 100 milliseconds (adjust as needed)
+    var progressValue = multiplierTimer / 5000 * 100; // Calculate progress value
+
+    if (multiplierTimer <= 0) {
+      resetMultiplier();
     } else {
-      multiplierTimerElem.textContent = multiplierTimer;
+      timerProgress.style.width = "".concat(progressValue, "%");
     }
-  }, 1000); // Update the timer every second (1000 milliseconds)
+  }, 100); // Update every 100 milliseconds
 }
 
 function checkMultiplierCollision() {
   var dinoRect = (0, _dino.getDinoRect)();
   (0, _scoreMultiplier.getMultiplierRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
+      toggleElemOn(interfaceComboContainer);
+      toggleElemOn(currentComboScoreContainer);
       _soundController.soundController.beatScore.play();
       document.getElementById(element.id).remove();
       clearInterval(timerInterval);
       startMultiplierTimer();
       // Multiply the existing multiplier by the newly collided multiplier
-      multiplierRatio *= parseInt(element.multiplier);
-      currentMultiplierElem.textContent = multiplierRatio;
+      if (multiplierRatio === 1) {
+        multiplierRatio += parseInt(element.multiplier) - 1;
+      } else {
+        multiplierRatio += parseInt(element.multiplier);
+      }
+      currentMultiplierElem.textContent = "x".concat(multiplierRatio);
       return true;
     }
   });
@@ -4585,15 +5170,30 @@ function randomArc(element) {
   document.documentElement.style.setProperty('--random-x-end', randomXEnd + 'px');
 }
 function calculateFontSize(points) {
-  return Math.min(20 + points * 0.08, 46);
+  return Math.min(12 + points * 0.01, 36);
 }
+var goldCoinCounter = 0;
+var redGemMultiplier = 1;
 function checkCoinCollision() {
   var dinoRect = (0, _dino.getDinoRect)();
   (0, _coin.getCoinRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       var coinElement = document.getElementById(element.id);
+      if (coinElement.dataset.type === 'gold-coin' && goldCoinCounter < 14 && selectedStarter === 'Glasses') {
+        // Increment the counter and update the value of the next red gem
+        goldCoinCounter++;
+        redGemMultiplier = goldCoinCounter;
+
+        // Check if glasses buff div exists, otherwise create it
+        var glassesBuffDiv = document.querySelector('.top-hud-right .glasses-buff');
+        if (!glassesBuffDiv) {
+          createGlassesBuffDiv(_glasses.default);
+        }
+
+        // Update the glasses buff div with the current counter
+        updateGlassesBuffDiv(goldCoinCounter);
+      }
       // Create a pickup text element
-      console.log('picked up');
       var newElement = document.createElement('div');
       addPickupText(newElement, coinElement);
       coinElement.remove();
@@ -4607,27 +5207,120 @@ function checkCoinCollision() {
     }
   });
 }
+
+// Function to create glasses buff div
+function createGlassesBuffDiv(imgSrc) {
+  var topHudRightDiv = document.querySelector('.top-hud-right');
+  var glassesBuffDiv = document.createElement('div');
+  glassesBuffDiv.id = 'glasses-buff-container';
+  glassesBuffDiv.classList.add('glasses-buff', 'hide-element');
+  topHudRightDiv.appendChild(glassesBuffDiv);
+  // Create an img element with the specified src
+  var imgElement = document.createElement('img');
+  imgElement.classList.add('buff-icon', 'w-full');
+  imgElement.src = imgSrc; // Set the src attribute with the provided imgSrc
+
+  var buffStackDiv = document.createElement('div');
+  buffStackDiv.classList.add('glasses-buff-stacks', 'buff-stacks', 'power-up-rank');
+  buffStackDiv.id = "glasses-buff";
+  buffStackDiv.textContent = '0';
+  // Append the img element to the bordered div
+  var borderedDiv = document.createElement('div');
+  borderedDiv.classList.add('bordered-buff-div', 'relative', 'small-border-inset');
+  borderedDiv.appendChild(imgElement);
+  borderedDiv.appendChild(buffStackDiv);
+  // Append the bordered div to the glasses buff div
+  glassesBuffDiv.appendChild(borderedDiv);
+
+  // Append the glasses buff div to the top hud
+}
+
+// Function to update glasses buff div with the current counter
+function updateGlassesBuffDiv(counter) {
+  var glassesBuffStackDiv = document.getElementById('glasses-buff');
+  if (glassesBuffStackDiv) {
+    if (glassesBuffStackDiv.textContent === '0') {
+      var glassesBuffDiv = document.getElementById('glasses-buff-container');
+      glassesBuffDiv.classList.remove('hide-element');
+      glassesBuffDiv.classList.add('show-element');
+    }
+    glassesBuffStackDiv.textContent = counter;
+  }
+}
+var lastMultiplierScore = document.querySelector('[data-last-multiplier-score]');
 function addPickupText(text, pickupElement) {
-  var _pickupElement$datase;
   text.classList.add('plus-points', 'sans');
   text.style.position = 'absolute';
   text.style.left = pickupElement.offsetLeft + 'px';
   text.style.top = pickupElement.offsetTop - 70 + 'px';
   randomArc(text);
   pickupElement.parentNode.insertBefore(text, pickupElement);
-  var points = (pickupElement === null || pickupElement === void 0 || (_pickupElement$datase = pickupElement.dataset) === null || _pickupElement$datase === void 0 ? void 0 : _pickupElement$datase.points) * multiplierRatio;
+  var pickupPoints, points;
+
+  //case when glasses are starter
+  if (pickupElement.dataset.type === 'red-gem' && redGemMultiplier !== 1) {
+    var _pickupElement$datase;
+    pickupPoints = (pickupElement === null || pickupElement === void 0 || (_pickupElement$datase = pickupElement.dataset) === null || _pickupElement$datase === void 0 ? void 0 : _pickupElement$datase.points) * redGemMultiplier;
+    points = pickupPoints * multiplierRatio;
+    redGemMultiplier = 1;
+    goldCoinCounter = 0;
+    var glassesBuffStackDiv = document.getElementById('glasses-buff');
+    glassesBuffStackDiv.textContent = goldCoinCounter;
+    if (glassesBuffStackDiv) {
+      var glassesBuffDiv = document.getElementById('glasses-buff-container');
+      if (glassesBuffDiv.classList.contains('show-element')) {
+        glassesBuffDiv.classList.remove('show-element');
+        glassesBuffDiv.classList.add('hide-element');
+      } // Set the number of stacks
+    }
+  }
+  //case when coins are starter
+  else if (selectedStarter === 'Coins' && pickupElement.dataset.type === 'gold-coin') {
+    var _pickupElement$datase2;
+    pickupPoints = Math.round((pickupElement === null || pickupElement === void 0 || (_pickupElement$datase2 = pickupElement.dataset) === null || _pickupElement$datase2 === void 0 ? void 0 : _pickupElement$datase2.points) / 2);
+    points = pickupPoints * multiplierRatio;
+  } else {
+    var _pickupElement$datase3;
+    console.log(pickupElement.dataset.type);
+    pickupPoints = pickupElement === null || pickupElement === void 0 || (_pickupElement$datase3 = pickupElement.dataset) === null || _pickupElement$datase3 === void 0 ? void 0 : _pickupElement$datase3.points;
+    points = pickupPoints * multiplierRatio;
+  }
   updateScoreWithPoints(points);
   var fontSize = calculateFontSize(points);
   text.style.fontSize = fontSize + 'px';
   text.textContent = "+".concat(points);
+  // Add a div inside the lastMultiplierScore
+  var innerDiv = document.createElement('div');
+  innerDiv.textContent = "+".concat(pickupPoints, "x").concat(multiplierRatio);
+  innerDiv.classList.add('inner-plus-points', 'sans');
+
+  // Check if there is an existing innerDiv, remove it if present
+  var existingInnerDiv = lastMultiplierScore.querySelector('.inner-plus-points');
+  if (existingInnerDiv) {
+    lastMultiplierScore.removeChild(existingInnerDiv);
+  }
+
+  // Append the new innerDiv inside lastMultiplierScore
+  lastMultiplierScore.appendChild(innerDiv);
+
+  // Remove the new innerDiv after 1 second
+  setTimeout(function () {
+    lastMultiplierScore.removeChild(innerDiv);
+  }, 1000);
 }
+var scoreSinceMilestone = 0;
 function updateScoreWithPoints(delta) {
   var initialScore = score;
   var increments = Math.ceil(duration / updateInterval);
   var incrementAmount = delta / increments;
   var intervalId = setInterval(function () {
     score += incrementAmount;
+    scoreSinceMilestone += incrementAmount;
     scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+    if (multiplierRatio > 1) {
+      currentComboScore += incrementAmount;
+      currentMultiplierScoreElem.textContent = Math.floor(currentComboScore).toString().padStart(1, 0);
+    }
     if (score >= initialScore + delta) {
       // Stop the interval when the target score is reached
       clearInterval(intervalId);
@@ -4646,6 +5339,7 @@ function checkLose() {
   //if no lives remain then lose
   if (livesElem.textContent === '0') {
     worldElem.setAttribute('transition-style', 'out:circle:hesitate');
+    worldElem.classList.remove('stop-time'); // Add the class to stop time
     return true;
   } //check if enemy and player are in colliding
   else if (isEnemyAndPlayerCollision && !playerImmunity) {
@@ -4658,6 +5352,7 @@ function checkLose() {
         currentLives -= 1;
         livesElem.textContent = currentLives;
       }
+      resetMultiplier();
       //switch player collision state to true
       collisionOccurred = true;
       //set player to flash
@@ -4706,32 +5401,62 @@ function isCollision(rect1, rect2) {
 function updateSpeedScale(delta) {
   speedScale += delta * SPEED_SCALE_INCREASE;
 }
+
+// Assuming you have the necessary elements in your HTML
+var levelBarElem = document.getElementById('levelBar');
+var levelDisplayElem = document.getElementById('levelDisplay');
 function calculateNextMilestone(currentMilestone) {
   // You can customize the growth rate based on your requirements
-  var growthRate = 1.5; // Adjust this as needed
+  var growthRate = 2; // Adjust this as needed
   return Math.floor(currentMilestone * growthRate);
+}
+function handleLevelUp() {
+  scoreSinceMilestone = 0;
+  // Increment the level
+  var currentLevel = parseInt(levelDisplayElem.textContent, 10);
+  levelDisplayElem.textContent = currentLevel + 1;
+  if (selectedStarter === 'Book Smart') {
+    currentPassives.forEach(function (item) {
+      var currentItem = collectableOptions.find(function (curItem) {
+        return curItem.type === item.type;
+      });
+      item.lastValue = currentItem.points;
+      item.effect(incrementAdjustment);
+    });
+  }
+  if (currentLevel === 1) {
+    (0, _buff.createStarterBuffs)();
+  } else {
+    (0, _buff.createBuffs)();
+  }
+  // Reset the progress bar to 0
+  levelBarElem.value = 0;
+  // Update the milestone for the next level
+  milestone = calculateNextMilestone(milestone);
 }
 function updateScore(delta) {
   score += delta * 0.01;
-  scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+  scoreSinceMilestone += delta * 0.01;
+  scoreElem.textContent = Math.floor(score).toString().padStart(6, '0');
+
+  // Update the level bar
+  var progress = scoreSinceMilestone / milestone * 100;
+  levelBarElem.value = progress;
   if (score > highScoreElem.textContent && !hasBeatenScore && highScoreElem.textContent !== '000000') {
     _soundController.soundController.beatScore.play();
     hasBeatenScore = true;
   }
-  if (score > milestone) {
-    createOneUpText();
-    var currentLives = parseInt(livesElem.textContent, 10);
-    currentLives += 1;
-    livesElem.textContent = currentLives;
-    milestone = calculateNextMilestone(milestone);
-    console.log(milestone);
+  if (scoreSinceMilestone >= milestone) {
+    handleLevelUp();
   }
 }
 function handleCheckIfHighScore(score) {
   if (score > highScoreElem.textContent) {
     highScoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
     localStorage.setItem('lion-high-score', highScoreElem.textContent);
-    handleCheckLeaderboardHighScore(highScoreElem.textContent);
+  }
+  if (handleCheckLeaderboardHighScore(score)) {
+    return true;
   }
 }
 function setUpElements() {
@@ -4752,10 +5477,11 @@ function handleStart() {
   multiplierRatio = 1;
   setUpElements();
   dinoElem.classList.remove('leap');
-  currentMultiplierElem.textContent = multiplierRatio;
-  livesElem.textContent = 2;
+  currentMultiplierElem.textContent = "x".concat(multiplierRatio);
+  livesElem.textContent = 10;
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
+  gameOverIconElem.classList.add('hide-element');
   // Get the container element where the ticker items will be appended
   var tickerData = [{
     username: 'bap1',
@@ -4841,51 +5567,152 @@ function handleStart() {
 
   window.requestAnimationFrame(update);
 }
-function handleCheckLeaderboardHighScore(score) {
-  var users = (0, _apis.getAllHighScoreUsers)().then(function (data) {
-    var sortedData = data.users.sort(function (a, b) {
-      return parseInt(b.score, 10) - parseInt(a.score, 10);
-    });
-  });
+function revealAchievementForm(index, score) {
+  gameOverIconElem.classList.add('hide-element');
+  var rank = index + 2;
+  scoreNewHighScoreElem.textContent = Math.round(score);
+  var achievementRankElem = document.getElementById('achievement-rank-text');
+  achievementRankElem.textContent = "".concat(rank).concat((0, _leaderboard.getSuffix)(rank));
+  var achievementBlockElem = document.getElementById('achievement-block');
+  var lionGameAchievementTitleElem = document.getElementById('achievement-title-block');
+  var achievementInstructionsBlockElem = document.getElementById('achievement-instructions-block');
+  var achievementFormElem = document.getElementById('achievement-form-block');
+  var newHighScoreInput = document.getElementById('newHighScoreInput');
+  submitNewScoreFormElem.classList.remove('hide-form');
+  submitNewScoreFormElem.classList.add('show-form');
+  setTimeout(function () {
+    lionGameAchievementTitleElem.classList.remove('fade-out-text');
+    lionGameAchievementTitleElem.classList.add('fade-in-text');
+  }, 2000);
+  setTimeout(function () {
+    typeLettersWithoutSpaces(0, 'Achievement', achievementBlockElem, 100);
+  }, 4050);
+  setTimeout(function () {
+    typeLettersWithoutSpaces(0, 'New high score, enter your username!', achievementInstructionsBlockElem, 100);
+  }, 8050);
+  setTimeout(function () {
+    newHighScoreInput.focus();
+    achievementFormElem.classList.remove('fade-out-text');
+    achievementFormElem.classList.remove('fade-in-text');
+  }, 12050);
 }
-handleCheckLeaderboardHighScore('90013');
+function handleCheckLeaderboardHighScore(_x) {
+  return _handleCheckLeaderboardHighScore.apply(this, arguments);
+} //trim any extra spaces in score
+function _handleCheckLeaderboardHighScore() {
+  _handleCheckLeaderboardHighScore = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(score) {
+    return _regeneratorRuntime().wrap(function _callee$(_context) {
+      while (1) switch (_context.prev = _context.next) {
+        case 0:
+          _context.prev = 0;
+          _context.next = 3;
+          return (0, _apis.getAllHighScoreUsers)().then(function (data) {
+            //sort all the data in ascending order
+            var sortedData = data.users.sort(function (a, b) {
+              return parseInt(b.score, 10) - parseInt(a.score, 10);
+            });
+            //check the last highest score compared to the leaderboard
+            var lastHigherScore = sortedData.reverse().find(function (user) {
+              return parseInt(user.score, 10) > parseInt(score, 10);
+            });
+            //find the index of the last highest score
+            var index = sortedData.reverse().indexOf(lastHigherScore);
+            //if the index is not data.length-1 then the score is not higher than any on the leaderboard
+            if (index !== sortedData.length - 1) {
+              // const rank = index !== 0 ? index + 2 : index; will need to add condition for the highest score
+              revealAchievementForm(index, score);
+              return true;
+            } else {
+              setTimeout(function () {
+                document.addEventListener('keydown', handleStart, {
+                  once: true
+                });
+                document.addEventListener('touchstart', handleStart, {
+                  once: true
+                });
+                endScreenElem.classList.remove('hide');
+              }, 100);
+              setTimeout(function () {
+                typeLetters(0);
+              }, 1500);
+              return;
+            }
+          });
+        case 3:
+          _context.next = 8;
+          break;
+        case 5:
+          _context.prev = 5;
+          _context.t0 = _context["catch"](0);
+          console.log(_context.t0);
+        case 8:
+        case "end":
+          return _context.stop();
+      }
+    }, _callee, null, [[0, 5]]);
+  }));
+  return _handleCheckLeaderboardHighScore.apply(this, arguments);
+}
+function trimmedOutExtraSpacesScore(score) {
+  return score.replace(/\s+/g, ' ').trim();
+}
+
+//submit new score to leaderboard
 function handleSubmitNewScore() {
   return _handleSubmitNewScore.apply(this, arguments);
 }
 function _handleSubmitNewScore() {
-  _handleSubmitNewScore = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-    var userInput, scoreNewHighScoreElem, res;
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
-      while (1) switch (_context.prev = _context.next) {
+  _handleSubmitNewScore = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+    var userInput, res, leaderboardContent;
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) switch (_context2.prev = _context2.next) {
         case 0:
           userInput = document.getElementById('newHighScoreInput').value; //check for validation errors and update error message accordingly
           if (!(!(0, _validateInput.validateInput)() || !userInput)) {
-            _context.next = 5;
+            _context2.next = 5;
             break;
           }
           scoreErrorMessageElem.textContent = 'Enter a valid name!';
           scoreErrorMessageElem.classList.remove('hide');
-          return _context.abrupt("return");
+          return _context2.abrupt("return");
         case 5:
-          scoreNewHighScoreElem = document.querySelector('[data-score-new-high-score]');
-          _context.next = 8;
-          return (0, _apis.handleNewHighScore)(userInput, scoreNewHighScoreElem.textContent);
-        case 8:
-          res = _context.sent;
+          _context2.next = 7;
+          return (0, _apis.handleNewHighScore)(userInput, trimmedOutExtraSpacesScore(scoreNewHighScoreElem.textContent));
+        case 7:
+          res = _context2.sent;
           if (!(res === 'user already exists')) {
-            _context.next = 15;
+            _context2.next = 14;
             break;
           }
           scoreErrorMessageElem.textContent = res;
           scoreErrorMessageElem.classList.remove('hide');
-          return _context.abrupt("return");
-        case 15:
-          scoreErrorMessageElem.classList.add('hide');
-        case 16:
+          return _context2.abrupt("return");
+        case 14:
+          submitNewScoreFormElem.classList.add('fade-out-text');
+          scrollableTableElem.style.display = 'flex';
+          showLeaderboard = !showLeaderboard;
+          leaderboardContent = document.getElementById('leaderboard-content');
+          leaderboardContent.classList.remove('flicker-opacity-off');
+          loading = true;
+          runTypeLetters();
+          showLeaderboard = !showLeaderboard;
+          worldElem.setAttribute('transition-style', '');
+          stopLoading();
+          scrollableTableElem.setAttribute('transition-style', 'in:wipe:left');
+          scrollableTableElem.classList.add('show-element');
+          leaderboardContent.classList.add('translateX-right-to-left');
+          scrollableTableElem.classList.remove('hide-element');
+          setTimeout(function () {
+            showLeaderboard = true;
+            scrollableTableElem.classList.remove('hide-element');
+            scrollableTableElem.classList.add('show-element');
+            scoreErrorMessageElem.classList.add('hide');
+          }, 3000);
+        case 29:
         case "end":
-          return _context.stop();
+          return _context2.stop();
       }
-    }, _callee);
+    }, _callee2);
   }));
   return _handleSubmitNewScore.apply(this, arguments);
 }
@@ -4938,14 +5765,13 @@ var pageButtons = {
   'controls-page': 'show-controls-page-button'
 };
 underlineCurrentPageButton('leaderboard-page');
-var showLeaderboard = false;
 var loading;
 function stopLoading() {
   loading = false;
 }
 function handleToggleLeaderboard() {
   var leaderboardContent = document.getElementById('leaderboard-content');
-  if (!showLeaderboard) {
+  if (showLeaderboard !== null && showLeaderboard === false) {
     leaderboardContent.classList.remove('flicker-opacity-off');
     loading = true;
     runTypeLetters();
@@ -4960,6 +5786,7 @@ function handleToggleLeaderboard() {
       scrollableTableElem.classList.remove('hide-element');
     }, randomTimeout);
   } else {
+    handleStart();
     loading = true;
     runTypeLetters();
     showLeaderboard = !showLeaderboard;
@@ -4967,6 +5794,7 @@ function handleToggleLeaderboard() {
     leaderboardContent.classList.add('flicker-opacity-off');
     setTimeout(function () {
       stopLoading();
+      scrollableTableElem.style.display = 'none';
       worldElem.setAttribute('transition-style', 'in:wipe:left');
       scrollableTableElem.classList.remove('show-element');
       scrollableTableElem.classList.add('hide-element');
@@ -4986,21 +5814,9 @@ function handleLose() {
   gameOverTextElem.textContent = '';
   // tickerContainerElem.classList.add('show-element');
   // tickerContainerElem.classList.remove('hide-element');
-  handleCheckIfHighScore(score);
   _soundController.soundController.die.play();
   (0, _dino.setDinoLose)();
-  setTimeout(function () {
-    document.addEventListener('keydown', handleStart, {
-      once: true
-    });
-    document.addEventListener('touchstart', handleStart, {
-      once: true
-    });
-    endScreenElem.classList.remove('hide');
-  }, 100);
-  setTimeout(function () {
-    typeLetters(0);
-  }, 1500);
+  handleCheckIfHighScore(score);
 }
 function setPixelToWorldScale() {
   var worldToPixelScale;
@@ -5031,6 +5847,8 @@ handleOrientationChange();
 
 // Listen for orientation changes
 window.addEventListener('orientationchange', handleOrientationChange);
+
+//snow particle system
 var snow = {
   el: '#snow',
   density: 12500,
@@ -5126,7 +5944,192 @@ function typeLettersAny(index, text, elem, timeout) {
     elem.classList.add('show-element');
   }
 }
-},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+function typeLettersWithoutSpaces(index, text, elem, timeout) {
+  if (index < text.length) {
+    elem.textContent += text.charAt(index);
+    setTimeout(function () {
+      typeLettersWithoutSpaces(index + 1, text, elem, timeout);
+    }, timeout); // Use the provided timeout
+  } else {
+    elem.classList.remove('hide-element');
+    elem.classList.add('show-element');
+  }
+}
+var collectableOptions = exports.collectableOptions = [{
+  type: 'gold-coin',
+  weight: 0.3,
+  points: 13
+}, {
+  type: 'red-gem',
+  weight: 0.1,
+  points: 45
+}, {
+  type: 'silver-coin',
+  weight: 0.6,
+  points: 6
+}];
+
+//buff-effects
+
+function filetMignonEffect() {
+  var rank = 1;
+  var currentLives = parseInt(livesElem.textContent, 10);
+  currentLives += rank;
+  livesElem.textContent = currentLives;
+  createOneUpText();
+}
+function trustyPocketWatchEffect() {
+  var startRank = 0.4;
+  var endRank = 0.95;
+  var updateInterval = 1000; // Update every second
+
+  var currentRank = startRank;
+  var intervalId = setInterval(function () {
+    // Increment the current rank
+    currentRank += 0.1; // Adjust the increment as needed
+
+    // Ensure the current rank does not exceed the end rank
+    currentRank = Math.min(currentRank, endRank);
+
+    // Update the deltaAdjustment based on the current rank
+    deltaAdjustment = currentRank;
+    if (currentRank >= endRank) {
+      // Stop the interval when the end rank is reached
+      clearInterval(intervalId);
+      deltaAdjustment = endRank;
+    }
+  }, updateInterval);
+}
+function getRandomCollectable() {
+  var randomValue = Math.random();
+  var cumulativeProbability = 0;
+  var _iterator = _createForOfIteratorHelper(collectableOptions),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var option = _step.value;
+      cumulativeProbability += option.weight;
+      if (randomValue <= cumulativeProbability) {
+        return option;
+      }
+    }
+
+    // Default case (fallback)
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+  return collectableOptions[collectableOptions.length - 1];
+}
+function sackOfCoinsEffect() {
+  var totalPoints = 0;
+  for (var i = 0; i < 25; i++) {
+    var randomCollectable = getRandomCollectable();
+    totalPoints += randomCollectable.points;
+  }
+  updateScoreWithPoints(totalPoints);
+
+  // Add totalPoints to the score (adjust as needed)
+  // Example: score += totalPoints;
+  console.log("Collected ".concat(totalPoints, " points from 25 random coins."));
+}
+function momsCookiesEffect() {
+  updateScoreWithPoints(milestone);
+}
+var gravityFallAdjustment = 0.01;
+function reduceByPercentage(value, percentage) {
+  return value * (1 - percentage);
+}
+function slowFallEffect() {
+  var reductionPercentage = 0.3; // Adjust the percentage as needed
+  gravityFallAdjustment = reduceByPercentage(gravityFallAdjustment, reductionPercentage);
+}
+function increaseByPercentage(value, percentage) {
+  var multiplier = 1 + percentage / 100;
+  return value * multiplier;
+}
+function reverseAndReIncrement(finalValue, incrementFactor, reIncrementFactor) {
+  // Reverse the increment by incrementFactor
+  var decreasedValue = finalValue / incrementFactor;
+  // Re-increment the reversed value by reIncrementFactor
+  var reIncrementedValue = decreasedValue * reIncrementFactor;
+  return reIncrementedValue;
+}
+var incrementAdjustment = 1.016;
+function applyIncrementEffect(collectable, incrementAdjustment, newIncrementAdjustment, effectMultiplier) {
+  if (incrementAdjustment) {
+    var lastCollectable = currentPassives.find(function (item) {
+      return item.type === collectable.type;
+    });
+    // Increment the points by passive increase
+    collectable.points = reverseAndReIncrement(lastCollectable.lastValue, effectMultiplier, newIncrementAdjustment);
+  } else {
+    collectable.points *= effectMultiplier;
+  }
+  collectable.points = Math.round(collectable.points);
+}
+function silverFeatherEffect(incrementAdjustment) {
+  var newIncrementAdjustment;
+  var silverFeatherIncrement = 1.2;
+  var silverCoin = collectableOptions.find(function (item) {
+    return item.type === 'silver-coin';
+  });
+  var hasSilverFeatherEffect = currentPassives.some(function (passive) {
+    return passive.effect === silverFeatherEffect;
+  });
+  if (!hasSilverFeatherEffect) {
+    handleAddToCurrentPassives(silverFeatherEffect, 'silver-coin', silverCoin.points);
+  } else {
+    newIncrementAdjustment = silverFeatherIncrement * incrementAdjustment;
+  }
+  applyIncrementEffect(silverCoin, incrementAdjustment, newIncrementAdjustment, silverFeatherIncrement);
+}
+function amuletEffect(incrementAdjustment) {
+  var newIncrementAdjustment;
+  var amuletIncrement = 1.2;
+  var goldCoin = collectableOptions.find(function (item) {
+    return item.type === 'gold-coin';
+  });
+  // Check if amuletEffect is already in currentPassives
+  var hasAmuletEffect = currentPassives.some(function (passive) {
+    return passive.effect === amuletEffect;
+  });
+  // If not, add it
+  if (!hasAmuletEffect) {
+    handleAddToCurrentPassives(amuletEffect, 'gold-coin', goldCoin.points);
+  } else {
+    newIncrementAdjustment = amuletIncrement * incrementAdjustment;
+  }
+  applyIncrementEffect(goldCoin, incrementAdjustment, newIncrementAdjustment, amuletIncrement);
+}
+//starters
+var selectedStarter;
+var currentPassives = [];
+function handleAddToCurrentPassives(effect, type, lastValue) {
+  if (selectedStarter === 'Book Smart') {
+    currentPassives.push({
+      effect: effect,
+      lastValue: lastValue,
+      type: type
+    });
+  }
+}
+function booksSmartEffect() {
+  if (currentPassives !== []) {
+    currentPassives.forEach(function (ability) {
+      console.log("".concat(ability.name, " - Level ").concat(ability.level, ", Value ").concat(ability.value));
+    });
+  }
+  selectedStarter = 'Book Smart';
+}
+function glassesEffect() {
+  selectedStarter = 'Glasses';
+}
+function coinsEffect() {
+  selectedStarter = 'Coins';
+}
+},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png","./elements/buff.js":"../elements/buff.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -5151,7 +6154,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64138" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50364" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

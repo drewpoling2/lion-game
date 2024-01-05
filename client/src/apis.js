@@ -65,12 +65,14 @@ const handleNewHighScore = async (username, score) => {
         score: score,
       }),
     });
+    console.log(response);
 
     if (!response.ok) {
+      console.log('not ok');
       // Check if the response status is not OK (e.g., 4xx or 5xx)
       const errorData = await response.json();
       if (errorData.type === 'username already exists') {
-        return 'username already exists';
+        return console.log('username already exists');
       } else {
         alert('ERROR: Something went wrong');
       }

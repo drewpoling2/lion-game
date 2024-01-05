@@ -18,7 +18,7 @@ import {
   setupCactus,
   getCactusRects,
 } from './elements/cactus.js';
-import { createLeaderboard } from './elements/leaderboard.js';
+import { createLeaderboard, getSuffix } from './elements/leaderboard.js';
 import { soundController } from './utility/sound-controller.js';
 import {
   getAllHighScoreUsers,
@@ -31,21 +31,18 @@ import {
   updateMultiplier,
   getMultiplierRects,
 } from './elements/score-multiplier.js';
-import {
-  setupCoin,
-  updateCoin,
-  getCoinRects,
-  getCoinRectsWithOuterRadius,
-} from './elements/coin.js';
+import { setupCoin, updateCoin, getCoinRects } from './elements/coin.js';
 import muteImg from './public/imgs/icons/Speaker-Off.png';
 import unmuteImg from './public/imgs/icons/Speaker-On.png';
 import pauseImg from './public/imgs/icons/Pause.png';
 import playImg from './public/imgs/icons/Play.png';
+import glasses from './public/imgs/buffs/glasses.png';
 import redoImg from './public/imgs/icons/Redo.png';
 import foregroundImg from './public/imgs/backgrounds/Foreground-Trees.png';
+import { createBuffs, createStarterBuffs } from './elements/buff.js';
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 45;
-const SPEED_SCALE_INCREASE = 0.00001;
+export let SPEED_SCALE_INCREASE = 0.00001;
 let multiplierRatio = 1;
 const worldElem = document.querySelector('[data-world]');
 const scoreElem = document.querySelector('[data-score]');
@@ -66,7 +63,7 @@ const multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
 const tickerElem = document.querySelector('[data-ticker]');
 const tickerElem2 = document.querySelector('[data-ticker2]');
 const tickerElem3 = document.querySelector('[data-ticker3]');
-const livesElem = document.querySelector('[data-lives]');
+export const livesElem = document.querySelector('[data-lives]');
 const dinoElem = document.querySelector('[data-dino]');
 const scrollableTableElem = document.querySelector('[data-scrollable-table]');
 const currentMultiplierElem = document.querySelector(
@@ -75,6 +72,20 @@ const currentMultiplierElem = document.querySelector(
 const plusPointsElem = document.querySelector('[data-plus-points]');
 const tickerContainerElem = document.querySelector('[data-ticker-container]');
 const loadingTextElem = document.querySelector('[data-loading-text]');
+const submitNewScoreFormElem = document.querySelector(
+  '[data-submit-new-score-form]'
+);
+
+const interfaceComboContainer = document.getElementById(
+  'interface-combo-container'
+);
+const currentMultiplierScoreElem = document.querySelector(
+  '[data-current-multiplier-score]'
+);
+const currentComboScoreContainer = document.getElementById(
+  'current-combo-score-container'
+);
+let showLeaderboard = false;
 
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
 
@@ -85,13 +96,13 @@ setPixelToWorldScale();
 createLeaderboard(leaderboardElem);
 
 window.addEventListener('resize', setPixelToWorldScale);
-// document.addEventListener('keydown', handleStart, { once: true });
-// document.addEventListener('touchstart', handleStart, { once: true });
+document.addEventListener('keydown', handleStart, { once: true });
+document.addEventListener('touchstart', handleStart, { once: true });
 let lastTime;
 let speedScale;
 let score;
 let collisionOccurred = false; // Flag to track collision
-let milestone = 10000;
+let milestone = 500;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
@@ -100,15 +111,15 @@ let hasBeatenScore = false;
 let isPaused = false;
 let playerImmunity = false;
 let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
-// scrollableTableElem.classList.add('hide-element');
-// scrollableTableElem.style.display = 'none';
-// worldElem.setAttribute('transition-style', 'in:circle:center');
-// tickerContainerElem.classList.add('hide-element');
-// tickerContainerElem.classList.remove('show-element');
+scrollableTableElem.classList.add('hide-element');
+scrollableTableElem.style.display = 'none';
+worldElem.setAttribute('transition-style', 'in:circle:center');
+tickerContainerElem.classList.add('hide-element');
+tickerContainerElem.classList.remove('show-element');
 const pauseIconButton = document.getElementById('pause-icon-button');
 
 // Function to toggle the pause state
-function togglePause() {
+export function togglePause() {
   isPaused = !isPaused;
   if (isPaused) {
     pauseIconButton.src = playImg;
@@ -170,6 +181,8 @@ function setPlayerImmunity() {
 
 function updateElements() {}
 
+let deltaAdjustment = 1;
+
 function update(time) {
   if (isPaused) {
     // Do nothing if the game is paused
@@ -182,8 +195,10 @@ function update(time) {
     return;
   }
 
+  let baseDelta = 5;
+
   // let delta = time - lastTime;
-  let delta = 30;
+  let delta = baseDelta;
   if (collisionOccurred) {
     setPlayerImmunity();
     togglePause();
@@ -197,7 +212,7 @@ function update(time) {
   updateGround(delta, speedScale);
   updateGroundLayerThree(delta, speedScale);
   updateGroundLayerTwo(delta, speedScale);
-  updateDino(delta, speedScale);
+  updateDino(delta, speedScale, gravityFallAdjustment, selectedStarter);
   updateCactus(delta, speedScale);
   updateSpeedScale(delta);
   updateScore(delta);
@@ -213,55 +228,84 @@ function update(time) {
 function createOneUpText() {
   soundController.beatScore.play();
 
+  const playerContainer = document.querySelector('.player-container'); // Adjust the selector accordingly
+
   const newElement = document.createElement('div');
   newElement.classList.add('one-up', 'sans');
   newElement.style.position = 'absolute';
-  newElement.style.left = livesElem.offsetLeft + 'px';
-  newElement.style.top = '20%';
-  livesElem.parentNode.insertBefore(newElement, livesElem);
+  playerContainer.appendChild(newElement);
   newElement.textContent = '1UP';
   setTimeout(() => {
-    newElement.remove();
+    // newElement.remove();
   }, 600);
   return true;
 }
 
-let multiplierTimer = 5;
+function toggleElemOn(elem) {
+  const classList = elem.classList;
+  classList.remove('hide-element');
+  classList.add('show-element');
+}
+function toggleElemOff(elem) {
+  const classList = elem.classList;
+  classList.add('hide-element');
+  classList.remove('show-element');
+}
+
 let timerInterval;
 
-function startMultiplierTimer() {
-  //reset the old timer
-  clearInterval(timerInterval);
-  multiplierTimer = 5;
-  multiplierTimerElem.textContent = multiplierTimer;
+// Get the timer elements
+const timerProgress = document.getElementById('timerProgress');
 
-  //start new interval
+let multiplierTimer = 5000; // Set the initial time in milliseconds
+let currentComboScore = 0; // Initialize the current combo score variable
+
+function resetMultiplier() {
+  toggleElemOff(interfaceComboContainer);
+  toggleElemOff(currentComboScoreContainer);
+  clearInterval(timerInterval);
+  currentComboScore = 0;
+  timerProgress.style.width = '100%'; // Set the progress bar to full width
+  multiplierTimer = 5000; // Reset timer when it reaches 0
+  currentMultiplierElem.textContent = 'x1';
+  currentMultiplierScoreElem.textContent = '0';
+  multiplierRatio = 1;
+}
+
+function startMultiplierTimer() {
+  clearInterval(timerInterval);
+
+  multiplierTimer = 5000; // Reset the timer to its initial value
+
   timerInterval = setInterval(() => {
-    multiplierTimer--;
-    if (multiplierTimer === 0) {
-      clearInterval(timerInterval);
-      multiplierTimerElem.textContent = '';
-      // Reset the timer and multiplier when the countdown ends
-      multiplierTimer = 5;
-      multiplierRatio = 1;
-      currentMultiplierElem.textContent = 1;
+    multiplierTimer -= 100; // Subtract 100 milliseconds (adjust as needed)
+    const progressValue = (multiplierTimer / 5000) * 100; // Calculate progress value
+
+    if (multiplierTimer <= 0) {
+      resetMultiplier();
     } else {
-      multiplierTimerElem.textContent = multiplierTimer;
+      timerProgress.style.width = `${progressValue}%`;
     }
-  }, 1000); // Update the timer every second (1000 milliseconds)
+  }, 100); // Update every 100 milliseconds
 }
 
 function checkMultiplierCollision() {
   const dinoRect = getDinoRect();
   getMultiplierRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
+      toggleElemOn(interfaceComboContainer);
+      toggleElemOn(currentComboScoreContainer);
       soundController.beatScore.play();
       document.getElementById(element.id).remove();
       clearInterval(timerInterval);
       startMultiplierTimer();
       // Multiply the existing multiplier by the newly collided multiplier
-      multiplierRatio *= parseInt(element.multiplier);
-      currentMultiplierElem.textContent = multiplierRatio;
+      if (multiplierRatio === 1) {
+        multiplierRatio += parseInt(element.multiplier) - 1;
+      } else {
+        multiplierRatio += parseInt(element.multiplier);
+      }
+      currentMultiplierElem.textContent = `x${multiplierRatio}`;
       return true;
     }
   });
@@ -280,17 +324,39 @@ function randomArc(element) {
 }
 
 function calculateFontSize(points) {
-  return Math.min(20 + points * 0.08, 46);
+  return Math.min(12 + points * 0.01, 36);
 }
+
+let goldCoinCounter = 0;
+let redGemMultiplier = 1;
 
 function checkCoinCollision() {
   const dinoRect = getDinoRect();
-
   getCoinRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
       const coinElement = document.getElementById(element.id);
+      if (
+        coinElement.dataset.type === 'gold-coin' &&
+        goldCoinCounter < 14 &&
+        selectedStarter === 'Glasses'
+      ) {
+        // Increment the counter and update the value of the next red gem
+        goldCoinCounter++;
+        redGemMultiplier = goldCoinCounter;
+
+        // Check if glasses buff div exists, otherwise create it
+        const glassesBuffDiv = document.querySelector(
+          '.top-hud-right .glasses-buff'
+        );
+
+        if (!glassesBuffDiv) {
+          createGlassesBuffDiv(glasses);
+        }
+
+        // Update the glasses buff div with the current counter
+        updateGlassesBuffDiv(goldCoinCounter);
+      }
       // Create a pickup text element
-      console.log('picked up');
       const newElement = document.createElement('div');
       addPickupText(newElement, coinElement);
       coinElement.remove();
@@ -305,6 +371,59 @@ function checkCoinCollision() {
   });
 }
 
+// Function to create glasses buff div
+function createGlassesBuffDiv(imgSrc) {
+  const topHudRightDiv = document.querySelector('.top-hud-right');
+  const glassesBuffDiv = document.createElement('div');
+  glassesBuffDiv.id = 'glasses-buff-container';
+  glassesBuffDiv.classList.add('glasses-buff', 'hide-element');
+  topHudRightDiv.appendChild(glassesBuffDiv);
+  // Create an img element with the specified src
+  const imgElement = document.createElement('img');
+  imgElement.classList.add('buff-icon', 'w-full');
+  imgElement.src = imgSrc; // Set the src attribute with the provided imgSrc
+
+  const buffStackDiv = document.createElement('div');
+  buffStackDiv.classList.add(
+    'glasses-buff-stacks',
+    'buff-stacks',
+    'power-up-rank'
+  );
+  buffStackDiv.id = `glasses-buff`;
+  buffStackDiv.textContent = '0';
+  // Append the img element to the bordered div
+  const borderedDiv = document.createElement('div');
+  borderedDiv.classList.add(
+    'bordered-buff-div',
+    'relative',
+    'small-border-inset'
+  );
+  borderedDiv.appendChild(imgElement);
+  borderedDiv.appendChild(buffStackDiv);
+  // Append the bordered div to the glasses buff div
+  glassesBuffDiv.appendChild(borderedDiv);
+
+  // Append the glasses buff div to the top hud
+}
+
+// Function to update glasses buff div with the current counter
+function updateGlassesBuffDiv(counter) {
+  const glassesBuffStackDiv = document.getElementById('glasses-buff');
+  if (glassesBuffStackDiv) {
+    if (glassesBuffStackDiv.textContent === '0') {
+      const glassesBuffDiv = document.getElementById('glasses-buff-container');
+      glassesBuffDiv.classList.remove('hide-element');
+      glassesBuffDiv.classList.add('show-element');
+    }
+
+    glassesBuffStackDiv.textContent = counter;
+  }
+}
+
+const lastMultiplierScore = document.querySelector(
+  '[data-last-multiplier-score]'
+);
+
 function addPickupText(text, pickupElement) {
   text.classList.add('plus-points', 'sans');
   text.style.position = 'absolute';
@@ -312,12 +431,63 @@ function addPickupText(text, pickupElement) {
   text.style.top = pickupElement.offsetTop - 70 + 'px';
   randomArc(text);
   pickupElement.parentNode.insertBefore(text, pickupElement);
-  const points = pickupElement?.dataset?.points * multiplierRatio;
+  let pickupPoints, points;
+
+  //case when glasses are starter
+  if (pickupElement.dataset.type === 'red-gem' && redGemMultiplier !== 1) {
+    pickupPoints = pickupElement?.dataset?.points * redGemMultiplier;
+    points = pickupPoints * multiplierRatio;
+    redGemMultiplier = 1;
+    goldCoinCounter = 0;
+    const glassesBuffStackDiv = document.getElementById('glasses-buff');
+    glassesBuffStackDiv.textContent = goldCoinCounter;
+
+    if (glassesBuffStackDiv) {
+      const glassesBuffDiv = document.getElementById('glasses-buff-container');
+      if (glassesBuffDiv.classList.contains('show-element')) {
+        glassesBuffDiv.classList.remove('show-element');
+        glassesBuffDiv.classList.add('hide-element');
+      } // Set the number of stacks
+    }
+  }
+  //case when coins are starter
+  else if (
+    selectedStarter === 'Coins' &&
+    pickupElement.dataset.type === 'gold-coin'
+  ) {
+    pickupPoints = Math.round(pickupElement?.dataset?.points / 2);
+    points = pickupPoints * multiplierRatio;
+  } else {
+    console.log(pickupElement.dataset.type);
+    pickupPoints = pickupElement?.dataset?.points;
+    points = pickupPoints * multiplierRatio;
+  }
   updateScoreWithPoints(points);
   const fontSize = calculateFontSize(points);
   text.style.fontSize = fontSize + 'px';
   text.textContent = `+${points}`;
+  // Add a div inside the lastMultiplierScore
+  const innerDiv = document.createElement('div');
+  innerDiv.textContent = `+${pickupPoints}x${multiplierRatio}`;
+  innerDiv.classList.add('inner-plus-points', 'sans');
+
+  // Check if there is an existing innerDiv, remove it if present
+  const existingInnerDiv =
+    lastMultiplierScore.querySelector('.inner-plus-points');
+  if (existingInnerDiv) {
+    lastMultiplierScore.removeChild(existingInnerDiv);
+  }
+
+  // Append the new innerDiv inside lastMultiplierScore
+  lastMultiplierScore.appendChild(innerDiv);
+
+  // Remove the new innerDiv after 1 second
+  setTimeout(() => {
+    lastMultiplierScore.removeChild(innerDiv);
+  }, 1000);
 }
+
+let scoreSinceMilestone = 0;
 
 function updateScoreWithPoints(delta) {
   const initialScore = score;
@@ -326,8 +496,15 @@ function updateScoreWithPoints(delta) {
 
   const intervalId = setInterval(() => {
     score += incrementAmount;
+    scoreSinceMilestone += incrementAmount;
     scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
 
+    if (multiplierRatio > 1) {
+      currentComboScore += incrementAmount;
+      currentMultiplierScoreElem.textContent = Math.floor(currentComboScore)
+        .toString()
+        .padStart(1, 0);
+    }
     if (score >= initialScore + delta) {
       // Stop the interval when the target score is reached
       clearInterval(intervalId);
@@ -347,6 +524,7 @@ function checkLose() {
   //if no lives remain then lose
   if (livesElem.textContent === '0') {
     worldElem.setAttribute('transition-style', 'out:circle:hesitate');
+    worldElem.classList.remove('stop-time'); // Add the class to stop time
     return true;
   } //check if enemy and player are in colliding
   else if (isEnemyAndPlayerCollision && !playerImmunity) {
@@ -359,6 +537,7 @@ function checkLose() {
         currentLives -= 1;
         livesElem.textContent = currentLives;
       }
+      resetMultiplier();
       //switch player collision state to true
       collisionOccurred = true;
       //set player to flash
@@ -416,15 +595,50 @@ function updateSpeedScale(delta) {
   speedScale += delta * SPEED_SCALE_INCREASE;
 }
 
+// Assuming you have the necessary elements in your HTML
+const levelBarElem = document.getElementById('levelBar');
+const levelDisplayElem = document.getElementById('levelDisplay');
+
 function calculateNextMilestone(currentMilestone) {
   // You can customize the growth rate based on your requirements
-  const growthRate = 1.5; // Adjust this as needed
+  const growthRate = 2; // Adjust this as needed
   return Math.floor(currentMilestone * growthRate);
+}
+
+function handleLevelUp() {
+  scoreSinceMilestone = 0;
+  // Increment the level
+  const currentLevel = parseInt(levelDisplayElem.textContent, 10);
+  levelDisplayElem.textContent = currentLevel + 1;
+  if (selectedStarter === 'Book Smart') {
+    currentPassives.forEach((item) => {
+      const currentItem = collectableOptions.find(
+        (curItem) => curItem.type === item.type
+      );
+
+      item.lastValue = currentItem.points;
+      item.effect(incrementAdjustment);
+    });
+  }
+  if (currentLevel === 1) {
+    createStarterBuffs();
+  } else {
+    createBuffs();
+  }
+  // Reset the progress bar to 0
+  levelBarElem.value = 0;
+  // Update the milestone for the next level
+  milestone = calculateNextMilestone(milestone);
 }
 
 function updateScore(delta) {
   score += delta * 0.01;
-  scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+  scoreSinceMilestone += delta * 0.01;
+  scoreElem.textContent = Math.floor(score).toString().padStart(6, '0');
+
+  // Update the level bar
+  let progress = (scoreSinceMilestone / milestone) * 100;
+  levelBarElem.value = progress;
 
   if (
     score > highScoreElem.textContent &&
@@ -434,13 +648,9 @@ function updateScore(delta) {
     soundController.beatScore.play();
     hasBeatenScore = true;
   }
-  if (score > milestone) {
-    createOneUpText();
-    let currentLives = parseInt(livesElem.textContent, 10);
-    currentLives += 1;
-    livesElem.textContent = currentLives;
-    milestone = calculateNextMilestone(milestone);
-    console.log(milestone);
+
+  if (scoreSinceMilestone >= milestone) {
+    handleLevelUp();
   }
 }
 
@@ -448,7 +658,9 @@ function handleCheckIfHighScore(score) {
   if (score > highScoreElem.textContent) {
     highScoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
     localStorage.setItem('lion-high-score', highScoreElem.textContent);
-    handleCheckLeaderboardHighScore(highScoreElem.textContent);
+  }
+  if (handleCheckLeaderboardHighScore(score)) {
+    return true;
   }
 }
 
@@ -471,10 +683,11 @@ function handleStart() {
   multiplierRatio = 1;
   setUpElements();
   dinoElem.classList.remove('leap');
-  currentMultiplierElem.textContent = multiplierRatio;
-  livesElem.textContent = 2;
+  currentMultiplierElem.textContent = `x${multiplierRatio}`;
+  livesElem.textContent = 10;
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
+  gameOverIconElem.classList.add('hide-element');
   // Get the container element where the ticker items will be appended
   const tickerData = [
     {
@@ -546,16 +759,88 @@ function handleStart() {
   window.requestAnimationFrame(update);
 }
 
-function handleCheckLeaderboardHighScore(score) {
-  const users = getAllHighScoreUsers().then((data) => {
-    const sortedData = data.users.sort((a, b) => {
-      return parseInt(b.score, 10) - parseInt(a.score, 10);
-    });
-  });
+function revealAchievementForm(index, score) {
+  gameOverIconElem.classList.add('hide-element');
+  const rank = index + 2;
+  scoreNewHighScoreElem.textContent = Math.round(score);
+  const achievementRankElem = document.getElementById('achievement-rank-text');
+  achievementRankElem.textContent = `${rank}${getSuffix(rank)}`;
+  const achievementBlockElem = document.getElementById('achievement-block');
+  const lionGameAchievementTitleElem = document.getElementById(
+    'achievement-title-block'
+  );
+  const achievementInstructionsBlockElem = document.getElementById(
+    'achievement-instructions-block'
+  );
+  const achievementFormElem = document.getElementById('achievement-form-block');
+  const newHighScoreInput = document.getElementById('newHighScoreInput');
+  submitNewScoreFormElem.classList.remove('hide-form');
+  submitNewScoreFormElem.classList.add('show-form');
+  setTimeout(() => {
+    lionGameAchievementTitleElem.classList.remove('fade-out-text');
+    lionGameAchievementTitleElem.classList.add('fade-in-text');
+  }, 2000);
+  setTimeout(() => {
+    typeLettersWithoutSpaces(0, 'Achievement', achievementBlockElem, 100);
+  }, 4050);
+  setTimeout(() => {
+    typeLettersWithoutSpaces(
+      0,
+      'New high score, enter your username!',
+      achievementInstructionsBlockElem,
+      100
+    );
+  }, 8050);
+  setTimeout(() => {
+    newHighScoreInput.focus();
+    achievementFormElem.classList.remove('fade-out-text');
+    achievementFormElem.classList.remove('fade-in-text');
+  }, 12050);
 }
 
-handleCheckLeaderboardHighScore('90013');
+async function handleCheckLeaderboardHighScore(score) {
+  try {
+    await getAllHighScoreUsers().then((data) => {
+      //sort all the data in ascending order
+      const sortedData = data.users.sort((a, b) => {
+        return parseInt(b.score, 10) - parseInt(a.score, 10);
+      });
+      //check the last highest score compared to the leaderboard
+      const lastHigherScore = sortedData
+        .reverse()
+        .find((user) => parseInt(user.score, 10) > parseInt(score, 10));
+      //find the index of the last highest score
+      const index = sortedData.reverse().indexOf(lastHigherScore);
+      //if the index is not data.length-1 then the score is not higher than any on the leaderboard
+      if (index !== sortedData.length - 1) {
+        // const rank = index !== 0 ? index + 2 : index; will need to add condition for the highest score
+        revealAchievementForm(index, score);
+        return true;
+      } else {
+        setTimeout(() => {
+          document.addEventListener('keydown', handleStart, { once: true });
+          document.addEventListener('touchstart', handleStart, {
+            once: true,
+          });
+          endScreenElem.classList.remove('hide');
+        }, 100);
+        setTimeout(() => {
+          typeLetters(0);
+        }, 1500);
+        return;
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
 
+//trim any extra spaces in score
+function trimmedOutExtraSpacesScore(score) {
+  return score.replace(/\s+/g, ' ').trim();
+}
+
+//submit new score to leaderboard
 async function handleSubmitNewScore() {
   const userInput = document.getElementById('newHighScoreInput').value;
   //check for validation errors and update error message accordingly
@@ -565,12 +850,9 @@ async function handleSubmitNewScore() {
     return;
   }
 
-  const scoreNewHighScoreElem = document.querySelector(
-    '[data-score-new-high-score]'
-  );
   const res = await handleNewHighScore(
     userInput,
-    scoreNewHighScoreElem.textContent
+    trimmedOutExtraSpacesScore(scoreNewHighScoreElem.textContent)
   );
 
   //check if user already exists from res and update error message accordingly, else submit new score
@@ -579,7 +861,26 @@ async function handleSubmitNewScore() {
     scoreErrorMessageElem.classList.remove('hide');
     return;
   } else {
-    scoreErrorMessageElem.classList.add('hide');
+    submitNewScoreFormElem.classList.add('fade-out-text');
+    scrollableTableElem.style.display = 'flex';
+    showLeaderboard = !showLeaderboard;
+    const leaderboardContent = document.getElementById('leaderboard-content');
+    leaderboardContent.classList.remove('flicker-opacity-off');
+    loading = true;
+    runTypeLetters();
+    showLeaderboard = !showLeaderboard;
+    worldElem.setAttribute('transition-style', '');
+    stopLoading();
+    scrollableTableElem.setAttribute('transition-style', 'in:wipe:left');
+    scrollableTableElem.classList.add('show-element');
+    leaderboardContent.classList.add('translateX-right-to-left');
+    scrollableTableElem.classList.remove('hide-element');
+    setTimeout(() => {
+      showLeaderboard = true;
+      scrollableTableElem.classList.remove('hide-element');
+      scrollableTableElem.classList.add('show-element');
+      scoreErrorMessageElem.classList.add('hide');
+    }, 3000);
   }
 }
 
@@ -664,8 +965,6 @@ const pageButtons = {
 
 underlineCurrentPageButton('leaderboard-page');
 
-let showLeaderboard = false;
-
 let loading;
 function stopLoading() {
   loading = false;
@@ -673,8 +972,7 @@ function stopLoading() {
 
 function handleToggleLeaderboard() {
   const leaderboardContent = document.getElementById('leaderboard-content');
-
-  if (!showLeaderboard) {
+  if (showLeaderboard !== null && showLeaderboard === false) {
     leaderboardContent.classList.remove('flicker-opacity-off');
     loading = true;
     runTypeLetters();
@@ -689,6 +987,7 @@ function handleToggleLeaderboard() {
       scrollableTableElem.classList.remove('hide-element');
     }, randomTimeout);
   } else {
+    handleStart();
     loading = true;
     runTypeLetters();
     showLeaderboard = !showLeaderboard;
@@ -696,6 +995,7 @@ function handleToggleLeaderboard() {
     leaderboardContent.classList.add('flicker-opacity-off');
     setTimeout(() => {
       stopLoading();
+      scrollableTableElem.style.display = 'none';
       worldElem.setAttribute('transition-style', 'in:wipe:left');
       scrollableTableElem.classList.remove('show-element');
       scrollableTableElem.classList.add('hide-element');
@@ -717,17 +1017,9 @@ function handleLose() {
   gameOverTextElem.textContent = '';
   // tickerContainerElem.classList.add('show-element');
   // tickerContainerElem.classList.remove('hide-element');
-  handleCheckIfHighScore(score);
   soundController.die.play();
   setDinoLose();
-  setTimeout(() => {
-    document.addEventListener('keydown', handleStart, { once: true });
-    document.addEventListener('touchstart', handleStart, { once: true });
-    endScreenElem.classList.remove('hide');
-  }, 100);
-  setTimeout(() => {
-    typeLetters(0);
-  }, 1500);
+  handleCheckIfHighScore(score);
 }
 
 function setPixelToWorldScale() {
@@ -764,6 +1056,7 @@ handleOrientationChange();
 // Listen for orientation changes
 window.addEventListener('orientationchange', handleOrientationChange);
 
+//snow particle system
 const snow = {
   el: '#snow',
   density: 12500, // higher = fewer bits
@@ -856,3 +1149,235 @@ function typeLettersAny(index, text, elem, timeout) {
     elem.classList.add('show-element');
   }
 }
+
+function typeLettersWithoutSpaces(index, text, elem, timeout) {
+  if (index < text.length) {
+    elem.textContent += text.charAt(index);
+    setTimeout(() => {
+      typeLettersWithoutSpaces(index + 1, text, elem, timeout);
+    }, timeout); // Use the provided timeout
+  } else {
+    elem.classList.remove('hide-element');
+    elem.classList.add('show-element');
+  }
+}
+
+export let collectableOptions = [
+  { type: 'gold-coin', weight: 0.3, points: 13 },
+  { type: 'red-gem', weight: 0.1, points: 45 },
+  { type: 'silver-coin', weight: 0.6, points: 6 },
+];
+
+//buff-effects
+
+function filetMignonEffect() {
+  const rank = 1;
+
+  let currentLives = parseInt(livesElem.textContent, 10);
+  currentLives += rank;
+  livesElem.textContent = currentLives;
+  createOneUpText();
+}
+
+function trustyPocketWatchEffect() {
+  const startRank = 0.4;
+  const endRank = 0.95;
+  const updateInterval = 1000; // Update every second
+
+  let currentRank = startRank;
+  const intervalId = setInterval(() => {
+    // Increment the current rank
+    currentRank += 0.1; // Adjust the increment as needed
+
+    // Ensure the current rank does not exceed the end rank
+    currentRank = Math.min(currentRank, endRank);
+
+    // Update the deltaAdjustment based on the current rank
+    deltaAdjustment = currentRank;
+
+    if (currentRank >= endRank) {
+      // Stop the interval when the end rank is reached
+      clearInterval(intervalId);
+      deltaAdjustment = endRank;
+    }
+  }, updateInterval);
+}
+
+function getRandomCollectable() {
+  const randomValue = Math.random();
+  let cumulativeProbability = 0;
+
+  for (const option of collectableOptions) {
+    cumulativeProbability += option.weight;
+    if (randomValue <= cumulativeProbability) {
+      return option;
+    }
+  }
+
+  // Default case (fallback)
+  return collectableOptions[collectableOptions.length - 1];
+}
+
+function sackOfCoinsEffect() {
+  let totalPoints = 0;
+
+  for (let i = 0; i < 25; i++) {
+    const randomCollectable = getRandomCollectable();
+    totalPoints += randomCollectable.points;
+  }
+
+  updateScoreWithPoints(totalPoints);
+
+  // Add totalPoints to the score (adjust as needed)
+  // Example: score += totalPoints;
+  console.log(`Collected ${totalPoints} points from 25 random coins.`);
+}
+
+function momsCookiesEffect() {
+  updateScoreWithPoints(milestone);
+}
+
+let gravityFallAdjustment = 0.01;
+
+function reduceByPercentage(value, percentage) {
+  return value * (1 - percentage);
+}
+
+function slowFallEffect() {
+  const reductionPercentage = 0.3; // Adjust the percentage as needed
+  gravityFallAdjustment = reduceByPercentage(
+    gravityFallAdjustment,
+    reductionPercentage
+  );
+}
+
+function increaseByPercentage(value, percentage) {
+  const multiplier = 1 + percentage / 100;
+  return value * multiplier;
+}
+
+function reverseAndReIncrement(finalValue, incrementFactor, reIncrementFactor) {
+  // Reverse the increment by incrementFactor
+  const decreasedValue = finalValue / incrementFactor;
+  // Re-increment the reversed value by reIncrementFactor
+  const reIncrementedValue = decreasedValue * reIncrementFactor;
+  return reIncrementedValue;
+}
+
+let incrementAdjustment = 1.016;
+
+function applyIncrementEffect(
+  collectable,
+  incrementAdjustment,
+  newIncrementAdjustment,
+  effectMultiplier
+) {
+  if (incrementAdjustment) {
+    const lastCollectable = currentPassives.find(
+      (item) => item.type === collectable.type
+    );
+    // Increment the points by passive increase
+    collectable.points = reverseAndReIncrement(
+      lastCollectable.lastValue,
+      effectMultiplier,
+      newIncrementAdjustment
+    );
+  } else {
+    collectable.points *= effectMultiplier;
+  }
+
+  collectable.points = Math.round(collectable.points);
+}
+
+function silverFeatherEffect(incrementAdjustment) {
+  let newIncrementAdjustment;
+  const silverFeatherIncrement = 1.2;
+  const silverCoin = collectableOptions.find(
+    (item) => item.type === 'silver-coin'
+  );
+  const hasSilverFeatherEffect = currentPassives.some(
+    (passive) => passive.effect === silverFeatherEffect
+  );
+  if (!hasSilverFeatherEffect) {
+    handleAddToCurrentPassives(
+      silverFeatherEffect,
+      'silver-coin',
+      silverCoin.points
+    );
+  } else {
+    newIncrementAdjustment = silverFeatherIncrement * incrementAdjustment;
+  }
+  applyIncrementEffect(
+    silverCoin,
+    incrementAdjustment,
+    newIncrementAdjustment,
+    silverFeatherIncrement
+  );
+}
+
+function amuletEffect(incrementAdjustment) {
+  let newIncrementAdjustment;
+  const amuletIncrement = 1.2;
+  const goldCoin = collectableOptions.find((item) => item.type === 'gold-coin');
+  // Check if amuletEffect is already in currentPassives
+  const hasAmuletEffect = currentPassives.some(
+    (passive) => passive.effect === amuletEffect
+  );
+  // If not, add it
+  if (!hasAmuletEffect) {
+    handleAddToCurrentPassives(amuletEffect, 'gold-coin', goldCoin.points);
+  } else {
+    newIncrementAdjustment = amuletIncrement * incrementAdjustment;
+  }
+  applyIncrementEffect(
+    goldCoin,
+    incrementAdjustment,
+    newIncrementAdjustment,
+    amuletIncrement
+  );
+}
+
+export {
+  amuletEffect,
+  silverFeatherEffect,
+  momsCookiesEffect,
+  filetMignonEffect,
+  trustyPocketWatchEffect,
+  sackOfCoinsEffect,
+  slowFallEffect,
+};
+
+//starters
+let selectedStarter;
+let currentPassives = [];
+
+function handleAddToCurrentPassives(effect, type, lastValue) {
+  if (selectedStarter === 'Book Smart') {
+    currentPassives.push({
+      effect: effect,
+      lastValue: lastValue,
+      type: type,
+    });
+  }
+}
+
+function booksSmartEffect() {
+  if (currentPassives !== []) {
+    currentPassives.forEach((ability) => {
+      console.log(
+        `${ability.name} - Level ${ability.level}, Value ${ability.value}`
+      );
+    });
+  }
+  selectedStarter = 'Book Smart';
+}
+
+function glassesEffect() {
+  selectedStarter = 'Glasses';
+}
+
+function coinsEffect() {
+  selectedStarter = 'Coins';
+}
+
+export { booksSmartEffect, glassesEffect, coinsEffect };
