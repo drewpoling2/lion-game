@@ -1,1 +1,0 @@
-import { handleNewHighScore } from './apis';

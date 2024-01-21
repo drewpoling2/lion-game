@@ -401,15 +401,25 @@
 }</script>
 
       <div class="world sans" data-world="">
+        <!-- <div
+          data-game-loading-screen
+          class="game-loading-screen justify-center items-center flex"
+        >
+          <div class="game-loading-text-container">
+            <div data-game-loading-text class="game-loading-text"></div>
+          </div>
+        </div> -->
         <div class="top-hud-container flex-row justify-between">
           <div class="top-hud-left">
             <div class="flex-col">
               <div class="score hud-font" data-score="">000000</div>
             </div>
           </div>
+          <div class="top-hud-middle" data-current-game-timer="">0:00</div>
           <div class="top-hud-right"></div>
         </div>
         <div id="level-up-modal" class="modal">
+          <canvas id="confetti" class="confetti"></canvas>
           <div class="modal-content">
             <div class="text-center level-up-text">Level Up!</div>
             <div class="buff-options"></div>
@@ -502,17 +512,23 @@
           </div>
         </div>
 
-        <canvas id="snow"></canvas>
+        <canvas id="snow" style="z-index: 1"></canvas>
         <div id="spotlight" class="spotlight pixel-corners"></div>
         <div class="start-screen blink" data-start-screen="">
           Press Any Key To Start
         </div>
+        <div class="pause-overlay" style="display: none" data-paused-screen="">
+          <div class="paused-screen">Game Paused</div>
+        </div>
+        <div class="notification-screen" data-notification-screen=""></div>
         <img alt="" src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
         <img alt="" src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
         <img alt="" src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
         <img alt="" src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
-        <img alt="" src="/ground.efe81358.png" class="ground" data-ground="">
+        <img alt="" src="/Bonus.17a540d4.png" class="bonus-layer" data-bonus-layer="">
+        <img alt="" src="/Bonus.17a540d4.png" class="bonus-layer" data-bonus-layer="">
 
+        <img alt="" src="/ground.efe81358.png" class="ground" data-ground="">
         <img alt="" src="/ground.efe81358.png" class="ground" data-ground="">
         <div class="dino w-fit" data-dino="">
           <div class="player-container relative w-fit h-full">

@@ -12,6 +12,7 @@ import amulet from '../public/imgs/buffs/amulet.png';
 import book from '../public/imgs/buffs/book.png';
 import glasses from '../public/imgs/buffs/glasses.png';
 import coins from '../public/imgs/buffs/coins.png';
+import star from '../public/imgs/icons/Star.png';
 import {
   filetMignonEffect,
   trustyPocketWatchEffect,
@@ -25,13 +26,26 @@ import {
   glassesEffect,
   coinsEffect,
 } from '../game-manager';
-const modalContent = document.querySelector('.modal-content');
+import { confetti } from './particle-systems';
 const buffOptionsContainer = document.querySelector('.buff-options');
 const modal = document.getElementById('level-up-modal');
 
+function normalizeWeights(buffs) {
+  const keys = Object.keys(buffs);
+  const weights = keys.map((key) => buffs[key].weight);
+  const sumOfWeights = weights.reduce((sum, weight) => sum + weight, 0);
+
+  const normalizedWeights = {};
+  keys.forEach((key, index) => {
+    normalizedWeights[key] = weights[index] / sumOfWeights;
+  });
+
+  return normalizedWeights;
+}
+
 function getRandomBuffWeighted(buffs) {
   const keys = Object.keys(buffs);
-  const probabilities = keys.map((key) => buffs[key].weight);
+  const probabilities = keys.map((key) => buffs[key]);
   const randomValue = Math.random();
   let cumulativeProbability = 0;
 
@@ -91,16 +105,20 @@ function applyBuff(buffName) {
       lastEmptyPowerUp.appendChild(rank);
     }
   }
+  confetti.destroy();
   // Close the modal
   modal.style.display = 'none';
+  modal.classList.remove('show-modal');
   buffOptionsContainer.innerHTML = '';
   togglePause();
 }
 
 function applySackOfCoins() {
-  alwaysBuffs['Sack of Coins'].effect();
+  alwaysBuffs['Coin purse'].effect();
+  confetti.destroy();
   // Close the modal
   modal.style.display = 'none';
+  modal.classList.remove('show-modal');
   buffOptionsContainer.innerHTML = '';
   togglePause();
 }
@@ -150,8 +168,10 @@ function applyStarterBuff(buffName) {
       lastEmptyPowerUp.appendChild(rank);
     }
   }
+  confetti.destroy();
   // Close the modal
   modal.style.display = 'none';
+  modal.classList.remove('show-modal');
   buffOptionsContainer.innerHTML = '';
   togglePause();
 }
@@ -161,13 +181,14 @@ export function createStarterBuffs() {
   // Show the modal
   const modal = document.getElementById('level-up-modal');
   modal.style.display = 'flex';
+  modal.classList.add('show-modal');
 
   // Keep track of selected buffs
   const selectedBuffs = new Set();
 
   // Generate 3 unique buffs
   while (selectedBuffs.size < 4) {
-    const randomBuffKey = getRandomBuffWeighted(starterBuffs);
+    const randomBuffKey = getRandomBuffWeighted(normalizedStarterBuffWeights);
 
     // Check if the buff is not already selected
     if (!selectedBuffs.has(randomBuffKey)) {
@@ -175,14 +196,14 @@ export function createStarterBuffs() {
 
       // Create buff container (use a div as a clickable area)
       const buffContainer = document.createElement('div');
-      buffContainer.classList.add('buff-container');
+      buffContainer.classList.add('buff-container', 'starter-buff');
       buffContainer.addEventListener('click', () =>
         applyStarterBuff(randomBuffKey)
       );
 
       // Create flex container for icon and title
       const flexContainer = document.createElement('div');
-      flexContainer.classList.add('flex-row', 'items-center');
+      flexContainer.classList.add('flex-col', 'items-center');
 
       // Create div to wrap the icon
       const iconWrapper = document.createElement('div');
@@ -201,28 +222,54 @@ export function createStarterBuffs() {
 
       // Determine rarity and set title color
       const rarity = assignRarity(starterBuffs[randomBuffKey]);
-      title.style.color = getColorForRarity(rarity);
-
+      createStarIcons(rarity, flexContainer);
+      // Append icon wrapper and title to flex container
+      flexContainer.appendChild(title);
       // Append icon to icon wrapper
       iconWrapper.appendChild(icon);
-
-      // Append icon wrapper and title to flex container
       flexContainer.appendChild(iconWrapper);
-      flexContainer.appendChild(title);
 
       // Create description
       const description = document.createElement('p');
       description.classList.add('buff-description', 'body');
       description.textContent = starterBuffs[randomBuffKey].description;
 
+      // Get all power-up divs
+      const powerUpDivs = document.querySelectorAll('.starter-power-up');
+
+      // Check if the user already has the selected power-up
+      const existingPowerUp = Array.from(powerUpDivs).find(
+        (powerUpDiv) =>
+          powerUpDiv.querySelector('img') &&
+          powerUpDiv.querySelector('img').alt.includes(randomBuffKey)
+      );
+
+      const abilityRank = document.createElement('div');
+      abilityRank.classList.add('buff-modal-rank');
+
+      if (existingPowerUp) {
+        // User already has the power-up, increment the rank
+        const existingRank = existingPowerUp.querySelector('.power-up-rank');
+        const existingRankValue = parseInt(existingRank.textContent);
+        abilityRank.textContent = `Rank ${existingRankValue + 1}`;
+      } else {
+        abilityRank.textContent = `Rank 1`;
+      }
+
+      const buffContainerTop = document.createElement('div');
+      buffContainerTop.classList.add('flex-col');
+
       // Append flex container and description to buff container
-      buffContainer.appendChild(flexContainer);
-      buffContainer.appendChild(description);
+      buffContainerTop.appendChild(flexContainer);
+      buffContainerTop.appendChild(description);
+      buffContainer.appendChild(buffContainerTop);
+      buffContainer.appendChild(abilityRank);
 
       // Append buff container to modal content
       buffOptionsContainer.appendChild(buffContainer);
     }
   }
+  confetti.init();
 }
 
 export function createBuffs() {
@@ -230,13 +277,13 @@ export function createBuffs() {
   // Show the modal
   const modal = document.getElementById('level-up-modal');
   modal.style.display = 'flex';
-
+  modal.classList.add('show-modal');
   // Keep track of selected buffs
   const selectedBuffs = new Set();
 
   // Generate 3 unique buffs
   while (selectedBuffs.size < 3) {
-    const randomBuffKey = getRandomBuffWeighted(buffs);
+    const randomBuffKey = getRandomBuffWeighted(normalizedBuffWeights);
 
     // Check if the buff is not already selected
     if (!selectedBuffs.has(randomBuffKey)) {
@@ -249,7 +296,7 @@ export function createBuffs() {
 
       // Create flex container for icon and title
       const flexContainer = document.createElement('div');
-      flexContainer.classList.add('flex-row', 'items-center');
+      flexContainer.classList.add('flex-col', 'items-center');
 
       // Create div to wrap the icon
       const iconWrapper = document.createElement('div');
@@ -268,87 +315,116 @@ export function createBuffs() {
 
       // Determine rarity and set title color
       const rarity = assignRarity(buffs[randomBuffKey]);
-      title.style.color = getColorForRarity(rarity);
-
+      createStarIcons(rarity, flexContainer);
+      // Append icon wrapper and title to flex container
+      flexContainer.appendChild(title);
       // Append icon to icon wrapper
       iconWrapper.appendChild(icon);
-
-      // Append icon wrapper and title to flex container
       flexContainer.appendChild(iconWrapper);
-      flexContainer.appendChild(title);
 
       // Create description
       const description = document.createElement('p');
       description.classList.add('buff-description', 'body');
       description.textContent = buffs[randomBuffKey].description;
 
+      // Get all power-up divs
+      const powerUpDivs = document.querySelectorAll('.power-up');
+
+      // Check if the user already has the selected power-up
+      const existingPowerUp = Array.from(powerUpDivs).find(
+        (powerUpDiv) =>
+          powerUpDiv.querySelector('img') &&
+          powerUpDiv.querySelector('img').alt.includes(randomBuffKey)
+      );
+
+      const abilityRank = document.createElement('div');
+      abilityRank.classList.add('buff-modal-rank');
+
+      if (existingPowerUp) {
+        // User already has the power-up, increment the rank
+        const existingRank = existingPowerUp.querySelector('.power-up-rank');
+        const existingRankValue = parseInt(existingRank.textContent);
+        abilityRank.textContent = `Rank ${existingRankValue + 1}`;
+      } else {
+        abilityRank.textContent = `Rank 1`;
+      }
+
+      const buffContainerTop = document.createElement('div');
+      buffContainerTop.classList.add('flex-col');
+
       // Append flex container and description to buff container
-      buffContainer.appendChild(flexContainer);
-      buffContainer.appendChild(description);
+      buffContainerTop.appendChild(flexContainer);
+      buffContainerTop.appendChild(description);
+      buffContainer.appendChild(buffContainerTop);
+      buffContainer.appendChild(abilityRank);
 
       // Append buff container to modal content
       buffOptionsContainer.appendChild(buffContainer);
     }
   }
+  confetti.init();
 
-  // Add the "Sack of Coins" power-up as the 4th option
+  // Add the "Coin purse" power-up as the 4th option
   const sackOfCoinsContainer = document.createElement('div');
   sackOfCoinsContainer.classList.add('buff-container');
   sackOfCoinsContainer.addEventListener('click', () => applySackOfCoins());
 
   const sackOfCoinsFlexContainer = document.createElement('div');
-  sackOfCoinsFlexContainer.classList.add('flex-row', 'items-center');
+  sackOfCoinsFlexContainer.classList.add('flex-col', 'items-center');
 
   const sackOfCoinsIconWrapper = document.createElement('div');
   sackOfCoinsIconWrapper.classList.add('buff-icon-wrapper');
 
   const sackOfCoinsIcon = document.createElement('img');
   sackOfCoinsIcon.classList.add('buff-icon');
-  sackOfCoinsIcon.src = alwaysBuffs['Sack of Coins'].icon;
-  sackOfCoinsIcon.alt = 'Sack of Coins Icon';
+  sackOfCoinsIcon.src = alwaysBuffs['Coin purse'].icon;
+  sackOfCoinsIcon.alt = 'Coin purse Icon';
 
   const sackOfCoinsTitle = document.createElement('div');
   sackOfCoinsTitle.classList.add('buff-title', 'uppercase');
-  sackOfCoinsTitle.textContent = 'Sack of Coins';
+  sackOfCoinsTitle.textContent = 'Coin purse';
 
   // Determine rarity and set title color
-  const rarity = assignRarity(alwaysBuffs['Sack of Coins']);
-  sackOfCoinsTitle.style.color = getColorForRarity(rarity);
-
+  const rarity = assignRarity(alwaysBuffs['Coin purse']);
+  createStarIcons(rarity, sackOfCoinsFlexContainer);
   // Append icon to icon wrapper
   sackOfCoinsIconWrapper.appendChild(sackOfCoinsIcon);
 
   // Append icon wrapper and title to flex container
-  sackOfCoinsFlexContainer.appendChild(sackOfCoinsIconWrapper);
   sackOfCoinsFlexContainer.appendChild(sackOfCoinsTitle);
+  sackOfCoinsFlexContainer.appendChild(sackOfCoinsIconWrapper);
 
   // Create description
   const sackOfCoinsDescription = document.createElement('p');
   sackOfCoinsDescription.classList.add('buff-description', 'body');
-  sackOfCoinsDescription.textContent = alwaysBuffs['Sack of Coins'].description;
+  sackOfCoinsDescription.textContent = alwaysBuffs['Coin purse'].description;
+
+  const sackOfCoinsContainerTop = document.createElement('div');
+  sackOfCoinsContainerTop.classList.add('flex-col');
 
   // Append flex container and description to buff container
-  sackOfCoinsContainer.appendChild(sackOfCoinsFlexContainer);
-  sackOfCoinsContainer.appendChild(sackOfCoinsDescription);
+  sackOfCoinsContainerTop.appendChild(sackOfCoinsFlexContainer);
+  sackOfCoinsContainerTop.appendChild(sackOfCoinsDescription);
+  sackOfCoinsContainer.appendChild(sackOfCoinsContainerTop);
 
-  // Append sack of coins container to modal content
+  // Append Coin purse container to modal content
   buffOptionsContainer.appendChild(sackOfCoinsContainer);
 }
 
-function getColorForRarity(rarity) {
+function getStarsForRarity(rarity) {
   switch (rarity) {
     case 'Legendary':
-      return '#FFDB5D'; // Adjust the color as needed
+      return 5; // Adjust the color as needed
     case 'Epic':
-      return '#EA59E4'; // Adjust the color as needed
+      return 4; // Adjust the color as needed
     case 'Rare':
-      return '#3199F9'; // Adjust the color as needed
+      return 3; // Adjust the color as needed
     case 'Uncommon':
-      return '#61E955'; // Adjust the color as needed
+      return 2; // Adjust the color as needed
     case 'Common':
-      return 'white'; // Adjust the color as needed
+      return 1; // Adjust the color as needed
     default:
-      return 'black'; // Default color
+      return 1; // Default color
   }
 }
 
@@ -371,9 +447,28 @@ function assignRarity(buff) {
   }
 }
 
+function createStarIcons(rarity, parent) {
+  const starCount = getStarsForRarity(rarity);
+  const starIconContainer = document.createElement('div');
+  starIconContainer.classList.add('flex-row', 'items-center');
+  for (let i = 0; i < starCount; i++) {
+    const starIcon = document.createElement('img');
+    starIcon.classList.add('star-icon');
+    starIcon.src = star;
+    starIconContainer.appendChild(starIcon);
+  }
+  if (starCount === 0) {
+    const starIcon = document.createElement('img');
+    starIcon.classList.add('star-icon', 'hide-elem');
+    starIcon.src = star;
+    starIconContainer.appendChild(starIcon);
+  }
+  parent.appendChild(starIconContainer);
+}
+
 const alwaysBuffs = {
-  'Sack of Coins': {
-    description: 'Miners fortune. Gain 25 random coins toward your score.',
+  'Coin purse': {
+    description: 'Gain 25 random coins toward your score.',
     weight: 1,
     icon: pouch,
     effect: sackOfCoinsEffect,
@@ -381,8 +476,8 @@ const alwaysBuffs = {
 };
 
 const buffs = {
-  'Filet Mignon': {
-    description: 'Enjoy a tasty meal. Gain 1 life',
+  Filet: {
+    description: 'Enjoy a meal. Gain 1 life',
     weight: 0.2,
     icon: filet,
     effect: filetMignonEffect,
@@ -395,7 +490,7 @@ const buffs = {
   },
   Amulet: {
     description: 'Gold coins are now worth 20% more (base value)',
-    weight: 0.4,
+    weight: 0.6,
     icon: amulet,
     effect: amuletEffect,
   },
@@ -446,30 +541,48 @@ const buffs = {
 };
 
 const starterBuffs = {
-  'Book Smart': {
+  'Text book': {
     description: 'Every time you get a level, your passives scale by %.',
-    weight: 0.009,
+    weight: 0.1,
     icon: book,
     effect: booksSmartEffect,
   },
   'Starter 2': {
     description:
-      'You spawn 1 gold coin above you when you jump, but your all gold coins you pick up are worth 50% less',
-    weight: 0.009,
+      'You spawn 1 gold coin above you when you jump, but all gold coins you pick up are worth 50% less',
+    weight: 0.6,
     icon: coins,
     effect: coinsEffect,
   },
   'Starter 3': {
     description: 'Every time you get a level, your passives scale by %.',
-    weight: 0.009,
+    weight: 0.4,
     icon: book,
     effect: booksSmartEffect,
   },
   Glasses: {
     description:
-      'Every gold coin you pick up increases the next red gem score by 1x stacks up to 14. Getting a red gem resets this back to 1x.',
-    weight: 0.009,
+      'Gold coins increase the next red gem by .5x, stacks up to 28. Getting a red gem resets stacks',
+    weight: 0.8,
+    icon: glasses,
+    effect: glassesEffect,
+  },
+  Glasses2: {
+    description:
+      'Gold coins increase the next red gem by .5x, stacks up to 28. Getting a red gem resets stacks',
+    weight: 0.1,
+    icon: glasses,
+    effect: glassesEffect,
+  },
+  Glasses3: {
+    description:
+      'Gold coins increase the next red gem by .5x, stacks up to 28. Getting a red gem resets stacks',
+    weight: 0.1,
     icon: glasses,
     effect: glassesEffect,
   },
 };
+
+// Example usage:
+const normalizedStarterBuffWeights = normalizeWeights(starterBuffs);
+const normalizedBuffWeights = normalizeWeights(buffs);

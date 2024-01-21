@@ -5,24 +5,26 @@ import {
 } from '../utility/updateCustomProperty.js';
 import lionJumpImg1 from '../public/imgs/nittany-lion/jump-animation/Jump-1.png';
 import lionJumpImg2 from '../public/imgs/nittany-lion/jump-animation/Jump-2.png';
-import lionJumpImg3 from '../public/imgs/nittany-lion/jump-animation/Jump-3.png';
 import lionLoseImg from '../public/imgs/nittany-lion/jump-animation/Jump-1.png';
 import lionRunImg1 from '../public/imgs/nittany-lion/run-cycle/Run-1.png';
 import lionRunImg2 from '../public/imgs/nittany-lion/run-cycle/Run-2.png';
 import lionRunImg3 from '../public/imgs/nittany-lion/run-cycle/Run-3.png';
 import lionRunImg4 from '../public/imgs/nittany-lion/run-cycle/Run-4.png';
-import lionRunImg5 from '../public/imgs/nittany-lion/run-cycle/Run-5.png';
-import lionRunImg6 from '../public/imgs/nittany-lion/run-cycle/Run-6.png';
+import lionIdleImg1 from '../public/imgs/nittany-lion/rest-animation/Rest-1.png';
+import lionIdleImg2 from '../public/imgs/nittany-lion/rest-animation/Rest-2.png';
+import lionIdleImg3 from '../public/imgs/nittany-lion/rest-animation/Rest-3.png';
 import { soundController } from '../utility/sound-controller.js';
 import { collectableOptions } from '../game-manager.js';
+import StateSingleton from '../game-state.js';
+const { getHasLeaf, getJumpCountLimit } = StateSingleton;
 const dinoElem = document.querySelector('[data-dino]');
 const dinoImg = document.querySelector('.dino-img');
 const JUMP_SPEED = 0.21;
 const DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
-const GRAVITY = 0.00075;
-const DINO_FRAME_COUNT = 6;
-const FRAME_TIME = 100;
-const BOTTOM_ANCHOR = 17.5;
+const GRAVITY = 0.0009;
+const DINO_FRAME_COUNT = 4;
+const FRAME_TIME = 85;
+const BOTTOM_ANCHOR = 19.5;
 
 let isJumping;
 let canDoubleJump;
@@ -96,23 +98,80 @@ function startJump(selectedStarter) {
 
     setTimeout(function () {
       dinoImg.src = lionJumpImg2;
-    }, 320); // Adjust the delay as needed
-
-    setTimeout(function () {
-      dinoImg.src = lionJumpImg3;
-    }, 400); // Adjust the delay as needed
+    }, 200); // Adjust the delay as needed
   }
 }
 
 function endJump() {
   isJumping = false;
   jumpAnimationInProgress = false;
+  isFalling = false;
+}
+
+let dropOffPlatform = false;
+let currentIdleImageIndex = 0;
+
+const imagePaths = [
+  lionIdleImg1,
+  lionIdleImg2,
+  lionIdleImg1,
+  lionIdleImg2,
+  lionIdleImg1,
+  lionIdleImg2,
+  lionIdleImg3,
+  // Add more image paths as needed
+];
+
+export function handleIdle() {
+  dinoImg.src = imagePaths[currentIdleImageIndex];
+  currentIdleImageIndex = (currentIdleImageIndex + 1) % imagePaths.length; // Loop back to the first image when reaching the end
+  // Call the updateImage function at a specific interval (e.g., every 200 milliseconds)
 }
 
 function handleRun(delta, speedScale, selectedStarter) {
   if (isJumping) {
     startJump(selectedStarter);
     return;
+  }
+
+  // Check if there is a collision and a current platform ID is set
+  if (collisionDetected && currentPlatformId) {
+    const currentPlatform = document.getElementById(currentPlatformId);
+    const currentPlatformRect = currentPlatform.getBoundingClientRect();
+    const dinoRect = getDinoRect();
+    canDoubleJump = true;
+    jumpCount = 0;
+    // Check if the dino has reached the end of the current platform
+    if (dinoRect.left >= currentPlatformRect.right) {
+      dropOffPlatform = true;
+      const currentBottom = getCustomProperty(dinoElem, '--bottom');
+      yVelocity -= GRAVITY * delta; // Increase or decrease gravityAdjustment as needed
+      incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
+      if (currentBottom <= BOTTOM_ANCHOR) {
+        setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
+        canDoubleJump = true;
+        jumpCount = 0;
+      }
+      // Dino reached the end of the current platform, end the jump
+      canDoubleJump = true;
+      jumpCount = 0;
+
+      // Reset the current platform ID
+      currentPlatformId = null;
+      collisionDetected = false;
+    }
+  }
+  if (dropOffPlatform === true) {
+    const currentBottom = getCustomProperty(dinoElem, '--bottom');
+    yVelocity -= GRAVITY * delta; // Increase or decrease gravityAdjustment as needed
+    incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
+    if (currentBottom <= BOTTOM_ANCHOR) {
+      setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
+      endJump();
+      canDoubleJump = true;
+      jumpCount = 0;
+      dropOffPlatform = false;
+    }
   }
   if (currentFrameTime >= FRAME_TIME) {
     dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT;
@@ -131,12 +190,6 @@ function handleRun(delta, speedScale, selectedStarter) {
       case 3:
         dinoImg.src = lionRunImg4;
         break;
-      case 4:
-        dinoImg.src = lionRunImg5;
-        break;
-      case 5:
-        dinoImg.src = lionRunImg6;
-        break;
       // Add more cases if you have more frames
     }
 
@@ -145,13 +198,19 @@ function handleRun(delta, speedScale, selectedStarter) {
   currentFrameTime += delta * speedScale;
 }
 
+let currentPlatformId; // Variable to store the ID of the current platform
+let collisionDetected = false;
+let isFalling = false;
 function handleJump(delta, gravityFallAdjustment = 0.01) {
   if (!isJumping) return;
 
   // Adjusting fall speed when jumping on the way down
   if (yVelocity <= 0) {
+    isFalling = true;
     // Set interval to adjust fall speed every 5 seconds (adjust the interval as needed)
-    yVelocity -= GRAVITY * delta + gravityFallAdjustment; // Increase or decrease gravityAdjustment as needed
+    yVelocity -= getHasLeaf()
+      ? GRAVITY * delta - gravityFallAdjustment / 4
+      : GRAVITY * delta + gravityFallAdjustment; // Increase or decrease gravityAdjustment as needed
   } else {
     yVelocity -= GRAVITY * delta;
   }
@@ -159,6 +218,30 @@ function handleJump(delta, gravityFallAdjustment = 0.01) {
   incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
 
   const currentBottom = getCustomProperty(dinoElem, '--bottom');
+
+  if (isFalling) {
+    // Check for collision with the top surface of platforms
+    const dinoRect = getDinoRect();
+    const platforms = document.querySelectorAll('[data-platform]');
+    platforms.forEach((platform) => {
+      const platformRect = platform.getBoundingClientRect();
+
+      if (
+        dinoRect.bottom >= platformRect.top &&
+        dinoRect.bottom <= platformRect.bottom &&
+        dinoRect.right > platformRect.left &&
+        dinoRect.left < platformRect.right
+      ) {
+        endJump();
+
+        // Collision with the top surface of a platform
+        dinoElem.style.bottom = platformRect.top;
+        collisionDetected = true;
+
+        currentPlatformId = platform.id;
+      }
+    });
+  }
 
   if (currentBottom <= BOTTOM_ANCHOR) {
     setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
@@ -176,7 +259,7 @@ function handleJump(delta, gravityFallAdjustment = 0.01) {
 function onJump(e) {
   if (
     (e.code !== 'Space' && e.type !== 'touchstart') ||
-    (isJumping && jumpCount >= 2)
+    (isJumping && jumpCount >= getJumpCountLimit())
   )
     return;
   endJump();

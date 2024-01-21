@@ -5,8 +5,8 @@ import {
 } from '../utility/updateCustomProperty';
 
 const SPEED = 0.05;
-const MULTIPLIER_INTERVAL_MIN = 500;
-const MULTIPLIER_INTERVAL_MAX = 1000;
+const MULTIPLIER_INTERVAL_MIN = 10000;
+const MULTIPLIER_INTERVAL_MAX = 21000;
 const worldElem = document.querySelector('[data-world]');
 
 let nextMultiplierTime;

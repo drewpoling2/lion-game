@@ -5,12 +5,14 @@ import {
 } from '../utility/updateCustomProperty';
 import { getDinoRect } from './dino';
 import { collectableOptions } from '../game-manager';
+import StateSingleton from '../game-state';
 
+const { getMagnetSpeedFactor, getIsCoinsRunning } = StateSingleton;
 const coinPositions = [];
 
 const SPEED = 0.05;
 const COIN_INTERVAL_MIN = 75;
-const COIN_INTERVAL_MAX = 1200;
+const COIN_INTERVAL_MAX = 400;
 const worldElem = document.querySelector('[data-world]');
 
 let nextCoinTime;
@@ -35,21 +37,48 @@ export function updateCoin(delta, speedScale) {
 
     // If the distance is less than 40px, move the coin towards the dinosaur
     if (coin.dataset.locked === 'true' || distance < 225) {
-      //lock the coin on the player
-      coin.dataset.locked = 'true';
-      const angle = Math.atan2(
-        dinoRect.y - coinRect.y,
-        dinoRect.x - coinRect.x
-      );
-      const speed = SPEED * delta * speedScale;
+      // Enter the locking phase
+      if (coin.dataset.isLocking === 'false') {
+        const angle = Math.atan2(
+          dinoRect.y - coinRect.y,
+          dinoRect.x - coinRect.x
+        );
+        let distanceFactor = 0.0025 * distance;
 
-      // Calculate incremental movement based on angle and speed
-      const deltaX = Math.cos(angle) * speed * 1.75;
-      const deltaY = Math.sin(angle) * speed * 1.75;
+        const speed = SPEED * delta * distanceFactor;
+        // Additional logic to move the coin in the opposite direction before locking
+        const oppositeDirectionX = Math.cos(angle) * speed * -1 * 2;
+        const oppositeDirectionY = Math.sin(angle) * speed * 2;
 
-      // Update coin position incrementally
-      incrementCustomProperty(coin, '--left', deltaX);
-      incrementCustomProperty(coin, '--bottom', deltaY * -1);
+        incrementCustomProperty(coin, '--left', oppositeDirectionX);
+        incrementCustomProperty(coin, '--bottom', oppositeDirectionY);
+
+        setTimeout(() => {
+          coin.dataset.locked = 'true';
+          coin.dataset.isLocking = 'true';
+        }, coin.dataset.isLockingDuration); // Adjust the timeout duration as needed
+      } else {
+        //lock the coin on the player
+        coin.dataset.locked = 'true';
+        const angle = Math.atan2(
+          dinoRect.y - coinRect.y,
+          dinoRect.x - coinRect.x
+        );
+        let magneticSpeedFactor =
+          coin.dataset.isMagnetLocked === 'true'
+            ? coin.dataset.isMagnetSpeedFactor
+            : 1;
+        let distanceFactor = 0.0025 * distance;
+        const speed = SPEED * delta * magneticSpeedFactor + distanceFactor;
+
+        // Calculate incremental movement based on angle and speed
+        const deltaX = Math.cos(angle) * speed;
+        const deltaY = Math.sin(angle) * speed;
+
+        // Update coin position incrementally
+        incrementCustomProperty(coin, '--left', deltaX);
+        incrementCustomProperty(coin, '--bottom', deltaY * -1);
+      }
     } else {
       // Move the coin to the left if not close to the dinosaur
       incrementCustomProperty(coin, '--left', delta * speedScale * SPEED * -1);
@@ -61,7 +90,7 @@ export function updateCoin(delta, speedScale) {
     }
   });
 
-  if (nextCoinTime <= 0) {
+  if (nextCoinTime <= 0 && getIsCoinsRunning()) {
     createCoins();
     nextCoinTime =
       randomNumberBetween(COIN_INTERVAL_MIN, COIN_INTERVAL_MAX) / speedScale;
@@ -102,6 +131,9 @@ function createCoins() {
   element.dataset.coin = true;
   element.dataset.type = selectedCollectable.type;
   element.dataset.locked = 'false';
+  element.dataset.isLocking = 'false';
+  element.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
+  element.dataset.isLockingDuration = randomNumberBetween(100, 300);
   element.dataset.points = selectedCollectable.points;
   element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
   element.id = Math.random().toString(16).slice(2);

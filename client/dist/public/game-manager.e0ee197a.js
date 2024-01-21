@@ -144,7 +144,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.setupGround = setupGround;
 exports.updateGround = updateGround;
 var _updateCustomProperty = require("../utility/updateCustomProperty.js");
-var SPEED = 0.05;
+var SPEED = 0.04;
 var groundElems = document.querySelectorAll('[data-ground]');
 function setupGround() {
   (0, _updateCustomProperty.setCustomProperty)(groundElems[0], '--left', 0);
@@ -158,7 +158,245 @@ function updateGround(delta, speedScale) {
     }
   });
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"../elements/groundLayerTwo.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"../game-state.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+// state.js
+var StateSingleton = function (_ref) {
+  //default state
+  var state = {
+    multiplierRatio: 1,
+    timerInterval: 3,
+    phaseTimerInterval: 10,
+    multiplierTimer: 5000,
+    currentPhase: 1,
+    speedScale: 0.9,
+    speedScaleIncrease: 0.000015,
+    jumpCountLimit: 1,
+    cherryPoints: 1000,
+    obstaclePoints: 5,
+    lastPhase: 0,
+    gravityFallAdjustment: 0.006,
+    selectedStarter: null,
+    //elements
+    isCoinsRunning: true,
+    isPlatformRunning: false,
+    isCactusRunning: false,
+    isBirdRunning: true,
+    //world
+    isGroundRunning: true,
+    isGroundLayer2Running: true,
+    isGroundLayer3Running: true,
+    groundSpeed: 0.04,
+    isFlagCreated: true,
+    platformSpeed: 0.05,
+    //items
+    isMultiplierRunning: false,
+    isMagnetRunning: false,
+    isStarRunning: false,
+    starDuration: 10000,
+    playerImmunity: false,
+    hasStar: false,
+    hasLeaf: false,
+    leafDuration: 10000,
+    isMagnetItem: false
+  };
+  return _ref = {
+    getCherryPoints: function getCherryPoints() {
+      return state.cherryPoints;
+    },
+    setCherryPoints: function setCherryPoints(newCherryPoints) {
+      state.cherryPoints = newCherryPoints;
+    },
+    getLeafDuration: function getLeafDuration() {
+      return state.leafDuration;
+    },
+    setLeafDuration: function setLeafDuration(newLeafDuration) {
+      state.leafDuration = newLeafDuration;
+    },
+    getHasLeaf: function getHasLeaf() {
+      return state.hasLeaf;
+    },
+    setHasLeaf: function setHasLeaf(newHasLeaf) {
+      state.hasLeaf = newHasLeaf;
+    },
+    getJumpCountLimit: function getJumpCountLimit() {
+      return state.jumpCountLimit;
+    },
+    setJumpCountLimit: function setJumpCountLimit(newJumpCountLimit) {
+      state.jumpCountLimit = newJumpCountLimit;
+    },
+    getPlatformSpeed: function getPlatformSpeed() {
+      return state.platformSpeed;
+    },
+    setPlatformSpeed: function setPlatformSpeed(newPlatformSpeed) {
+      state.platformSpeed = newPlatformSpeed;
+    },
+    getIsFlagCreated: function getIsFlagCreated() {
+      return state.isFlagCreated;
+    },
+    setIsFlagCreated: function setIsFlagCreated(newIsFlagCreated) {
+      state.isFlagCreated = newIsFlagCreated;
+    },
+    getGroundSpeed: function getGroundSpeed() {
+      return state.groundSpeed;
+    },
+    setGroundSpeed: function setGroundSpeed(newGroundSpeed) {
+      state.groundSpeed = newGroundSpeed;
+    },
+    getIsMultiplierRunning: function getIsMultiplierRunning() {
+      return state.isMultiplierRunning;
+    },
+    setIsMultiplierRunning: function setIsMultiplierRunning(newIsMultiplierRunning) {
+      state.isMultiplierRunning = newIsMultiplierRunning;
+    },
+    getIsMagnetRunning: function getIsMagnetRunning() {
+      return state.isMagnetRunning;
+    },
+    setIsMagnetRunning: function setIsMagnetRunning(newIsMagnetRunning) {
+      state.isMagnetRunning = newIsMagnetRunning;
+    },
+    getIsStarRunning: function getIsStarRunning() {
+      return state.isStarRunning;
+    },
+    setIsStarRunning: function setIsStarRunning(newIsStarRunning) {
+      state.isStarRunning = newIsStarRunning;
+    },
+    getIsGroundRunning: function getIsGroundRunning() {
+      return state.isGroundRunning;
+    },
+    setIsGroundRunning: function setIsGroundRunning(newIsGroundRunning) {
+      state.isGroundRunning = newIsGroundRunning;
+    },
+    getIsGroundLayer2Running: function getIsGroundLayer2Running() {
+      return state.isGroundLayer2Running;
+    },
+    setIsGroundLayer2Running: function setIsGroundLayer2Running(newIsGroundLayer2Running) {
+      state.isGroundLayer2Running = newIsGroundLayer2Running;
+    },
+    getIsGroundLayer3Running: function getIsGroundLayer3Running() {
+      return state.isGroundLayer3Running;
+    },
+    setIsGroundLayer3Running: function setIsGroundLayer3Running(newIsGroundLayer3Running) {
+      state.isGroundLayer3Running = newIsGroundLayer3Running;
+    },
+    getIsPlatformRunning: function getIsPlatformRunning() {
+      return state.isPlatformRunning;
+    },
+    setIsPlatformRunning: function setIsPlatformRunning(newIsPlatformRunning) {
+      state.isPlatformRunning = newIsPlatformRunning;
+    },
+    getIsCactusRunning: function getIsCactusRunning() {
+      return state.isCactusRunning;
+    },
+    setIsCactusRunning: function setIsCactusRunning(newIsCactusRunning) {
+      state.isCactusRunning = newIsCactusRunning;
+    },
+    getIsBirdRunning: function getIsBirdRunning() {
+      return state.isBirdRunning;
+    },
+    setIsBirdRunning: function setIsBirdRunning(newIsBirdRunning) {
+      state.isBirdRunning = newIsBirdRunning;
+    },
+    getIsCoinsRunning: function getIsCoinsRunning() {
+      return state.isCoinsRunning;
+    },
+    setIsCoinsRunning: function setIsCoinsRunning(newIsCoinsRunning) {
+      state.isCoinsRunning = newIsCoinsRunning;
+    },
+    getSelectedStarter: function getSelectedStarter() {
+      return state.selectedStarter;
+    },
+    setSelectedStarter: function setSelectedStarter(newSelectedStarter) {
+      state.selectedStarter = newSelectedStarter;
+    },
+    getGravityFallAdjustment: function getGravityFallAdjustment() {
+      return state.gravityFallAdjustment;
+    },
+    setGravityFallAdjustment: function setGravityFallAdjustment(newGravityFallAdjustment) {
+      state.gravityFallAdjustment = newGravityFallAdjustment;
+    },
+    getLastPhase: function getLastPhase() {
+      return state.lastPhase;
+    },
+    setLastPhase: function setLastPhase(newLastPhase) {
+      state.lastPhase = newLastPhase;
+    },
+    getIsMagnetItem: function getIsMagnetItem() {
+      return state.isMagnetItem;
+    },
+    setIsMagnetItem: function setIsMagnetItem(newBoolean) {
+      state.isMagnetItem = newBoolean;
+    },
+    getObstaclePoints: function getObstaclePoints() {
+      return state.obstaclePoints;
+    },
+    setObstaclePoints: function setObstaclePoints(newPoints) {
+      state.obstaclePoints = newPoints;
+    }
+  }, _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_ref, "getObstaclePoints", function getObstaclePoints() {
+    return state.obstaclePoints;
+  }), "setObstaclePoints", function setObstaclePoints(newPoints) {
+    state.obstaclePoints = newPoints;
+  }), "getStarDuration", function getStarDuration() {
+    return state.starDuration;
+  }), "setStarDuration", function setStarDuration(newDuration) {
+    state.starDuration = newDuration;
+  }), "getHasStar", function getHasStar() {
+    return state.hasStar;
+  }), "setHasStar", function setHasStar(newHasStar) {
+    state.hasStar = newHasStar;
+  }), "getPlayerImmunity", function getPlayerImmunity() {
+    return state.playerImmunity;
+  }), "setPlayerImmunity", function setPlayerImmunity(newImmunity) {
+    state.playerImmunity = newImmunity;
+  }), "getMultiplierRatio", function getMultiplierRatio() {
+    return state.multiplierRatio;
+  }), "setMultiplierRatio", function setMultiplierRatio(newRatio) {
+    state.multiplierRatio = newRatio;
+  }), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_ref, "getTimerInterval", function getTimerInterval() {
+    return state.timerInterval;
+  }), "setTimerInterval", function setTimerInterval(newInterval) {
+    state.timerInterval = newInterval;
+  }), "getPhaseTimerInterval", function getPhaseTimerInterval() {
+    return state.phaseTimerInterval;
+  }), "setPhaseTimerInterval", function setPhaseTimerInterval(newInterval) {
+    state.phaseTimerInterval = newInterval;
+  }), "getMultiplierTimer", function getMultiplierTimer() {
+    return state.multiplierTimer;
+  }), "setMultiplierTimer", function setMultiplierTimer(newTimer) {
+    state.multiplierTimer = newTimer;
+  }), "getCurrentPhase", function getCurrentPhase() {
+    return state.currentPhase;
+  }), "setCurrentPhase", function setCurrentPhase(newPhase) {
+    state.currentPhase = newPhase;
+  }), "getSpeedScale", function getSpeedScale() {
+    return state.speedScale;
+  }), "setSpeedScale", function setSpeedScale(newSpeedScale) {
+    state.speedScale = newSpeedScale;
+  }), _defineProperty(_defineProperty(_defineProperty(_ref, "getSpeedScaleIncrease", function getSpeedScaleIncrease() {
+    return state.speedScaleIncrease;
+  }), "setSpeedScaleIncrease", function setSpeedScaleIncrease(newSpeedScaleIncrease) {
+    state.speedScaleIncrease = newSpeedScaleIncrease;
+  }), "updateState", function updateState(newValues) {
+    Object.assign(state, newValues);
+  });
+}();
+var _default = exports.default = StateSingleton; // // To get the current phase
+// const currentPhase = StateSingleton.getCurrentPhase();
+// // To set a new phase
+// StateSingleton.setCurrentPhase(2);
+// // To update other properties in the state object
+// StateSingleton.updateState({ someProperty: 'new value' });
+},{}],"../elements/groundLayerTwo.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -167,21 +405,59 @@ Object.defineProperty(exports, "__esModule", {
 exports.setupGroundLayerTwo = setupGroundLayerTwo;
 exports.updateGroundLayerTwo = updateGroundLayerTwo;
 var _updateCustomProperty = require("../utility/updateCustomProperty.js");
-var SPEED = 0.022;
+var _gameState = _interopRequireDefault(require("../game-state.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getIsGroundLayer2Running = _gameState.default.getIsGroundLayer2Running;
+var SPEED = 0.02;
 var groundLayerTwoElems = document.querySelectorAll('[data-ground-layer-two]');
 function setupGroundLayerTwo() {
   (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[0], '--left', 0);
-  (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[1], '--left', 260);
+  (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[1], '--left', 220);
 }
 function updateGroundLayerTwo(delta, speedScale) {
   groundLayerTwoElems.forEach(function (ground) {
     (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
-    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -260) {
-      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 520);
+    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -220) {
+      if (!getIsGroundLayer2Running()) {
+        (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 439);
+      } else {
+        (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 439);
+      }
     }
   });
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"../elements/groundLayerThree.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state.js":"../game-state.js"}],"../elements/groundLayerTwoTwo.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setupGroundLayerTwoTwo = setupGroundLayerTwoTwo;
+exports.updateGroundLayerTwoTwo = updateGroundLayerTwoTwo;
+var _updateCustomProperty = require("../utility/updateCustomProperty.js");
+var _gameState = _interopRequireDefault(require("../game-state.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getIsGroundLayer2Running = _gameState.default.getIsGroundLayer2Running;
+var SPEED = 0.017;
+var groundLayerTwoElems = document.querySelectorAll('[data-ground-layer-two-two]');
+function setupGroundLayerTwoTwo() {
+  (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[0], '--left', 0);
+  (0, _updateCustomProperty.setCustomProperty)(groundLayerTwoElems[1], '--left', 220);
+}
+function updateGroundLayerTwoTwo(delta, speedScale) {
+  groundLayerTwoElems.forEach(function (ground) {
+    (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -220) {
+      if (!getIsGroundLayer2Running()) {
+        (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 400);
+      } else {
+        (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 520);
+        ground.style.zIndex = '-1';
+      }
+    }
+  });
+}
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state.js":"../game-state.js"}],"../elements/groundLayerThree.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -208,8 +484,6 @@ function updateGroundLayerThree(delta, speedScale) {
 module.exports = "/Jump-1.75f1a3cd.png";
 },{}],"imgs/nittany-lion/jump-animation/Jump-2.png":[function(require,module,exports) {
 module.exports = "/Jump-2.6da28d8f.png";
-},{}],"imgs/nittany-lion/jump-animation/Jump-3.png":[function(require,module,exports) {
-module.exports = "/Jump-3.37993b63.png";
 },{}],"imgs/nittany-lion/run-cycle/Run-1.png":[function(require,module,exports) {
 module.exports = "/Run-1.46a06f1c.png";
 },{}],"imgs/nittany-lion/run-cycle/Run-2.png":[function(require,module,exports) {
@@ -218,10 +492,12 @@ module.exports = "/Run-2.3a155b76.png";
 module.exports = "/Run-3.ae5640e0.png";
 },{}],"imgs/nittany-lion/run-cycle/Run-4.png":[function(require,module,exports) {
 module.exports = "/Run-4.920d82db.png";
-},{}],"imgs/nittany-lion/run-cycle/Run-5.png":[function(require,module,exports) {
-module.exports = "/Run-5.cda810b2.png";
-},{}],"imgs/nittany-lion/run-cycle/Run-6.png":[function(require,module,exports) {
-module.exports = "/Run-6.e2d461ae.png";
+},{}],"imgs/nittany-lion/rest-animation/Rest-1.png":[function(require,module,exports) {
+module.exports = "/Rest-1.d9294cd3.png";
+},{}],"imgs/nittany-lion/rest-animation/Rest-2.png":[function(require,module,exports) {
+module.exports = "/Rest-2.7e0465ba.png";
+},{}],"imgs/nittany-lion/rest-animation/Rest-3.png":[function(require,module,exports) {
+module.exports = "/Rest-3.edfe9fe2.png";
 },{}],"../node_modules/howler/dist/howler.js":[function(require,module,exports) {
 var define;
 var global = arguments[3];
@@ -3511,30 +3787,34 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getDinoRect = getDinoRect;
+exports.handleIdle = handleIdle;
 exports.setDinoLose = setDinoLose;
 exports.setupDino = setupDino;
 exports.updateDino = updateDino;
 var _updateCustomProperty = require("../utility/updateCustomProperty.js");
 var _Jump = _interopRequireDefault(require("../public/imgs/nittany-lion/jump-animation/Jump-1.png"));
 var _Jump2 = _interopRequireDefault(require("../public/imgs/nittany-lion/jump-animation/Jump-2.png"));
-var _Jump3 = _interopRequireDefault(require("../public/imgs/nittany-lion/jump-animation/Jump-3.png"));
 var _Run = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-1.png"));
 var _Run2 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-2.png"));
 var _Run3 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-3.png"));
 var _Run4 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-4.png"));
-var _Run5 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-5.png"));
-var _Run6 = _interopRequireDefault(require("../public/imgs/nittany-lion/run-cycle/Run-6.png"));
+var _Rest = _interopRequireDefault(require("../public/imgs/nittany-lion/rest-animation/Rest-1.png"));
+var _Rest2 = _interopRequireDefault(require("../public/imgs/nittany-lion/rest-animation/Rest-2.png"));
+var _Rest3 = _interopRequireDefault(require("../public/imgs/nittany-lion/rest-animation/Rest-3.png"));
 var _soundController = require("../utility/sound-controller.js");
 var _gameManager = require("../game-manager.js");
+var _gameState = _interopRequireDefault(require("../game-state.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getHasLeaf = _gameState.default.getHasLeaf,
+  getJumpCountLimit = _gameState.default.getJumpCountLimit;
 var dinoElem = document.querySelector('[data-dino]');
 var dinoImg = document.querySelector('.dino-img');
 var JUMP_SPEED = 0.21;
 var DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
-var GRAVITY = 0.00075;
-var DINO_FRAME_COUNT = 6;
-var FRAME_TIME = 100;
-var BOTTOM_ANCHOR = 17.5;
+var GRAVITY = 0.0009;
+var DINO_FRAME_COUNT = 4;
+var FRAME_TIME = 85;
+var BOTTOM_ANCHOR = 19.5;
 var isJumping;
 var canDoubleJump;
 var jumpCount;
@@ -3594,22 +3874,71 @@ function startJump(selectedStarter) {
     }
     setTimeout(function () {
       dinoImg.src = _Jump2.default;
-    }, 320); // Adjust the delay as needed
-
-    setTimeout(function () {
-      dinoImg.src = _Jump3.default;
-    }, 400); // Adjust the delay as needed
+    }, 200); // Adjust the delay as needed
   }
 }
 
 function endJump() {
   isJumping = false;
   jumpAnimationInProgress = false;
+  isFalling = false;
 }
+var dropOffPlatform = false;
+var currentIdleImageIndex = 0;
+var imagePaths = [_Rest.default, _Rest2.default, _Rest.default, _Rest2.default, _Rest.default, _Rest2.default, _Rest3.default
+// Add more image paths as needed
+];
+
+function handleIdle() {
+  dinoImg.src = imagePaths[currentIdleImageIndex];
+  currentIdleImageIndex = (currentIdleImageIndex + 1) % imagePaths.length; // Loop back to the first image when reaching the end
+  // Call the updateImage function at a specific interval (e.g., every 200 milliseconds)
+}
+
 function handleRun(delta, speedScale, selectedStarter) {
   if (isJumping) {
     startJump(selectedStarter);
     return;
+  }
+
+  // Check if there is a collision and a current platform ID is set
+  if (collisionDetected && currentPlatformId) {
+    var currentPlatform = document.getElementById(currentPlatformId);
+    var currentPlatformRect = currentPlatform.getBoundingClientRect();
+    var dinoRect = getDinoRect();
+    canDoubleJump = true;
+    jumpCount = 0;
+    // Check if the dino has reached the end of the current platform
+    if (dinoRect.left >= currentPlatformRect.right) {
+      dropOffPlatform = true;
+      var currentBottom = (0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom');
+      yVelocity -= GRAVITY * delta; // Increase or decrease gravityAdjustment as needed
+      (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
+      if (currentBottom <= BOTTOM_ANCHOR) {
+        (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
+        canDoubleJump = true;
+        jumpCount = 0;
+      }
+      // Dino reached the end of the current platform, end the jump
+      canDoubleJump = true;
+      jumpCount = 0;
+
+      // Reset the current platform ID
+      currentPlatformId = null;
+      collisionDetected = false;
+    }
+  }
+  if (dropOffPlatform === true) {
+    var _currentBottom = (0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom');
+    yVelocity -= GRAVITY * delta; // Increase or decrease gravityAdjustment as needed
+    (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
+    if (_currentBottom <= BOTTOM_ANCHOR) {
+      (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
+      endJump();
+      canDoubleJump = true;
+      jumpCount = 0;
+      dropOffPlatform = false;
+    }
   }
   if (currentFrameTime >= FRAME_TIME) {
     dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT;
@@ -3628,12 +3957,6 @@ function handleRun(delta, speedScale, selectedStarter) {
       case 3:
         dinoImg.src = _Run4.default;
         break;
-      case 4:
-        dinoImg.src = _Run5.default;
-        break;
-      case 5:
-        dinoImg.src = _Run6.default;
-        break;
       // Add more cases if you have more frames
     }
 
@@ -3641,19 +3964,39 @@ function handleRun(delta, speedScale, selectedStarter) {
   }
   currentFrameTime += delta * speedScale;
 }
+var currentPlatformId; // Variable to store the ID of the current platform
+var collisionDetected = false;
+var isFalling = false;
 function handleJump(delta) {
   var gravityFallAdjustment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.01;
   if (!isJumping) return;
 
   // Adjusting fall speed when jumping on the way down
   if (yVelocity <= 0) {
+    isFalling = true;
     // Set interval to adjust fall speed every 5 seconds (adjust the interval as needed)
-    yVelocity -= GRAVITY * delta + gravityFallAdjustment; // Increase or decrease gravityAdjustment as needed
+    yVelocity -= getHasLeaf() ? GRAVITY * delta - gravityFallAdjustment / 4 : GRAVITY * delta + gravityFallAdjustment; // Increase or decrease gravityAdjustment as needed
   } else {
     yVelocity -= GRAVITY * delta;
   }
   (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
   var currentBottom = (0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom');
+  if (isFalling) {
+    // Check for collision with the top surface of platforms
+    var dinoRect = getDinoRect();
+    var platforms = document.querySelectorAll('[data-platform]');
+    platforms.forEach(function (platform) {
+      var platformRect = platform.getBoundingClientRect();
+      if (dinoRect.bottom >= platformRect.top && dinoRect.bottom <= platformRect.bottom && dinoRect.right > platformRect.left && dinoRect.left < platformRect.right) {
+        endJump();
+
+        // Collision with the top surface of a platform
+        dinoElem.style.bottom = platformRect.top;
+        collisionDetected = true;
+        currentPlatformId = platform.id;
+      }
+    });
+  }
   if (currentBottom <= BOTTOM_ANCHOR) {
     (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
     endJump();
@@ -3666,7 +4009,7 @@ function handleJump(delta) {
   }
 }
 function onJump(e) {
-  if (e.code !== 'Space' && e.type !== 'touchstart' || isJumping && jumpCount >= 2) return;
+  if (e.code !== 'Space' && e.type !== 'touchstart' || isJumping && jumpCount >= getJumpCountLimit()) return;
   endJump();
   startJump(newSelectedStarter);
   _soundController.soundController.jump.play();
@@ -3715,14 +4058,70 @@ function createCoinAboveDino() {
   var worldElem = document.querySelector('[data-world]');
   worldElem.appendChild(coinElement);
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/nittany-lion/jump-animation/Jump-1.png":"imgs/nittany-lion/jump-animation/Jump-1.png","../public/imgs/nittany-lion/jump-animation/Jump-2.png":"imgs/nittany-lion/jump-animation/Jump-2.png","../public/imgs/nittany-lion/jump-animation/Jump-3.png":"imgs/nittany-lion/jump-animation/Jump-3.png","../public/imgs/nittany-lion/run-cycle/Run-1.png":"imgs/nittany-lion/run-cycle/Run-1.png","../public/imgs/nittany-lion/run-cycle/Run-2.png":"imgs/nittany-lion/run-cycle/Run-2.png","../public/imgs/nittany-lion/run-cycle/Run-3.png":"imgs/nittany-lion/run-cycle/Run-3.png","../public/imgs/nittany-lion/run-cycle/Run-4.png":"imgs/nittany-lion/run-cycle/Run-4.png","../public/imgs/nittany-lion/run-cycle/Run-5.png":"imgs/nittany-lion/run-cycle/Run-5.png","../public/imgs/nittany-lion/run-cycle/Run-6.png":"imgs/nittany-lion/run-cycle/Run-6.png","../utility/sound-controller.js":"../utility/sound-controller.js","../game-manager.js":"../game-manager.js"}],"imgs/trees/Bush-Tree.png":[function(require,module,exports) {
-module.exports = "/Bush-Tree.609b3d8f.png";
-},{}],"imgs/trees/Round-Tree.png":[function(require,module,exports) {
-module.exports = "/Round-Tree.9c40ea34.png";
-},{}],"imgs/trees/Pine-Tree.png":[function(require,module,exports) {
-module.exports = "/Pine-Tree.447fc010.png";
-},{}],"imgs/Obstacles/Snowball-Small.png":[function(require,module,exports) {
-module.exports = "/Snowball-Small.68bfe430.png";
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../public/imgs/nittany-lion/jump-animation/Jump-1.png":"imgs/nittany-lion/jump-animation/Jump-1.png","../public/imgs/nittany-lion/jump-animation/Jump-2.png":"imgs/nittany-lion/jump-animation/Jump-2.png","../public/imgs/nittany-lion/run-cycle/Run-1.png":"imgs/nittany-lion/run-cycle/Run-1.png","../public/imgs/nittany-lion/run-cycle/Run-2.png":"imgs/nittany-lion/run-cycle/Run-2.png","../public/imgs/nittany-lion/run-cycle/Run-3.png":"imgs/nittany-lion/run-cycle/Run-3.png","../public/imgs/nittany-lion/run-cycle/Run-4.png":"imgs/nittany-lion/run-cycle/Run-4.png","../public/imgs/nittany-lion/rest-animation/Rest-1.png":"imgs/nittany-lion/rest-animation/Rest-1.png","../public/imgs/nittany-lion/rest-animation/Rest-2.png":"imgs/nittany-lion/rest-animation/Rest-2.png","../public/imgs/nittany-lion/rest-animation/Rest-3.png":"imgs/nittany-lion/rest-animation/Rest-3.png","../utility/sound-controller.js":"../utility/sound-controller.js","../game-manager.js":"../game-manager.js","../game-state.js":"../game-state.js"}],"imgs/obstacles/bushes/Bush-1.png":[function(require,module,exports) {
+module.exports = "/Bush-1.e0cc1c5e.png";
+},{}],"imgs/obstacles/rocks/Rock-1.png":[function(require,module,exports) {
+module.exports = "/Rock-1.c9bd9011.png";
+},{}],"imgs/obstacles/rocks/Rock-2.png":[function(require,module,exports) {
+module.exports = "/Rock-2.61467632.png";
+},{}],"../elements-refs.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.worldElem = exports.timerProgress = exports.tickerElem3 = exports.tickerElem2 = exports.tickerElem = exports.tickerContainerElem = exports.submitNewScoreFormElem = exports.startScreenElem = exports.scrollableTableElem = exports.scoreNewHighScoreElem = exports.scoreMultiplierElem = exports.scoreErrorMessageElem = exports.scoreElem = exports.plusPointsElem = exports.pausedScreenElem = exports.multiplierTimerElem = exports.loadingTextElem = exports.livesElem = exports.leaderboardElem = exports.interfaceComboContainer = exports.highScoreElem = exports.gameOverTextElem = exports.gameOverIconElem = exports.gameNotificationElem = exports.gameLoadingTextElem = exports.gameLoadingScreenElem = exports.endScreenElem = exports.dinoElem = exports.currentMultiplierScoreElem = exports.currentMultiplierElem = exports.currentGameTimerElem = exports.currentComboScoreContainer = void 0;
+// sharedElements.js
+var worldElem = exports.worldElem = document.querySelector('[data-world]');
+var scoreElem = exports.scoreElem = document.querySelector('[data-score]');
+var highScoreElem = exports.highScoreElem = document.querySelector('[data-high-score]');
+var startScreenElem = exports.startScreenElem = document.querySelector('[data-start-screen]');
+var endScreenElem = exports.endScreenElem = document.querySelector('[data-game-over-screen]');
+var gameOverTextElem = exports.gameOverTextElem = document.querySelector('[data-game-over-text]');
+var gameOverIconElem = exports.gameOverIconElem = document.getElementById('game-over-icon');
+var leaderboardElem = exports.leaderboardElem = document.querySelector('[data-leaderboard-body]');
+var scoreMultiplierElem = exports.scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
+var scoreNewHighScoreElem = exports.scoreNewHighScoreElem = document.querySelector('[data-score-new-high-score]');
+var scoreErrorMessageElem = exports.scoreErrorMessageElem = document.querySelector('[data-score-error-message]');
+var multiplierTimerElem = exports.multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
+var tickerElem = exports.tickerElem = document.querySelector('[data-ticker]');
+var tickerElem2 = exports.tickerElem2 = document.querySelector('[data-ticker2]');
+var tickerElem3 = exports.tickerElem3 = document.querySelector('[data-ticker3]');
+var livesElem = exports.livesElem = document.querySelector('[data-lives]');
+var dinoElem = exports.dinoElem = document.querySelector('[data-dino]');
+var scrollableTableElem = exports.scrollableTableElem = document.querySelector('[data-scrollable-table]');
+var currentMultiplierElem = exports.currentMultiplierElem = document.querySelector('[data-current-multiplier]');
+var plusPointsElem = exports.plusPointsElem = document.querySelector('[data-plus-points]');
+var tickerContainerElem = exports.tickerContainerElem = document.querySelector('[data-ticker-container]');
+var loadingTextElem = exports.loadingTextElem = document.querySelector('[data-loading-text]');
+var submitNewScoreFormElem = exports.submitNewScoreFormElem = document.querySelector('[data-submit-new-score-form]');
+var interfaceComboContainer = exports.interfaceComboContainer = document.getElementById('interface-combo-container');
+var currentMultiplierScoreElem = exports.currentMultiplierScoreElem = document.querySelector('[data-current-multiplier-score]');
+var currentComboScoreContainer = exports.currentComboScoreContainer = document.getElementById('current-combo-score-container');
+var timerProgress = exports.timerProgress = document.getElementById('timerProgress');
+var currentGameTimerElem = exports.currentGameTimerElem = document.querySelector('[data-current-game-timer]');
+var gameLoadingScreenElem = exports.gameLoadingScreenElem = document.querySelector('[data-game-loading-screen]');
+var gameLoadingTextElem = exports.gameLoadingTextElem = document.querySelector('[data-game-loading-text]');
+var gameNotificationElem = exports.gameNotificationElem = document.querySelector('[data-notification-screen]');
+var pausedScreenElem = exports.pausedScreenElem = document.querySelector('[data-paused-screen]');
+},{}],"../utility/toggle-element.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.toggleElemOff = toggleElemOff;
+exports.toggleElemOn = toggleElemOn;
+function toggleElemOn(elem) {
+  var classList = elem.classList;
+  classList.remove('hide-element');
+  classList.add('show-element');
+}
+function toggleElemOff(elem) {
+  var classList = elem.classList;
+  classList.add('hide-element');
+  classList.remove('show-element');
+}
 },{}],"../elements/cactus.js":[function(require,module,exports) {
 "use strict";
 
@@ -3733,10 +4132,14 @@ exports.getCactusRects = getCactusRects;
 exports.setupCactus = setupCactus;
 exports.updateCactus = updateCactus;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
-var _BushTree = _interopRequireDefault(require("../public/imgs/trees/Bush-Tree.png"));
-var _RoundTree = _interopRequireDefault(require("../public/imgs/trees/Round-Tree.png"));
-var _PineTree = _interopRequireDefault(require("../public/imgs/trees/Pine-Tree.png"));
-var _SnowballSmall = _interopRequireDefault(require("../public/imgs/Obstacles/Snowball-Small.png"));
+var _Bush = _interopRequireDefault(require("../public/imgs/obstacles/bushes/Bush-1.png"));
+var _Rock = _interopRequireDefault(require("../public/imgs/obstacles/rocks/Rock-1.png"));
+var _Rock2 = _interopRequireDefault(require("../public/imgs/obstacles/rocks/Rock-2.png"));
+var _dino = require("./dino");
+var _gameManager = require("../game-manager");
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _elementsRefs = require("../elements-refs");
+var _toggleElement = require("../utility/toggle-element");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -3745,8 +4148,14 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var setMultiplierRatio = _gameState.default.setMultiplierRatio,
+  getMultiplierRatio = _gameState.default.getMultiplierRatio,
+  getPlayerImmunity = _gameState.default.getPlayerImmunity,
+  getHasStar = _gameState.default.getHasStar,
+  getObstaclePoints = _gameState.default.getObstaclePoints,
+  getIsCactusRunning = _gameState.default.getIsCactusRunning;
 var cactiPositions = [];
-var SPEED = 0.05;
+var SPEED = 0.04;
 var CACTUS_INTERVAL_MIN = 500;
 var CACTUS_INTERVAL_MAX = 2000;
 var worldElem = document.querySelector('[data-world]');
@@ -3760,31 +4169,143 @@ function setupCactus() {
 function isPositionOccupied(position) {
   return cactiPositions.includes(position);
 }
+var groupIdCounter = 0; // Counter to generate unique groupIds
+
 function generateRandomCacti() {
   var minCacti = 1;
-  var maxCacti = 3; // Adjust the range as needed
+  var maxCacti = 2; // Adjust the range as needed
+  var groupId; // Declare groupId outside the loop
 
   var numberOfCacti = randomNumberBetween(minCacti, maxCacti);
-  for (var i = 0; i < numberOfCacti; i++) {
-    var newPosition = void 0;
+  if (numberOfCacti >= minCacti) {
+    groupId = groupIdCounter++;
+    for (var i = 0; i < numberOfCacti; i++) {
+      var newPosition = void 0;
+      do {
+        newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
+      } while (isPositionOccupied(newPosition));
+      cactiPositions.push({
+        position: newPosition,
+        groupId: groupId
+      });
+      createCactus(newPosition, groupId);
+    }
+  } else {
+    var _newPosition;
     do {
-      newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
-    } while (isPositionOccupied(newPosition));
-    cactiPositions.push(newPosition);
-    createCactus(newPosition);
+      _newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
+    } while (isPositionOccupied(_newPosition));
+    cactiPositions.push({
+      position: _newPosition
+    });
+    createCactus(_newPosition);
   }
 
   // Clear cacti positions for the next round (optional)
   cactiPositions.length = 0;
 }
+var distanceThreshold = 200; // Adjust this threshold as needed
+var cactusGroups = new Map(); // Declare cactusGroups outside the updateCactus function
+
 function updateCactus(delta, speedScale) {
   document.querySelectorAll('[data-cactus]').forEach(function (cactus) {
+    // Check if the comboIncremented flag is already set for this cactus
+    var comboIncremented = cactus.dataset.comboIncremented === 'true';
+
+    // Get positions of the dinosaur and cactus
+    var dinoRect = (0, _dino.getDinoRect)();
+    var cactusRect = cactus.getBoundingClientRect();
+
+    // Calculate distance
+    var distance = Math.sqrt(Math.pow(dinoRect.x - cactusRect.x, 2) + Math.pow(dinoRect.y - cactusRect.y, 2));
+    var collision = (0, _gameManager.isCollision)(dinoRect, cactusRect);
+
+    // Check if the cactus belongs to a group
+    var groupId = cactus.dataset.groupId;
+    var isGrouped = groupId !== undefined;
+
+    // Initialize groupFlags to an empty object
+    var groupFlags = {};
+    // Check if the dinosaur is within the threshold near the cactus
+    var isDinoNearCactus = distance < distanceThreshold;
+
+    // Check if there was a collision in the previous frame
+    var hadCollision = cactus.dataset.hadCollision === 'true';
+
+    // Check if the cactus has moved past the dinosaur
+    var hasPassedDino = cactusRect.right < dinoRect.left;
+    if (isGrouped) {
+      // Check if this cactus belongs to a group
+      if (!cactusGroups.has(groupId)) {
+        // If the group does not exist, create it
+        cactusGroups.set(groupId, {
+          isDinoNear: false,
+          hadCollision: false,
+          comboIncremented: false
+        });
+      }
+
+      // Update the group's flags based on individual cactuses
+      groupFlags = cactusGroups.get(groupId);
+
+      // Update the flags for this cactus in the group
+      groupFlags.isDinoNear = groupFlags.isDinoNear || cactus.dataset.isDinoNear === 'true';
+      groupFlags.hadCollision = groupFlags.hadCollision || hadCollision;
+
+      // Check if the cactus has moved past the dinosaur within the group
+      groupFlags.hasPassedDino = groupFlags.hasPassedDino || hasPassedDino;
+    }
+    if (isDinoNearCactus) {
+      // If the dinosaur is within the threshold, set the flag to true
+      cactus.dataset.isDinoNear = 'true';
+    } else {
+      // If the dinosaur is not within the threshold, set the flag to false
+      cactus.dataset.isDinoNear = 'false';
+    }
+    if (isGrouped && groupFlags.isDinoNear && !groupFlags.hadCollision && groupFlags.hasPassedDino && !groupFlags.comboIncremented) {
+      // Increment combo only if there was no collision in the previous frame
+      // and the cactus group has moved past the dinosaur without a new collision
+      var currentMultiplierRatio = getMultiplierRatio();
+      setMultiplierRatio(currentMultiplierRatio += 1);
+      (0, _gameManager.updateMultiplierInterface)();
+      // const newElement = document.createElement('div');
+      // newElement.classList.add('one-up');
+      // newElement.style.position = 'absolute';
+      // newElement.textContent = '+1x';
+      // cactus.appendChild(newElement);
+      // setTimeout(() => {
+      //   newElement.remove();
+      // }, 600);
+      // Set the comboIncremented flag for the entire group
+      groupFlags.comboIncremented = true;
+    }
+    if (!cactus.dataset.hadCollision && collision === true && !cactus.dataset.scoreUpdated) {
+      if (getPlayerImmunity() && getHasStar()) {
+        var text = document.createElement('div');
+        text.classList.add('cactus-plus-points');
+        text.style.position = 'absolute';
+        text.style.left = cactus.offsetLeft + 'px';
+        text.style.top = cactus.offsetTop - 70 + 'px';
+        cactus.parentNode.insertBefore(text, cactus);
+        var points = getMultiplierRatio() * getObstaclePoints();
+        text.textContent = "+".concat(points);
+        (0, _gameManager.updateScoreWithPoints)(points);
+        cactus.classList.add('cactus-die');
+        cactus.dataset.scoreUpdated = true;
+        // After the transition, remove the cactus
+        cactus.addEventListener('animationend', function () {
+          cactus.remove();
+        });
+      } else {
+        cactus.dataset.hadCollision = true;
+      }
+    }
     (0, _updateCustomProperty.incrementCustomProperty)(cactus, '--left', delta * speedScale * SPEED * -1);
     if ((0, _updateCustomProperty.getCustomProperty)(cactus, '--left') <= -100) {
       cactus.remove();
     }
   });
-  if (nextCactusTime <= 0) {
+  if (nextCactusTime <= 0 && getIsCactusRunning()) {
     generateRandomCacti();
     nextCactusTime = randomNumberBetween(CACTUS_INTERVAL_MIN, CACTUS_INTERVAL_MAX) / speedScale;
   }
@@ -3798,22 +4319,19 @@ function getCactusRects() {
 
 // Array of possible cactus images with associated weights
 var cactusImages = [{
-  src: _BushTree.default,
+  src: _Bush.default,
   weight: 5
 }, {
-  src: _RoundTree.default,
-  weight: 1
-}, {
-  src: _PineTree.default,
-  weight: 2
-}, {
-  src: _SnowballSmall.default,
+  src: _Rock.default,
   weight: 3
+}, {
+  src: _Rock2.default,
+  weight: 4
 }
 // Add more image sources with corresponding weights
 ];
 
-function createCactus(newPosition) {
+function createCactus(newPosition, groupId) {
   // Calculate the total weight
   var totalWeight = cactusImages.reduce(function (sum, image) {
     return sum + image.weight;
@@ -3845,14 +4363,513 @@ function createCactus(newPosition) {
   cactus.dataset.cactus = true;
   cactus.src = selectedImage.src;
   cactus.classList.add('cactus', 'game-element');
+  // Randomly flip the cloud horizontally
+  if (Math.random() < 0.5) {
+    cactus.style.transform = 'scaleX(-1)';
+  }
+  // Set the groupId as a data attribute on the cactus element
+  cactus.dataset.groupId = groupId;
   (0, _updateCustomProperty.setCustomProperty)(cactus, '--left', newPosition);
-  (0, _updateCustomProperty.setCustomProperty)(cactus, 'height', "".concat(randomNumberBetween(13, 17), "%"));
+  (0, _updateCustomProperty.setCustomProperty)(cactus, 'height', '6.3%');
+  (0, _updateCustomProperty.setCustomProperty)(cactus, '--bottom', "".concat(randomNumberBetween(15.5, 17.5)));
   worldElem.append(cactus);
 }
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/trees/Bush-Tree.png":"imgs/trees/Bush-Tree.png","../public/imgs/trees/Round-Tree.png":"imgs/trees/Round-Tree.png","../public/imgs/trees/Pine-Tree.png":"imgs/trees/Pine-Tree.png","../public/imgs/Obstacles/Snowball-Small.png":"imgs/Obstacles/Snowball-Small.png"}],"../apis.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/obstacles/bushes/Bush-1.png":"imgs/obstacles/bushes/Bush-1.png","../public/imgs/obstacles/rocks/Rock-1.png":"imgs/obstacles/rocks/Rock-1.png","../public/imgs/obstacles/rocks/Rock-2.png":"imgs/obstacles/rocks/Rock-2.png","./dino":"../elements/dino.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../elements-refs":"../elements-refs.js","../utility/toggle-element":"../utility/toggle-element.js"}],"imgs/cloud/Cloud-1.png":[function(require,module,exports) {
+module.exports = "/Cloud-1.fd6d161e.png";
+},{}],"imgs/cloud/Cloud-2.png":[function(require,module,exports) {
+module.exports = "/Cloud-2.0d1d9676.png";
+},{}],"../item-drop-state.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+// state.js
+var ItemDropStateSingleton = function () {
+  //default state
+  var state = {
+    // star: { weight: 8 },
+    // magnet: { weight: 4 },
+    // heart: { weight: 12 },
+    // leaf: { weight: 12 },
+    cherry: {
+      weight: 12
+    }
+    // empty: { weight: 2 },
+  };
+
+  return {
+    getItemDropState: function getItemDropState() {
+      return state;
+    },
+    updateState: function updateState(newValues) {
+      Object.assign(state, newValues);
+    }
+  };
+}();
+var _default = exports.default = ItemDropStateSingleton;
+},{}],"../utility/child-items.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createChildItems = createChildItems;
+var _gameState = _interopRequireDefault(require("../game-state"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function createChildItems(elementName, parent) {
+  var element = document.createElement('div');
+  element.dataset["".concat(elementName)] = true;
+  element.classList.add("".concat(elementName, "-item-cloud"), "".concat(elementName, "-cloud-item-asset"));
+  element.id = Math.random().toString(16).slice(2);
+  if (elementName === 'cherry') {
+    element.dataset.type = 'cherry';
+    element.dataset.points = _gameState.default.getCherryPoints();
+  }
+  parent.append(element);
+}
+},{"../game-state":"../game-state.js"}],"../elements/platform.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getPlatformRects = getPlatformRects;
+exports.getRandomWeighted = getRandomWeighted;
+exports.normalizeWeights = normalizeWeights;
+exports.randomNumberBetween = randomNumberBetween;
+exports.setupPlatform = setupPlatform;
+exports.updatePlatform = updatePlatform;
+var _updateCustomProperty = require("../utility/updateCustomProperty");
+var _Cloud = _interopRequireDefault(require("../public/imgs/cloud/Cloud-1.png"));
+var _Cloud2 = _interopRequireDefault(require("../public/imgs/cloud/Cloud-2.png"));
+var _dino = require("./dino");
+var _gameManager = require("../game-manager");
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _itemDropState = _interopRequireDefault(require("../item-drop-state"));
+var _childItems = require("../utility/child-items");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var getIsPlatformRunning = _gameState.default.getIsPlatformRunning,
+  getPlatformSpeed = _gameState.default.getPlatformSpeed;
+var getItemDropState = _itemDropState.default.getItemDropState;
+var platformPositions = [];
+var SPEED = 0.035;
+var platform_INTERVAL_MIN = 1000;
+var platform_INTERVAL_MAX = 1500;
+var worldElem = document.querySelector('[data-world]');
+var nextPlatformTime;
+function setupPlatform() {
+  nextPlatformTime = platform_INTERVAL_MIN;
+  document.querySelectorAll('[data-platform]').forEach(function (platform) {
+    platform.remove();
+  });
+}
+function isPositionOccupied(position) {
+  return platformPositions.includes(position);
+}
+function generateRandomPlatforms() {
+  var minPlatforms = 1;
+  var maxPlatforms = 1; // Adjust the range as needed
+
+  var numberOfPlatforms = randomNumberBetween(minPlatforms, maxPlatforms);
+  if (numberOfPlatforms >= minPlatforms) {
+    for (var i = 0; i < numberOfPlatforms; i++) {
+      var newPosition = void 0;
+      do {
+        newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
+      } while (isPositionOccupied(newPosition));
+      platformPositions.push({
+        position: newPosition
+      });
+      createPlatform(newPosition);
+    }
+  } else {
+    var _newPosition;
+    do {
+      _newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
+    } while (isPositionOccupied(_newPosition));
+    platformPositions.push({
+      position: _newPosition
+    });
+    createPlatform(_newPosition);
+  }
+  platformPositions.length = 0;
+}
+var distanceThreshold = 200; // Adjust this threshold as needed
+
+function updatePlatform(delta, speedScale) {
+  document.querySelectorAll('[data-platform]').forEach(function (platform) {
+    // Get positions of the dinosaur and platform
+    var dinoRect = (0, _dino.getDinoRect)();
+    var platformRect = platform.getBoundingClientRect();
+
+    // Calculate distance
+    var distance = Math.sqrt(Math.pow(dinoRect.x - platformRect.x, 2) + Math.pow(dinoRect.y - platformRect.y, 2));
+    var collision = (0, _gameManager.isCollision)(dinoRect, platformRect);
+
+    // Check if the dinosaur is within the threshold near the platform
+    var isDinoNearPlatform = distance < distanceThreshold;
+    if (isDinoNearPlatform) {
+      // If the dinosaur is within the threshold, set the flag to true
+      platform.dataset.isDinoNear = 'true';
+    } else {
+      // If the dinosaur is not within the threshold, set the flag to false
+      platform.dataset.isDinoNear = 'false';
+    }
+    if (!platform.dataset.hadCollision && collision === true) {
+      platform.dataset.hadCollision = true;
+    }
+  });
+  document.querySelectorAll('[data-platform-container]').forEach(function (platformContainer) {
+    (0, _updateCustomProperty.incrementCustomProperty)(platformContainer, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(platformContainer, '--left') <= -100) {
+      platformContainer.remove();
+    }
+  });
+  if (nextPlatformTime <= 0 && getIsPlatformRunning()) {
+    generateRandomPlatforms();
+    nextPlatformTime = randomNumberBetween(platform_INTERVAL_MIN, platform_INTERVAL_MAX) / speedScale;
+  }
+  nextPlatformTime -= delta;
+}
+function getPlatformRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-platform]')).map(function (platform) {
+    return platform.getBoundingClientRect();
+  });
+}
+
+// Array of possible platform images with associated weights
+var platformObj = {
+  'item-cloud': {
+    weight: 20
+  },
+  2: {
+    weight: 1
+  },
+  3: {
+    weight: 2
+  },
+  4: {
+    weight: 5
+  },
+  5: {
+    weight: 5
+  }
+  // Add more image sources with corresponding weights
+};
+
+function createCloud(platformElem, isFirstChild, zIndex, i) {
+  var cloud = document.createElement('img');
+  cloud.src = _Cloud.default;
+  var cloudClass = i % 3 === 0 ? 'floating-cloud-animation-1' : i % 3 === 1 ? 'floating-cloud-animation-2' : 'floating-cloud-animation-3';
+  cloud.classList.add('cloud', cloudClass);
+  // Shift each cloud to the left by 30% of its width if it's not the first cloud
+  if (!isFirstChild) {
+    cloud.style.marginLeft = '-4px';
+  }
+  cloud.style.zIndex = zIndex;
+  platformElem.append(cloud);
+}
+var normalizedPlatformItemWeights = normalizeWeights(getItemDropState());
+function createItemCloud(platformElem) {
+  var cloud = document.createElement('img');
+  cloud.src = _Cloud2.default;
+  cloud.classList.add('item-cloud');
+
+  // Randomly flip the cloud horizontally
+  if (Math.random() < 0.5) {
+    cloud.style.transform = 'scaleX(-1)';
+  }
+
+  // Shift each cloud to the left by 30% of its width if it's not the first cloud
+  platformElem.append(cloud);
+}
+function createPlatform(newPosition) {
+  var numberOfClouds = getRandomWeighted(normalizedPlatformWeights);
+  var platform = document.createElement('div');
+  var parentContainer = document.createElement('div');
+  parentContainer.dataset.platformContainer = true;
+  parentContainer.classList.add('platform-parent-container');
+  if (numberOfClouds !== 'item-cloud') {
+    for (var i = 0; i < numberOfClouds; i++) {
+      var zIndex = numberOfClouds.length - i + 2;
+      createCloud(platform, i === 0, zIndex, i);
+    }
+  } else {
+    createItemCloud(platform);
+    (0, _childItems.createChildItems)(getRandomWeighted(normalizedPlatformItemWeights), parentContainer);
+  }
+  platform.dataset.platform = true;
+  platform.classList.add('platform', 'game-element', 'flex-row');
+  platform.id = "platform-".concat(Math.random());
+  parentContainer.append(platform);
+  (0, _updateCustomProperty.setCustomProperty)(parentContainer, '--left', newPosition);
+  (0, _updateCustomProperty.setCustomProperty)(parentContainer, '--bottom', "".concat(randomNumberBetween(45, 52)));
+  worldElem.append(parentContainer);
+}
+function randomNumberBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+// Example usage:
+var normalizedPlatformWeights = normalizeWeights(platformObj);
+function normalizeWeights(item) {
+  var keys = Object.keys(item);
+  var weights = keys.map(function (key) {
+    return item[key].weight;
+  });
+  var sumOfWeights = weights.reduce(function (sum, weight) {
+    return sum + weight;
+  }, 0);
+  var normalizedWeights = {};
+  keys.forEach(function (key, index) {
+    normalizedWeights[key] = weights[index] / sumOfWeights;
+  });
+  return normalizedWeights;
+}
+function getRandomWeighted(item) {
+  var keys = Object.keys(item);
+  var probabilities = keys.map(function (key) {
+    return item[key];
+  });
+  var randomValue = Math.random();
+  var cumulativeProbability = 0;
+  for (var i = 0; i < keys.length; i++) {
+    cumulativeProbability += probabilities[i];
+    if (randomValue <= cumulativeProbability) {
+      return keys[i];
+    }
+  }
+
+  // Default case (fallback)
+  return keys[keys.length - 1];
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/cloud/Cloud-1.png":"imgs/cloud/Cloud-1.png","../public/imgs/cloud/Cloud-2.png":"imgs/cloud/Cloud-2.png","./dino":"../elements/dino.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","../utility/child-items":"../utility/child-items.js"}],"../elements/bird.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getBirdRects = getBirdRects;
+exports.setupBird = setupBird;
+exports.updateBird = updateBird;
+var _updateCustomProperty = require("../utility/updateCustomProperty");
+var _dino = require("./dino");
+var _gameManager = require("../game-manager");
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _elementsRefs = require("../elements-refs");
+var _toggleElement = require("../utility/toggle-element");
+var _platform = require("./platform");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var setMultiplierRatio = _gameState.default.setMultiplierRatio,
+  getMultiplierRatio = _gameState.default.getMultiplierRatio,
+  getPlayerImmunity = _gameState.default.getPlayerImmunity,
+  getHasStar = _gameState.default.getHasStar,
+  getObstaclePoints = _gameState.default.getObstaclePoints,
+  getIsBirdRunning = _gameState.default.getIsBirdRunning;
+var cactiPositions = [];
+var SPEED = 0.03;
+var BIRD_INTERVAL_MIN = 500;
+var BIRD_INTERVAL_MAX = 2000;
+var worldElem = document.querySelector('[data-world]');
+var nextBirdTime;
+function setupBird() {
+  nextBirdTime = BIRD_INTERVAL_MIN;
+  document.querySelectorAll('[data-bird]').forEach(function (bird) {
+    bird.remove();
+  });
+}
+function isPositionOccupied(position) {
+  return cactiPositions.includes(position);
+}
+var groupIdCounter = 0; // Counter to generate unique groupIds
+
+function generateRandomCacti() {
+  var minCacti = 1;
+  var maxCacti = 1; // Adjust the range as needed
+  var groupId; // Declare groupId outside the loop
+
+  var numberOfCacti = randomNumberBetween(minCacti, maxCacti);
+  if (numberOfCacti >= minCacti) {
+    groupId = groupIdCounter++;
+    for (var i = 0; i < numberOfCacti; i++) {
+      var newPosition = void 0;
+      do {
+        newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
+      } while (isPositionOccupied(newPosition));
+      cactiPositions.push({
+        position: newPosition,
+        groupId: groupId
+      });
+      createBird(newPosition, groupId);
+    }
+  } else {
+    var _newPosition;
+    do {
+      _newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
+    } while (isPositionOccupied(_newPosition));
+    cactiPositions.push({
+      position: _newPosition
+    });
+    createBird(_newPosition);
+  }
+
+  // Clear cacti positions for the next round (optional)
+  cactiPositions.length = 0;
+}
+var distanceThreshold = 200; // Adjust this threshold as needed
+var birdGroups = new Map(); // Declare birdGroups outside the updateBird function
+
+function updateBird(delta, speedScale) {
+  document.querySelectorAll('[data-bird]').forEach(function (bird) {
+    // Check if the comboIncremented flag is already set for this bird
+    var comboIncremented = bird.dataset.comboIncremented === 'true';
+
+    // Get positions of the dinosaur and bird
+    var dinoRect = (0, _dino.getDinoRect)();
+    var birdRect = bird.getBoundingClientRect();
+
+    // Calculate distance
+    var distance = Math.sqrt(Math.pow(dinoRect.x - birdRect.x, 2) + Math.pow(dinoRect.y - birdRect.y, 2));
+    var collision = (0, _gameManager.isCollision)(dinoRect, birdRect);
+
+    // Check if the bird belongs to a group
+    var groupId = bird.dataset.groupId;
+    var isGrouped = groupId !== undefined;
+
+    // Initialize groupFlags to an empty object
+    var groupFlags = {};
+    // Check if the dinosaur is within the threshold near the bird
+    var isDinoNearBird = distance < distanceThreshold;
+
+    // Check if there was a collision in the previous frame
+    var hadCollision = bird.dataset.hadCollision === 'true';
+
+    // Check if the bird has moved past the dinosaur
+    var hasPassedDino = birdRect.right < dinoRect.left;
+    if (isGrouped) {
+      // Check if this bird belongs to a group
+      if (!birdGroups.has(groupId)) {
+        // If the group does not exist, create it
+        birdGroups.set(groupId, {
+          isDinoNear: false,
+          hadCollision: false,
+          comboIncremented: false
+        });
+      }
+
+      // Update the group's flags based on individual birds
+      groupFlags = birdGroups.get(groupId);
+
+      // Update the flags for this bird in the group
+      groupFlags.isDinoNear = groupFlags.isDinoNear || bird.dataset.isDinoNear === 'true';
+      groupFlags.hadCollision = groupFlags.hadCollision || hadCollision;
+
+      // Check if the bird has moved past the dinosaur within the group
+      groupFlags.hasPassedDino = groupFlags.hasPassedDino || hasPassedDino;
+    }
+    if (isDinoNearBird) {
+      // If the dinosaur is within the threshold, set the flag to true
+      bird.dataset.isDinoNear = 'true';
+    } else {
+      // If the dinosaur is not within the threshold, set the flag to false
+      bird.dataset.isDinoNear = 'false';
+    }
+    if (isGrouped && groupFlags.isDinoNear && !groupFlags.hadCollision && groupFlags.hasPassedDino && !groupFlags.comboIncremented) {
+      // Increment combo only if there was no collision in the previous frame
+      // and the bird group has moved past the dinosaur without a new collision
+      var currentMultiplierRatio = getMultiplierRatio();
+      setMultiplierRatio(currentMultiplierRatio += 1);
+      (0, _gameManager.updateMultiplierInterface)();
+      // const newElement = document.createElement('div');
+      // newElement.classList.add('one-up');
+      // newElement.style.position = 'absolute';
+      // newElement.textContent = '+1x';
+      // bird.appendChild(newElement);
+      // setTimeout(() => {
+      //   newElement.remove();
+      // }, 600);
+      // Set the comboIncremented flag for the entire group
+      groupFlags.comboIncremented = true;
+    }
+    if (!bird.dataset.hadCollision && collision === true && !bird.dataset.scoreUpdated) {
+      if (getPlayerImmunity() && getHasStar()) {
+        var text = document.createElement('div');
+        text.classList.add('bird-plus-points');
+        text.style.position = 'absolute';
+        text.style.left = bird.offsetLeft + 'px';
+        text.style.top = bird.offsetTop - 70 + 'px';
+        bird.parentNode.insertBefore(text, bird);
+        var points = getMultiplierRatio() * getObstaclePoints();
+        text.textContent = "+".concat(points);
+        (0, _gameManager.updateScoreWithPoints)(points);
+        bird.classList.add('bird-die');
+        bird.dataset.scoreUpdated = true;
+        // After the transition, remove the bird
+        bird.addEventListener('animationend', function () {
+          bird.remove();
+        });
+      } else {
+        bird.dataset.hadCollision = true;
+      }
+    }
+    (0, _updateCustomProperty.incrementCustomProperty)(bird, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(bird, '--left') <= -100) {
+      bird.remove();
+    }
+  });
+  if (nextBirdTime <= 0 && getIsBirdRunning()) {
+    generateRandomCacti();
+    nextBirdTime = randomNumberBetween(BIRD_INTERVAL_MIN, BIRD_INTERVAL_MAX) / speedScale;
+  }
+  nextBirdTime -= delta;
+}
+function getBirdRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-bird]')).map(function (bird) {
+    return bird.getBoundingClientRect();
+  });
+}
+
+// Array of possible bird images with associated weights
+var birdObj = {
+  penguin: {
+    weight: 1
+  }
+  // Add more image sources with corresponding weights
+};
+
+var normalizedBirdWeights = (0, _platform.normalizeWeights)(birdObj);
+function createBird(newPosition, groupId) {
+  var bird = document.createElement('div');
+  bird.dataset.bird = true;
+  bird.classList.add('bird', 'flying-penguin', 'game-element');
+
+  // Set the groupId as a data attribute on the bird element
+  bird.dataset.groupId = groupId;
+  (0, _updateCustomProperty.setCustomProperty)(bird, '--left', newPosition);
+  (0, _updateCustomProperty.setCustomProperty)(bird, 'height', "".concat(randomNumberBetween(8, 13), "%"));
+  worldElem.append(bird);
+}
+function randomNumberBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./dino":"../elements/dino.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../elements-refs":"../elements-refs.js","../utility/toggle-element":"../utility/toggle-element.js","./platform":"../elements/platform.js"}],"../apis.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4189,8 +5206,8 @@ function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symb
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 var SPEED = 0.05;
-var MULTIPLIER_INTERVAL_MIN = 500;
-var MULTIPLIER_INTERVAL_MAX = 1000;
+var MULTIPLIER_INTERVAL_MIN = 10000;
+var MULTIPLIER_INTERVAL_MAX = 21000;
 var worldElem = document.querySelector('[data-world]');
 var nextMultiplierTime;
 function setupMultiplier() {
@@ -4253,6 +5270,244 @@ var multiplierRatios = {
   x5: 5,
   x10: 10
 };
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"../elements/magnet.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getMagnetRects = getMagnetRects;
+exports.setupMagnet = setupMagnet;
+exports.updateMagnet = updateMagnet;
+var _updateCustomProperty = require("../utility/updateCustomProperty");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var SPEED = 0.05;
+var MAGNET_INTERVAL_MIN = 1000;
+var MAGNET_INTERVAL_MAX = 1300;
+var worldElem = document.querySelector('[data-world]');
+var nextMagnetTime;
+function setupMagnet() {
+  nextMagnetTime = MAGNET_INTERVAL_MIN;
+  document.querySelectorAll('[data-magnet]').forEach(function (magnet) {
+    magnet.remove();
+  });
+}
+function updateMagnet(delta, speedScale) {
+  document.querySelectorAll('[data-magnet]').forEach(function (magnet) {
+    (0, _updateCustomProperty.incrementCustomProperty)(magnet, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(magnet, '--left') <= -100) {
+      magnet.remove();
+    }
+  });
+  if (nextMagnetTime <= 0) {
+    createMagnet();
+    nextMagnetTime = randomNumberBetween(MAGNET_INTERVAL_MIN, MAGNET_INTERVAL_MAX) / speedScale;
+  }
+  nextMagnetTime -= delta;
+}
+function getMagnetRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-magnet]')).map(function (magnet) {
+    return {
+      id: magnet.id,
+      rect: magnet.getBoundingClientRect(),
+      magnet: magnet.dataset.magnet
+    };
+  });
+}
+function createMagnet() {
+  var magnet = document.createElement('div');
+  magnet.dataset.magnet = true;
+  magnet.textContent = 'magnet';
+  magnet.classList.add('magnet', 'bouncing-item');
+  magnet.id = Math.random().toString(16).slice(2);
+  (0, _updateCustomProperty.setCustomProperty)(magnet, '--left', 100);
+  worldElem.append(magnet);
+}
+function randomNumberBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"../elements/heart.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getHeartRects = getHeartRects;
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function getHeartRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-heart]')).map(function (heart) {
+    return {
+      id: heart.id,
+      rect: heart.getBoundingClientRect(),
+      heart: heart.dataset.heart
+    };
+  });
+}
+},{}],"../elements/leaf.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getLeafRects = getLeafRects;
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function getLeafRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-leaf]')).map(function (leaf) {
+    return {
+      id: leaf.id,
+      rect: leaf.getBoundingClientRect(),
+      heart: leaf.dataset.leaf
+    };
+  });
+}
+},{}],"../elements/flag.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getFlagRects = getFlagRects;
+exports.updateFlag = updateFlag;
+var _updateCustomProperty = require("../utility/updateCustomProperty.js");
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _elementsRefs = require("../elements-refs.js");
+var _gameManager = require("../game-manager.js");
+var _dino = require("./dino.js");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var getGroundSpeed = _gameState.default.getGroundSpeed,
+  getCurrentPhase = _gameState.default.getCurrentPhase,
+  getIsFlagCreated = _gameState.default.getIsFlagCreated,
+  setIsFlagCreated = _gameState.default.setIsFlagCreated,
+  updateState = _gameState.default.updateState;
+var hasAlreadyPassedFlag;
+function updateFlag(delta, speedScale) {
+  document.querySelectorAll('[data-flag]').forEach(function (flag) {
+    var flagRect = flag.getBoundingClientRect();
+    var collision = (0, _gameManager.isCollision)((0, _dino.getDinoRect)(), flagRect);
+    var flagLeft = parseFloat(getComputedStyle(flag).left);
+    var dinoLeft = parseFloat(getComputedStyle(_elementsRefs.dinoElem).left);
+    var passedFlag = dinoLeft > flagLeft;
+    if (collision) {
+      flag.classList.remove('flag-animation');
+      flag.classList.add('flag-empty');
+    }
+    if (passedFlag && !hasAlreadyPassedFlag) {
+      updateState({
+        isGroundLayer2Running: false
+      });
+      (0, _gameManager.updateNotification)("".concat(getCurrentPhase(), "!"), 2000, 0);
+      hasAlreadyPassedFlag = true;
+    }
+    (0, _updateCustomProperty.incrementCustomProperty)(flag, '--left', delta * speedScale * getGroundSpeed() * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(flag, '--left') <= -100) {
+      flag.remove();
+    }
+  });
+  if (getCurrentPhase() === 'bonus' && getIsFlagCreated() === false) {
+    createFlag();
+    setIsFlagCreated(true);
+  }
+}
+function getFlagRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-flag]')).map(function (flag) {
+    return {
+      id: flag.id,
+      rect: flag.getBoundingClientRect(),
+      flag: flag.dataset.flag
+    };
+  });
+}
+function createFlag() {
+  hasAlreadyPassedFlag = false;
+  var flag = document.createElement('div');
+  flag.dataset.flag = true;
+  flag.classList.add('flag', 'flag-animation');
+  flag.id = Math.random().toString(16).slice(2);
+  (0, _updateCustomProperty.setCustomProperty)(flag, '--left', 100);
+  _elementsRefs.worldElem.append(flag);
+}
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state":"../game-state.js","../elements-refs.js":"../elements-refs.js","../game-manager.js":"../game-manager.js","./dino.js":"../elements/dino.js"}],"../elements/star.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getStarRects = getStarRects;
+exports.setupStar = setupStar;
+exports.updateStar = updateStar;
+var _updateCustomProperty = require("../utility/updateCustomProperty");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var SPEED = 0.05;
+var STARS_INTERVAL_MIN = 1000;
+var STARS_INTERVAL_MAX = 1300;
+var worldElem = document.querySelector('[data-world]');
+var nextStarTime;
+function setupStar() {
+  nextStarTime = STARS_INTERVAL_MIN;
+  document.querySelectorAll('[data-star]').forEach(function (star) {
+    star.remove();
+  });
+}
+function updateStar(delta, speedScale) {
+  document.querySelectorAll('[data-star]').forEach(function (star) {
+    (0, _updateCustomProperty.incrementCustomProperty)(star, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(star, '--left') <= -100) {
+      star.remove();
+    }
+  });
+  if (nextStarTime <= 0) {
+    createStars();
+    nextStarTime = randomNumberBetween(STARS_INTERVAL_MIN, STARS_INTERVAL_MAX) / speedScale;
+  }
+  nextStarTime -= delta;
+}
+function getStarRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-star]')).map(function (star) {
+    return {
+      id: star.id,
+      rect: star.getBoundingClientRect(),
+      star: star.dataset.star
+    };
+  });
+}
+function createStars() {
+  var star = document.createElement('div');
+  star.dataset.star = true;
+  star.textContent = 'star';
+  star.classList.add('star', 'bouncing-item');
+  star.id = Math.random().toString(16).slice(2);
+  (0, _updateCustomProperty.setCustomProperty)(star, '--left', 100);
+  worldElem.append(star);
+}
+function randomNumberBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 },{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"../elements/coin.js":[function(require,module,exports) {
 "use strict";
 
@@ -4265,6 +5520,8 @@ exports.updateCoin = updateCoin;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
 var _dino = require("./dino");
 var _gameManager = require("../game-manager");
+var _gameState = _interopRequireDefault(require("../game-state"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -4272,10 +5529,12 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var getMagnetSpeedFactor = _gameState.default.getMagnetSpeedFactor,
+  getIsCoinsRunning = _gameState.default.getIsCoinsRunning;
 var coinPositions = [];
 var SPEED = 0.05;
 var COIN_INTERVAL_MIN = 75;
-var COIN_INTERVAL_MAX = 1200;
+var COIN_INTERVAL_MAX = 400;
 var worldElem = document.querySelector('[data-world]');
 var nextCoinTime;
 function setupCoin() {
@@ -4294,18 +5553,36 @@ function updateCoin(delta, speedScale) {
 
     // If the distance is less than 40px, move the coin towards the dinosaur
     if (coin.dataset.locked === 'true' || distance < 225) {
-      //lock the coin on the player
-      coin.dataset.locked = 'true';
-      var angle = Math.atan2(dinoRect.y - coinRect.y, dinoRect.x - coinRect.x);
-      var speed = SPEED * delta * speedScale;
+      // Enter the locking phase
+      if (coin.dataset.isLocking === 'false') {
+        var angle = Math.atan2(dinoRect.y - coinRect.y, dinoRect.x - coinRect.x);
+        var distanceFactor = 0.0025 * distance;
+        var speed = SPEED * delta * distanceFactor;
+        // Additional logic to move the coin in the opposite direction before locking
+        var oppositeDirectionX = Math.cos(angle) * speed * -1 * 2;
+        var oppositeDirectionY = Math.sin(angle) * speed * 2;
+        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', oppositeDirectionX);
+        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--bottom', oppositeDirectionY);
+        setTimeout(function () {
+          coin.dataset.locked = 'true';
+          coin.dataset.isLocking = 'true';
+        }, coin.dataset.isLockingDuration); // Adjust the timeout duration as needed
+      } else {
+        //lock the coin on the player
+        coin.dataset.locked = 'true';
+        var _angle = Math.atan2(dinoRect.y - coinRect.y, dinoRect.x - coinRect.x);
+        var magneticSpeedFactor = coin.dataset.isMagnetLocked === 'true' ? coin.dataset.isMagnetSpeedFactor : 1;
+        var _distanceFactor = 0.0025 * distance;
+        var _speed = SPEED * delta * magneticSpeedFactor + _distanceFactor;
 
-      // Calculate incremental movement based on angle and speed
-      var deltaX = Math.cos(angle) * speed * 1.75;
-      var deltaY = Math.sin(angle) * speed * 1.75;
+        // Calculate incremental movement based on angle and speed
+        var deltaX = Math.cos(_angle) * _speed;
+        var deltaY = Math.sin(_angle) * _speed;
 
-      // Update coin position incrementally
-      (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', deltaX);
-      (0, _updateCustomProperty.incrementCustomProperty)(coin, '--bottom', deltaY * -1);
+        // Update coin position incrementally
+        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', deltaX);
+        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--bottom', deltaY * -1);
+      }
     } else {
       // Move the coin to the left if not close to the dinosaur
       (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', delta * speedScale * SPEED * -1);
@@ -4316,7 +5593,7 @@ function updateCoin(delta, speedScale) {
       coin.remove();
     }
   });
-  if (nextCoinTime <= 0) {
+  if (nextCoinTime <= 0 && getIsCoinsRunning()) {
     createCoins();
     nextCoinTime = randomNumberBetween(COIN_INTERVAL_MIN, COIN_INTERVAL_MAX) / speedScale;
   }
@@ -4362,6 +5639,9 @@ function createCoins() {
   element.dataset.coin = true;
   element.dataset.type = selectedCollectable.type;
   element.dataset.locked = 'false';
+  element.dataset.isLocking = 'false';
+  element.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
+  element.dataset.isLockingDuration = randomNumberBetween(100, 300);
   element.dataset.points = selectedCollectable.points;
   element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
   element.id = Math.random().toString(16).slice(2);
@@ -4377,7 +5657,7 @@ function getRandomKeyframe() {
   // Return a random number between 0 and 100 (percentage)
   return Math.floor(Math.random() * 101);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./dino":"../elements/dino.js","../game-manager":"../game-manager.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./dino":"../elements/dino.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
 module.exports = "/Speaker-Off.c6acac34.png";
 },{}],"imgs/icons/Speaker-On.png":[function(require,module,exports) {
 module.exports = "/Speaker-On.4eca78fe.png";
@@ -4417,6 +5697,214 @@ module.exports = "/amulet.e627f87d.png";
 module.exports = "/book.8e749379.png";
 },{}],"imgs/buffs/coins.png":[function(require,module,exports) {
 module.exports = "/coins.7d15c922.png";
+},{}],"imgs/icons/Star.png":[function(require,module,exports) {
+module.exports = "/Star.3e18d544.png";
+},{}],"../elements/particle-systems.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.snow = exports.confetti = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+//snow particle system
+var snow = exports.snow = {
+  el: '#snow',
+  density: 12500,
+  // higher = fewer bits
+  maxHSpeed: 1,
+  // How much do you want them to move horizontally
+  minFallSpeed: 0.5,
+  canvas: null,
+  ctx: null,
+  particles: [],
+  colors: [],
+  mp: 1,
+  quit: false,
+  paused: false,
+  init: function init() {
+    this.quit = false;
+    this.canvas = document.querySelector(this.el);
+    this.ctx = this.canvas.getContext('2d');
+    this.reset();
+    requestAnimationFrame(this.render.bind(this));
+    window.addEventListener('resize', this.reset.bind(this));
+  },
+  reset: function reset() {
+    this.w = window.innerWidth;
+    this.h = window.innerHeight;
+    this.canvas.width = this.w;
+    this.canvas.height = this.h;
+    this.particles = [];
+    this.mp = Math.ceil(this.w * this.h / this.density);
+    for (var i = 0; i < this.mp; i++) {
+      var size = Math.random() * 1.7 + 3;
+      this.particles.push({
+        x: Math.random() * this.w,
+        //x-coordinate
+        y: Math.random() * this.h,
+        //y-coordinate
+        w: size,
+        h: size,
+        vy: this.minFallSpeed + Math.random(),
+        //density
+        vx: Math.random() * this.maxHSpeed - this.maxHSpeed / 2,
+        fill: '#ffffff',
+        s: Math.random() * 0.2 - 0.1
+      });
+    }
+  },
+  render: function render() {
+    var _this = this;
+    if (this.paused) {
+      return;
+    }
+    this.ctx.clearRect(0, 0, this.w, this.h);
+    this.particles.forEach(function (p, i) {
+      p.y += p.vy;
+      p.x += p.vx;
+      _this.ctx.fillStyle = p.fill;
+      _this.ctx.fillRect(p.x, p.y, p.w, p.h);
+      if (p.x > _this.w + 5 || p.x < -5 || p.y > _this.h) {
+        p.x = Math.random() * _this.w;
+        p.y = -10;
+      }
+    });
+    if (this.quit) {
+      return;
+    }
+    requestAnimationFrame(this.render.bind(this));
+  },
+  togglePause: function togglePause() {
+    this.paused = !this.paused;
+    if (this.paused) {
+      // Pause actions
+      this.quit = true; // Stop the animation loop
+      // Additional pause logic if needed
+    } else {
+      // Resume actions
+      this.quit = false; // Resume the animation loop
+      requestAnimationFrame(this.render.bind(this));
+      // Additional resume logic if needed
+    }
+  },
+  destroy: function destroy() {
+    this.quit = true;
+  }
+};
+
+//confetti particle system
+var confetti = exports.confetti = _defineProperty(_defineProperty(_defineProperty(_defineProperty({
+  el: '#confetti',
+  density: 800,
+  maxHSpeed: 2.1,
+  // Increase max horizontal speed
+  minFallSpeed: 2,
+  // Increase min fall speed
+  canvas: null,
+  ctx: null,
+  particles: [],
+  colors: ['#009CDE', '#ffffff'],
+  // Blue and white colors
+  mp: 1,
+  quit: false,
+  initialFall: true,
+  init: function init() {
+    this.particles = [];
+    this.quit = false;
+    this.canvas = document.querySelector(this.el);
+    this.ctx = this.canvas.getContext('2d');
+    this.reset();
+    requestAnimationFrame(this.render.bind(this));
+    window.addEventListener('resize', this.reset.bind(this));
+  }
+}, "initialFall", false), "reset", function reset() {
+  this.w = window.innerWidth;
+  this.h = window.innerHeight;
+  this.canvas.width = this.w;
+  this.canvas.height = this.h;
+  this.particles = [];
+  // Not dense at the beginning, then regular density
+  this.mp = 1500;
+  for (var i = 0; i < this.mp; i++) {
+    var size = 0;
+    // Randomly choose between two size ranges
+    if (Math.random() < 0.5) {
+      size = Math.random() * 1.7 + 3; // Smaller particles
+    } else {
+      size = Math.random() * 2 + 4; // Bigger particles
+    }
+
+    // Randomly choose between two height ranges
+    var heightMultiplier = 1;
+    if (Math.random() < 0.5) {
+      heightMultiplier = 2; // 2 times as high
+    }
+
+    var vy = this.initialFall ? 0 : this.minFallSpeed + Math.random();
+    var y = this.initialFall ? Math.random() * this.h : Math.random() * -size * 140;
+    var widthTransition = Math.random() > 0.5 ? 1 : 0.9; // Random width transition value (0 to 1)
+    this.particles.push({
+      x: Math.random() * this.w,
+      y: y,
+      w: size,
+      h: size * heightMultiplier,
+      vy: vy,
+      vx: Math.random() * this.maxHSpeed - this.maxHSpeed / 2,
+      fill: this.colors[Math.floor(Math.random() * this.colors.length)],
+      s: Math.random() * 0.2 - 0.1,
+      angle: Math.random() * 360,
+      // Initialize the angle for rotation
+      rotationSpeed: Math.random() * 1.75 - 0.25,
+      // Initialize the rotation speed
+      widthTransition: widthTransition
+    });
+    this.initialFall = false;
+  }
+}), "render", function render() {
+  var _this2 = this;
+  this.ctx.clearRect(0, 0, this.w, this.h);
+  this.particles.forEach(function (p, i) {
+    p.x += p.vx;
+    // Apply rotation during the fall
+    p.angle += p.rotationSpeed;
+    p.y += p.vy; // Update the y-coordinate for falling
+
+    // Calculate opacity based on the particle's vertical position
+    var maxOpacity = 1;
+    var minOpacity = 0;
+    var opacityRange = maxOpacity - minOpacity;
+    var normalizedY = p.y / _this2.h; // Normalize the y-coordinate
+    var opacity = maxOpacity - normalizedY * opacityRange;
+
+    // Calculate width based on width transition value
+    var maxWidth = p.w;
+    var minWidth = 0;
+    var width = minWidth + p.widthTransition * (maxWidth - minWidth);
+
+    // Add rotation to the particles
+    _this2.ctx.save();
+    _this2.ctx.translate(p.x + width / 2, p.y + p.h / 2);
+    _this2.ctx.rotate(Math.PI / 180 * p.angle);
+    _this2.ctx.globalAlpha = opacity;
+    _this2.ctx.fillStyle = p.fill;
+    _this2.ctx.fillRect(-width / 2, -p.h / 2, width, p.h);
+    _this2.ctx.restore();
+    if (p.x > _this2.w + 5 || p.x < -5 || p.y > _this2.h) {
+      p.x = Math.random() * _this2.w;
+      p.y = -10;
+    }
+  });
+  if (this.quit) {
+    return;
+  }
+  requestAnimationFrame(this.render.bind(this));
+}), "destroy", function destroy() {
+  this.quit = true;
+});
 },{}],"../elements/buff.js":[function(require,module,exports) {
 "use strict";
 
@@ -4439,15 +5927,30 @@ var _amulet = _interopRequireDefault(require("../public/imgs/buffs/amulet.png"))
 var _book = _interopRequireDefault(require("../public/imgs/buffs/book.png"));
 var _glasses = _interopRequireDefault(require("../public/imgs/buffs/glasses.png"));
 var _coins = _interopRequireDefault(require("../public/imgs/buffs/coins.png"));
+var _Star = _interopRequireDefault(require("../public/imgs/icons/Star.png"));
 var _gameManager = require("../game-manager");
+var _particleSystems = require("./particle-systems");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-var modalContent = document.querySelector('.modal-content');
 var buffOptionsContainer = document.querySelector('.buff-options');
 var modal = document.getElementById('level-up-modal');
+function normalizeWeights(buffs) {
+  var keys = Object.keys(buffs);
+  var weights = keys.map(function (key) {
+    return buffs[key].weight;
+  });
+  var sumOfWeights = weights.reduce(function (sum, weight) {
+    return sum + weight;
+  }, 0);
+  var normalizedWeights = {};
+  keys.forEach(function (key, index) {
+    normalizedWeights[key] = weights[index] / sumOfWeights;
+  });
+  return normalizedWeights;
+}
 function getRandomBuffWeighted(buffs) {
   var keys = Object.keys(buffs);
   var probabilities = keys.map(function (key) {
-    return buffs[key].weight;
+    return buffs[key];
   });
   var randomValue = Math.random();
   var cumulativeProbability = 0;
@@ -4502,15 +6005,19 @@ function applyBuff(buffName) {
       lastEmptyPowerUp.appendChild(rank);
     }
   }
+  _particleSystems.confetti.destroy();
   // Close the modal
   modal.style.display = 'none';
+  modal.classList.remove('show-modal');
   buffOptionsContainer.innerHTML = '';
   (0, _gameManager.togglePause)();
 }
 function applySackOfCoins() {
-  alwaysBuffs['Sack of Coins'].effect();
+  alwaysBuffs['Coin purse'].effect();
+  _particleSystems.confetti.destroy();
   // Close the modal
   modal.style.display = 'none';
+  modal.classList.remove('show-modal');
   buffOptionsContainer.innerHTML = '';
   (0, _gameManager.togglePause)();
 }
@@ -4555,8 +6062,10 @@ function applyStarterBuff(buffName) {
       lastEmptyPowerUp.appendChild(rank);
     }
   }
+  _particleSystems.confetti.destroy();
   // Close the modal
   modal.style.display = 'none';
+  modal.classList.remove('show-modal');
   buffOptionsContainer.innerHTML = '';
   (0, _gameManager.togglePause)();
 }
@@ -4565,13 +6074,14 @@ function createStarterBuffs() {
   // Show the modal
   var modal = document.getElementById('level-up-modal');
   modal.style.display = 'flex';
+  modal.classList.add('show-modal');
 
   // Keep track of selected buffs
   var selectedBuffs = new Set();
 
   // Generate 3 unique buffs
   var _loop = function _loop() {
-    var randomBuffKey = getRandomBuffWeighted(starterBuffs);
+    var randomBuffKey = getRandomBuffWeighted(normalizedStarterBuffWeights);
 
     // Check if the buff is not already selected
     if (!selectedBuffs.has(randomBuffKey)) {
@@ -4579,14 +6089,14 @@ function createStarterBuffs() {
 
       // Create buff container (use a div as a clickable area)
       var buffContainer = document.createElement('div');
-      buffContainer.classList.add('buff-container');
+      buffContainer.classList.add('buff-container', 'starter-buff');
       buffContainer.addEventListener('click', function () {
         return applyStarterBuff(randomBuffKey);
       });
 
       // Create flex container for icon and title
       var flexContainer = document.createElement('div');
-      flexContainer.classList.add('flex-row', 'items-center');
+      flexContainer.classList.add('flex-col', 'items-center');
 
       // Create div to wrap the icon
       var iconWrapper = document.createElement('div');
@@ -4605,23 +6115,43 @@ function createStarterBuffs() {
 
       // Determine rarity and set title color
       var rarity = assignRarity(starterBuffs[randomBuffKey]);
-      title.style.color = getColorForRarity(rarity);
-
+      createStarIcons(rarity, flexContainer);
+      // Append icon wrapper and title to flex container
+      flexContainer.appendChild(title);
       // Append icon to icon wrapper
       iconWrapper.appendChild(icon);
-
-      // Append icon wrapper and title to flex container
       flexContainer.appendChild(iconWrapper);
-      flexContainer.appendChild(title);
 
       // Create description
       var description = document.createElement('p');
       description.classList.add('buff-description', 'body');
       description.textContent = starterBuffs[randomBuffKey].description;
 
+      // Get all power-up divs
+      var powerUpDivs = document.querySelectorAll('.starter-power-up');
+
+      // Check if the user already has the selected power-up
+      var existingPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
+        return powerUpDiv.querySelector('img') && powerUpDiv.querySelector('img').alt.includes(randomBuffKey);
+      });
+      var abilityRank = document.createElement('div');
+      abilityRank.classList.add('buff-modal-rank');
+      if (existingPowerUp) {
+        // User already has the power-up, increment the rank
+        var existingRank = existingPowerUp.querySelector('.power-up-rank');
+        var existingRankValue = parseInt(existingRank.textContent);
+        abilityRank.textContent = "Rank ".concat(existingRankValue + 1);
+      } else {
+        abilityRank.textContent = "Rank 1";
+      }
+      var buffContainerTop = document.createElement('div');
+      buffContainerTop.classList.add('flex-col');
+
       // Append flex container and description to buff container
-      buffContainer.appendChild(flexContainer);
-      buffContainer.appendChild(description);
+      buffContainerTop.appendChild(flexContainer);
+      buffContainerTop.appendChild(description);
+      buffContainer.appendChild(buffContainerTop);
+      buffContainer.appendChild(abilityRank);
 
       // Append buff container to modal content
       buffOptionsContainer.appendChild(buffContainer);
@@ -4630,19 +6160,20 @@ function createStarterBuffs() {
   while (selectedBuffs.size < 4) {
     _loop();
   }
+  _particleSystems.confetti.init();
 }
 function createBuffs() {
   (0, _gameManager.togglePause)();
   // Show the modal
   var modal = document.getElementById('level-up-modal');
   modal.style.display = 'flex';
-
+  modal.classList.add('show-modal');
   // Keep track of selected buffs
   var selectedBuffs = new Set();
 
   // Generate 3 unique buffs
   var _loop2 = function _loop2() {
-    var randomBuffKey = getRandomBuffWeighted(buffs);
+    var randomBuffKey = getRandomBuffWeighted(normalizedBuffWeights);
 
     // Check if the buff is not already selected
     if (!selectedBuffs.has(randomBuffKey)) {
@@ -4657,7 +6188,7 @@ function createBuffs() {
 
       // Create flex container for icon and title
       var flexContainer = document.createElement('div');
-      flexContainer.classList.add('flex-row', 'items-center');
+      flexContainer.classList.add('flex-col', 'items-center');
 
       // Create div to wrap the icon
       var iconWrapper = document.createElement('div');
@@ -4676,23 +6207,43 @@ function createBuffs() {
 
       // Determine rarity and set title color
       var _rarity = assignRarity(buffs[randomBuffKey]);
-      title.style.color = getColorForRarity(_rarity);
-
+      createStarIcons(_rarity, flexContainer);
+      // Append icon wrapper and title to flex container
+      flexContainer.appendChild(title);
       // Append icon to icon wrapper
       iconWrapper.appendChild(icon);
-
-      // Append icon wrapper and title to flex container
       flexContainer.appendChild(iconWrapper);
-      flexContainer.appendChild(title);
 
       // Create description
       var description = document.createElement('p');
       description.classList.add('buff-description', 'body');
       description.textContent = buffs[randomBuffKey].description;
 
+      // Get all power-up divs
+      var powerUpDivs = document.querySelectorAll('.power-up');
+
+      // Check if the user already has the selected power-up
+      var existingPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
+        return powerUpDiv.querySelector('img') && powerUpDiv.querySelector('img').alt.includes(randomBuffKey);
+      });
+      var abilityRank = document.createElement('div');
+      abilityRank.classList.add('buff-modal-rank');
+      if (existingPowerUp) {
+        // User already has the power-up, increment the rank
+        var existingRank = existingPowerUp.querySelector('.power-up-rank');
+        var existingRankValue = parseInt(existingRank.textContent);
+        abilityRank.textContent = "Rank ".concat(existingRankValue + 1);
+      } else {
+        abilityRank.textContent = "Rank 1";
+      }
+      var buffContainerTop = document.createElement('div');
+      buffContainerTop.classList.add('flex-col');
+
       // Append flex container and description to buff container
-      buffContainer.appendChild(flexContainer);
-      buffContainer.appendChild(description);
+      buffContainerTop.appendChild(flexContainer);
+      buffContainerTop.appendChild(description);
+      buffContainer.appendChild(buffContainerTop);
+      buffContainer.appendChild(abilityRank);
 
       // Append buff container to modal content
       buffOptionsContainer.appendChild(buffContainer);
@@ -4701,67 +6252,70 @@ function createBuffs() {
   while (selectedBuffs.size < 3) {
     _loop2();
   }
+  _particleSystems.confetti.init();
 
-  // Add the "Sack of Coins" power-up as the 4th option
+  // Add the "Coin purse" power-up as the 4th option
   var sackOfCoinsContainer = document.createElement('div');
   sackOfCoinsContainer.classList.add('buff-container');
   sackOfCoinsContainer.addEventListener('click', function () {
     return applySackOfCoins();
   });
   var sackOfCoinsFlexContainer = document.createElement('div');
-  sackOfCoinsFlexContainer.classList.add('flex-row', 'items-center');
+  sackOfCoinsFlexContainer.classList.add('flex-col', 'items-center');
   var sackOfCoinsIconWrapper = document.createElement('div');
   sackOfCoinsIconWrapper.classList.add('buff-icon-wrapper');
   var sackOfCoinsIcon = document.createElement('img');
   sackOfCoinsIcon.classList.add('buff-icon');
-  sackOfCoinsIcon.src = alwaysBuffs['Sack of Coins'].icon;
-  sackOfCoinsIcon.alt = 'Sack of Coins Icon';
+  sackOfCoinsIcon.src = alwaysBuffs['Coin purse'].icon;
+  sackOfCoinsIcon.alt = 'Coin purse Icon';
   var sackOfCoinsTitle = document.createElement('div');
   sackOfCoinsTitle.classList.add('buff-title', 'uppercase');
-  sackOfCoinsTitle.textContent = 'Sack of Coins';
+  sackOfCoinsTitle.textContent = 'Coin purse';
 
   // Determine rarity and set title color
-  var rarity = assignRarity(alwaysBuffs['Sack of Coins']);
-  sackOfCoinsTitle.style.color = getColorForRarity(rarity);
-
+  var rarity = assignRarity(alwaysBuffs['Coin purse']);
+  createStarIcons(rarity, sackOfCoinsFlexContainer);
   // Append icon to icon wrapper
   sackOfCoinsIconWrapper.appendChild(sackOfCoinsIcon);
 
   // Append icon wrapper and title to flex container
-  sackOfCoinsFlexContainer.appendChild(sackOfCoinsIconWrapper);
   sackOfCoinsFlexContainer.appendChild(sackOfCoinsTitle);
+  sackOfCoinsFlexContainer.appendChild(sackOfCoinsIconWrapper);
 
   // Create description
   var sackOfCoinsDescription = document.createElement('p');
   sackOfCoinsDescription.classList.add('buff-description', 'body');
-  sackOfCoinsDescription.textContent = alwaysBuffs['Sack of Coins'].description;
+  sackOfCoinsDescription.textContent = alwaysBuffs['Coin purse'].description;
+  var sackOfCoinsContainerTop = document.createElement('div');
+  sackOfCoinsContainerTop.classList.add('flex-col');
 
   // Append flex container and description to buff container
-  sackOfCoinsContainer.appendChild(sackOfCoinsFlexContainer);
-  sackOfCoinsContainer.appendChild(sackOfCoinsDescription);
+  sackOfCoinsContainerTop.appendChild(sackOfCoinsFlexContainer);
+  sackOfCoinsContainerTop.appendChild(sackOfCoinsDescription);
+  sackOfCoinsContainer.appendChild(sackOfCoinsContainerTop);
 
-  // Append sack of coins container to modal content
+  // Append Coin purse container to modal content
   buffOptionsContainer.appendChild(sackOfCoinsContainer);
 }
-function getColorForRarity(rarity) {
+function getStarsForRarity(rarity) {
   switch (rarity) {
     case 'Legendary':
-      return '#FFDB5D';
+      return 5;
     // Adjust the color as needed
     case 'Epic':
-      return '#EA59E4';
+      return 4;
     // Adjust the color as needed
     case 'Rare':
-      return '#3199F9';
+      return 3;
     // Adjust the color as needed
     case 'Uncommon':
-      return '#61E955';
+      return 2;
     // Adjust the color as needed
     case 'Common':
-      return 'white';
+      return 1;
     // Adjust the color as needed
     default:
-      return 'black';
+      return 1;
     // Default color
   }
 }
@@ -4783,17 +6337,35 @@ function assignRarity(buff) {
     return 'Unknown Rarity';
   }
 }
+function createStarIcons(rarity, parent) {
+  var starCount = getStarsForRarity(rarity);
+  var starIconContainer = document.createElement('div');
+  starIconContainer.classList.add('flex-row', 'items-center');
+  for (var i = 0; i < starCount; i++) {
+    var starIcon = document.createElement('img');
+    starIcon.classList.add('star-icon');
+    starIcon.src = _Star.default;
+    starIconContainer.appendChild(starIcon);
+  }
+  if (starCount === 0) {
+    var _starIcon = document.createElement('img');
+    _starIcon.classList.add('star-icon', 'hide-elem');
+    _starIcon.src = _Star.default;
+    starIconContainer.appendChild(_starIcon);
+  }
+  parent.appendChild(starIconContainer);
+}
 var alwaysBuffs = {
-  'Sack of Coins': {
-    description: 'Miners fortune. Gain 25 random coins toward your score.',
+  'Coin purse': {
+    description: 'Gain 25 random coins toward your score.',
     weight: 1,
     icon: _pouch.default,
     effect: _gameManager.sackOfCoinsEffect
   }
 };
 var buffs = {
-  'Filet Mignon': {
-    description: 'Enjoy a tasty meal. Gain 1 life',
+  Filet: {
+    description: 'Enjoy a meal. Gain 1 life',
     weight: 0.2,
     icon: _filet.default,
     effect: _gameManager.filetMignonEffect
@@ -4806,7 +6378,7 @@ var buffs = {
   },
   Amulet: {
     description: 'Gold coins are now worth 20% more (base value)',
-    weight: 0.4,
+    weight: 0.6,
     icon: _amulet.default,
     effect: _gameManager.amuletEffect
   },
@@ -4854,32 +6426,278 @@ var buffs = {
   }
 };
 var starterBuffs = {
-  'Book Smart': {
+  'Text book': {
     description: 'Every time you get a level, your passives scale by %.',
-    weight: 0.009,
+    weight: 0.1,
     icon: _book.default,
     effect: _gameManager.booksSmartEffect
   },
   'Starter 2': {
-    description: 'You spawn 1 gold coin above you when you jump, but your all gold coins you pick up are worth 50% less',
-    weight: 0.009,
+    description: 'You spawn 1 gold coin above you when you jump, but all gold coins you pick up are worth 50% less',
+    weight: 0.6,
     icon: _coins.default,
     effect: _gameManager.coinsEffect
   },
   'Starter 3': {
     description: 'Every time you get a level, your passives scale by %.',
-    weight: 0.009,
+    weight: 0.4,
     icon: _book.default,
     effect: _gameManager.booksSmartEffect
   },
   Glasses: {
-    description: 'Every gold coin you pick up increases the next red gem score by 1x stacks up to 14. Getting a red gem resets this back to 1x.',
-    weight: 0.009,
+    description: 'Gold coins increase the next red gem by .5x, stacks up to 28. Getting a red gem resets stacks',
+    weight: 0.8,
+    icon: _glasses.default,
+    effect: _gameManager.glassesEffect
+  },
+  Glasses2: {
+    description: 'Gold coins increase the next red gem by .5x, stacks up to 28. Getting a red gem resets stacks',
+    weight: 0.1,
+    icon: _glasses.default,
+    effect: _gameManager.glassesEffect
+  },
+  Glasses3: {
+    description: 'Gold coins increase the next red gem by .5x, stacks up to 28. Getting a red gem resets stacks',
+    weight: 0.1,
     icon: _glasses.default,
     effect: _gameManager.glassesEffect
   }
 };
-},{"../public/imgs/buffs/filet.png":"imgs/buffs/filet.png","../public/imgs/buffs/lucky-mittens.png":"imgs/buffs/lucky-mittens.png","../public/imgs/buffs/trusty-pocket-watch.png":"imgs/buffs/trusty-pocket-watch.png","../public/imgs/buffs/watermelon.png":"imgs/buffs/watermelon.png","../public/imgs/buffs/suspiciously-plain-chest.png":"imgs/buffs/suspiciously-plain-chest.png","../public/imgs/buffs/emotional-support-water-bottle.png":"imgs/buffs/emotional-support-water-bottle.png","../public/imgs/buffs/pouch.png":"imgs/buffs/pouch.png","../public/imgs/buffs/moms-cookies.png":"imgs/buffs/moms-cookies.png","../public/imgs/buffs/feather.png":"imgs/buffs/feather.png","../public/imgs/buffs/cape.png":"imgs/buffs/cape.png","../public/imgs/buffs/amulet.png":"imgs/buffs/amulet.png","../public/imgs/buffs/book.png":"imgs/buffs/book.png","../public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","../public/imgs/buffs/coins.png":"imgs/buffs/coins.png","../game-manager":"../game-manager.js"}],"../game-manager.js":[function(require,module,exports) {
+
+// Example usage:
+var normalizedStarterBuffWeights = normalizeWeights(starterBuffs);
+var normalizedBuffWeights = normalizeWeights(buffs);
+},{"../public/imgs/buffs/filet.png":"imgs/buffs/filet.png","../public/imgs/buffs/lucky-mittens.png":"imgs/buffs/lucky-mittens.png","../public/imgs/buffs/trusty-pocket-watch.png":"imgs/buffs/trusty-pocket-watch.png","../public/imgs/buffs/watermelon.png":"imgs/buffs/watermelon.png","../public/imgs/buffs/suspiciously-plain-chest.png":"imgs/buffs/suspiciously-plain-chest.png","../public/imgs/buffs/emotional-support-water-bottle.png":"imgs/buffs/emotional-support-water-bottle.png","../public/imgs/buffs/pouch.png":"imgs/buffs/pouch.png","../public/imgs/buffs/moms-cookies.png":"imgs/buffs/moms-cookies.png","../public/imgs/buffs/feather.png":"imgs/buffs/feather.png","../public/imgs/buffs/cape.png":"imgs/buffs/cape.png","../public/imgs/buffs/amulet.png":"imgs/buffs/amulet.png","../public/imgs/buffs/book.png":"imgs/buffs/book.png","../public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","../public/imgs/buffs/coins.png":"imgs/buffs/coins.png","../public/imgs/icons/Star.png":"imgs/icons/Star.png","../game-manager":"../game-manager.js","./particle-systems":"../elements/particle-systems.js"}],"../phases/phase-properties.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.phases = void 0;
+var phases = exports.phases = {
+  bonus: {
+    totalTime: 15,
+    speedScale: 0.9
+  },
+  1: {
+    totalTime: 60,
+    speedScale: 0.9
+  },
+  2: {
+    totalTime: 40,
+    speedScale: 0.4
+  }
+};
+},{}],"../phases/phase1.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.updatePhase1 = updatePhase1;
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _phaseProperties = require("./phase-properties");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getPhaseTimerInterval = _gameState.default.getPhaseTimerInterval,
+  getCurrentPhase = _gameState.default.getCurrentPhase,
+  setCurrentPhase = _gameState.default.setCurrentPhase,
+  setPhaseTimerInterval = _gameState.default.setPhaseTimerInterval,
+  updateState = _gameState.default.updateState,
+  setIsFlagCreated = _gameState.default.setIsFlagCreated;
+function updatePhase1(timer) {
+  updateState({
+    isCactusRunning: true,
+    isCoinRunning: true,
+    isPlatformRunning: true
+  });
+  if (timer > getPhaseTimerInterval()) {
+    console.log("Phase ".concat(getCurrentPhase(), " complete"));
+    setIsFlagCreated(false);
+    setCurrentPhase('bonus');
+    // Set the timer interval for the new phase
+    setPhaseTimerInterval(getPhaseTimerInterval() + _phaseProperties.phases['bonus'].totalTime);
+  }
+}
+},{"../game-state":"../game-state.js","./phase-properties":"../phases/phase-properties.js"}],"../phases/phase2.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.updatePhase2 = updatePhase2;
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _phaseProperties = require("./phase-properties");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getPhaseTimerInterval = _gameState.default.getPhaseTimerInterval,
+  setCurrentPhase = _gameState.default.setCurrentPhase,
+  setPhaseTimerInterval = _gameState.default.setPhaseTimerInterval,
+  getCurrentPhase = _gameState.default.getCurrentPhase,
+  updateState = _gameState.default.updateState,
+  setIsFlagCreated = _gameState.default.setIsFlagCreated;
+function updatePhase2(timer) {
+  updateState({
+    isPlatformRunning: true,
+    isCactusRunning: true
+  });
+  if (timer > getPhaseTimerInterval()) {
+    setCurrentPhase('bonus');
+    setIsFlagCreated(false);
+    console.log("Phase ".concat(getCurrentPhase(), " complete"));
+    setPhaseTimerInterval(_phaseProperties.phases['2'].totalTime);
+  }
+}
+},{"../game-state":"../game-state.js","./phase-properties":"../phases/phase-properties.js"}],"../phases/bonus-phase.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.updateBonusPhase = updateBonusPhase;
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _gameManager = require("../game-manager");
+var _phaseProperties = require("./phase-properties");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getPhaseTimerInterval = _gameState.default.getPhaseTimerInterval,
+  setCurrentPhase = _gameState.default.setCurrentPhase,
+  setPhaseTimerInterval = _gameState.default.setPhaseTimerInterval,
+  getLastPhase = _gameState.default.getLastPhase,
+  setLastPhase = _gameState.default.setLastPhase,
+  updateState = _gameState.default.updateState,
+  getCurrentPhase = _gameState.default.getCurrentPhase;
+function updateBonusPhase(timer) {
+  updateState({
+    isCactusRunning: false
+  });
+  if (timer > getPhaseTimerInterval()) {
+    var incrementPhase = getLastPhase() + 2;
+    setLastPhase(getLastPhase() + 1);
+    console.log("Phase bonus complete");
+    // Transition to the next phase
+    setCurrentPhase(incrementPhase);
+    (0, _gameManager.updateNotification)("stage ".concat(getCurrentPhase(), "!"));
+    updateState({
+      isGroundLayer2Running: true
+    });
+    // Set the timer interval for the new phase
+    setPhaseTimerInterval(getPhaseTimerInterval() + _phaseProperties.phases["".concat(incrementPhase)].totalTime);
+  }
+}
+},{"../game-state":"../game-state.js","../game-manager":"../game-manager.js","./phase-properties":"../phases/phase-properties.js"}],"../elements/bonus-layer.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setupBonusLayer = setupBonusLayer;
+exports.updateBonusLayer = updateBonusLayer;
+var _updateCustomProperty = require("../utility/updateCustomProperty.js");
+var _gameState = _interopRequireDefault(require("../game-state.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getIsGroundLayer2Running = _gameState.default.getIsGroundLayer2Running,
+  getGroundSpeed = _gameState.default.getGroundSpeed;
+var SPEED = getGroundSpeed();
+var bonusLayerElems = document.querySelectorAll('[data-bonus-layer]');
+function setupBonusLayer() {
+  (0, _updateCustomProperty.setCustomProperty)(bonusLayerElems[0], '--left', 100);
+  (0, _updateCustomProperty.setCustomProperty)(bonusLayerElems[1], '--left', 281);
+}
+var isBonusLayerMovedBack = false;
+var isBonusLayerSetup = true;
+function updateBonusLayer(delta, speedScale) {
+  if (!getIsGroundLayer2Running()) {
+    isBonusLayerSetup = false;
+    bonusLayerElems.forEach(function (bonus) {
+      (0, _updateCustomProperty.incrementCustomProperty)(bonus, '--left', delta * speedScale * SPEED * -1);
+      if ((0, _updateCustomProperty.getCustomProperty)(bonus, '--left') <= -281) {
+        (0, _updateCustomProperty.incrementCustomProperty)(bonus, '--left', 362);
+      }
+    });
+  } else if (getIsGroundLayer2Running() && !isBonusLayerMovedBack && !isBonusLayerSetup) {
+    (0, _updateCustomProperty.setCustomProperty)(bonusLayerElems[0], '--left', -77);
+    (0, _updateCustomProperty.setCustomProperty)(bonusLayerElems[1], '--left', -77);
+    isBonusLayerMovedBack = true;
+  } else if (getIsGroundLayer2Running() && isBonusLayerMovedBack && !isBonusLayerSetup) {
+    bonusLayerElems.forEach(function (bonus) {
+      (0, _updateCustomProperty.incrementCustomProperty)(bonus, '--left', delta * speedScale * SPEED * -1);
+      if ((0, _updateCustomProperty.getCustomProperty)(bonus, '--left') <= -281) {
+        (0, _updateCustomProperty.setCustomProperty)(bonusLayerElems[0], '--left', 100);
+        (0, _updateCustomProperty.setCustomProperty)(bonusLayerElems[1], '--left', 281);
+        isBonusLayerSetup = true;
+      }
+    });
+  } else return;
+}
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state.js":"../game-state.js"}],"../interface-text-elems-state.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+// state.js
+var InterfaceTextElemsSingleton = function () {
+  // State array to keep track of interfaceTextElems
+  var interfaceTextElemsState = [];
+  return {
+    getInterfaceTextElemsState: function getInterfaceTextElemsState() {
+      return interfaceTextElemsState;
+    },
+    updateState: function updateState(newValues) {
+      Object.assign(state, newValues);
+    },
+    addInterfaceTextElem: function addInterfaceTextElem(elem) {
+      interfaceTextElemsState.push(elem);
+    },
+    removeInterfaceTextElem: function removeInterfaceTextElem(elem) {
+      var index = interfaceTextElemsState.indexOf(elem);
+      if (index !== -1) {
+        interfaceTextElemsState.splice(index, 1);
+      }
+    }
+  };
+}();
+var _default = exports.default = InterfaceTextElemsSingleton;
+},{}],"../utility/update-interface-text.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.updateInterfaceText = updateInterfaceText;
+var _updateCustomProperty = require("../utility/updateCustomProperty.js");
+var _interfaceTextElemsState = _interopRequireDefault(require("../interface-text-elems-state.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getInterfaceTextElemsState = _interfaceTextElemsState.default.getInterfaceTextElemsState;
+var SPEED = 0.04;
+function updateInterfaceText(delta, speedScale) {
+  var interfaceTextElems = getInterfaceTextElemsState();
+  interfaceTextElems.forEach(function (text) {
+    (0, _updateCustomProperty.incrementCustomProperty)(text, '--left', delta * speedScale * SPEED * -1);
+  });
+}
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../interface-text-elems-state.js":"../interface-text-elems-state.js"}],"../elements/cherry.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getCherryRects = getCherryRects;
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function getCherryRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-cherry]')).map(function (cherry) {
+    return {
+      id: cherry.id,
+      rect: cherry.getBoundingClientRect(),
+      cherry: cherry.dataset['cherry']
+    };
+  });
+}
+},{}],"../game-manager.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4892,23 +6710,34 @@ exports.coinsEffect = coinsEffect;
 exports.collectableOptions = void 0;
 exports.filetMignonEffect = filetMignonEffect;
 exports.glassesEffect = glassesEffect;
-exports.livesElem = void 0;
+exports.isCollision = isCollision;
 exports.momsCookiesEffect = momsCookiesEffect;
 exports.sackOfCoinsEffect = sackOfCoinsEffect;
 exports.silverFeatherEffect = silverFeatherEffect;
 exports.slowFallEffect = slowFallEffect;
 exports.togglePause = togglePause;
 exports.trustyPocketWatchEffect = trustyPocketWatchEffect;
+exports.updateMultiplierInterface = updateMultiplierInterface;
+exports.updateNotification = updateNotification;
+exports.updateScoreWithPoints = updateScoreWithPoints;
 var _ground = require("./elements/ground.js");
 var _groundLayerTwo = require("./elements/groundLayerTwo");
+var _groundLayerTwoTwo = require("./elements/groundLayerTwoTwo");
 var _groundLayerThree = require("./elements/groundLayerThree");
 var _dino = require("./elements/dino.js");
 var _cactus = require("./elements/cactus.js");
+var _bird = require("./elements/bird.js");
+var _platform = require("./elements/platform.js");
 var _leaderboard = require("./elements/leaderboard.js");
 var _soundController = require("./utility/sound-controller.js");
 var _apis = require("./apis.js");
 var _validateInput = require("./utility/validate-input.js");
 var _scoreMultiplier = require("./elements/score-multiplier.js");
+var _magnet = require("./elements/magnet.js");
+var _heart = require("./elements/heart.js");
+var _leaf = require("./elements/leaf.js");
+var _flag = require("./elements/flag.js");
+var _star = require("./elements/star.js");
 var _coin = require("./elements/coin.js");
 var _SpeakerOff = _interopRequireDefault(require("./public/imgs/icons/Speaker-Off.png"));
 var _SpeakerOn = _interopRequireDefault(require("./public/imgs/icons/Speaker-On.png"));
@@ -4918,44 +6747,58 @@ var _glasses = _interopRequireDefault(require("./public/imgs/buffs/glasses.png")
 var _Redo = _interopRequireDefault(require("./public/imgs/icons/Redo.png"));
 var _ForegroundTrees = _interopRequireDefault(require("./public/imgs/backgrounds/Foreground-Trees.png"));
 var _buff = require("./elements/buff.js");
+var _gameState = _interopRequireDefault(require("./game-state.js"));
+var _elementsRefs = require("./elements-refs");
+var _toggleElement = require("./utility/toggle-element.js");
+var _particleSystems = require("./elements/particle-systems.js");
+var _phaseProperties = require("./phases/phase-properties.js");
+var _phase = require("./phases/phase1.js");
+var _phase2 = require("./phases/phase2.js");
+var _bonusPhase = require("./phases/bonus-phase.js");
+var _bonusLayer = require("./elements/bonus-layer.js");
+var _updateInterfaceText = require("./utility/update-interface-text.js");
+var _interfaceTextElemsState = _interopRequireDefault(require("./interface-text-elems-state.js"));
+var _cherry = require("./elements/cherry");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var removeInterfaceTextElem = _interfaceTextElemsState.default.removeInterfaceTextElem,
+  addInterfaceTextElem = _interfaceTextElemsState.default.addInterfaceTextElem;
+var setMultiplierRatio = _gameState.default.setMultiplierRatio,
+  getMultiplierRatio = _gameState.default.getMultiplierRatio,
+  getTimerInterval = _gameState.default.getTimerInterval,
+  setTimerInterval = _gameState.default.setTimerInterval,
+  setMultiplierTimer = _gameState.default.setMultiplierTimer,
+  getMultiplierTimer = _gameState.default.getMultiplierTimer,
+  getSpeedScale = _gameState.default.getSpeedScale,
+  getSpeedScaleIncrease = _gameState.default.getSpeedScaleIncrease,
+  getStarDuration = _gameState.default.getStarDuration,
+  getPlayerImmunity = _gameState.default.getPlayerImmunity,
+  setPlayerImmunity = _gameState.default.setPlayerImmunity,
+  getHasStar = _gameState.default.getHasStar,
+  setHasStar = _gameState.default.setHasStar,
+  getGravityFallAdjustment = _gameState.default.getGravityFallAdjustment,
+  setGravityFallAdjustment = _gameState.default.setGravityFallAdjustment,
+  getSelectedStarter = _gameState.default.getSelectedStarter,
+  setSelectedStarter = _gameState.default.setSelectedStarter,
+  getCurrentPhase = _gameState.default.getCurrentPhase,
+  setJumpCountLimit = _gameState.default.setJumpCountLimit,
+  getLeafDuration = _gameState.default.getLeafDuration,
+  setHasLeaf = _gameState.default.setHasLeaf,
+  setCherryPoints = _gameState.default.setCherryPoints,
+  getCherryPoints = _gameState.default.getCherryPoints;
 var WORLD_WIDTH = 100;
 var WORLD_HEIGHT = 45;
 var SPEED_SCALE_INCREASE = exports.SPEED_SCALE_INCREASE = 0.00001;
-var multiplierRatio = 1;
-var worldElem = document.querySelector('[data-world]');
-var scoreElem = document.querySelector('[data-score]');
-var highScoreElem = document.querySelector('[data-high-score]');
-var startScreenElem = document.querySelector('[data-start-screen]');
-var endScreenElem = document.querySelector('[data-game-over-screen]');
-var gameOverTextElem = document.querySelector('[data-game-over-text]');
-var gameOverIconElem = document.getElementById('game-over-icon');
-var leaderboardElem = document.querySelector('[data-leaderboard-body]');
-var scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
-var scoreNewHighScoreElem = document.querySelector('[data-score-new-high-score]');
-var scoreErrorMessageElem = document.querySelector('[data-score-error-message]');
-var multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
-var tickerElem = document.querySelector('[data-ticker]');
-var tickerElem2 = document.querySelector('[data-ticker2]');
-var tickerElem3 = document.querySelector('[data-ticker3]');
-var livesElem = exports.livesElem = document.querySelector('[data-lives]');
-var dinoElem = document.querySelector('[data-dino]');
-var scrollableTableElem = document.querySelector('[data-scrollable-table]');
-var currentMultiplierElem = document.querySelector('[data-current-multiplier]');
-var plusPointsElem = document.querySelector('[data-plus-points]');
-var tickerContainerElem = document.querySelector('[data-ticker-container]');
-var loadingTextElem = document.querySelector('[data-loading-text]');
-var submitNewScoreFormElem = document.querySelector('[data-submit-new-score-form]');
-var interfaceComboContainer = document.getElementById('interface-combo-container');
-var currentMultiplierScoreElem = document.querySelector('[data-current-multiplier-score]');
-var currentComboScoreContainer = document.getElementById('current-combo-score-container');
 var showLeaderboard = false;
 
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
@@ -4964,7 +6807,8 @@ var showLeaderboard = false;
 //   handleStart(); // Add any other actions you want to perform on button click
 // });
 setPixelToWorldScale();
-(0, _leaderboard.createLeaderboard)(leaderboardElem);
+(0, _leaderboard.createLeaderboard)(_elementsRefs.leaderboardElem);
+_particleSystems.snow.init();
 window.addEventListener('resize', setPixelToWorldScale);
 document.addEventListener('keydown', handleStart, {
   once: true
@@ -4973,33 +6817,21 @@ document.addEventListener('touchstart', handleStart, {
   once: true
 });
 var lastTime;
-var speedScale;
 var score;
+var idleIntervalId;
 var collisionOccurred = false; // Flag to track collision
-var milestone = 500;
+var milestone = 100000;
 //init highScore elem
-highScoreElem.textContent = localStorage.getItem('lion-high-score') ? localStorage.getItem('lion-high-score') : Math.floor('0').toString().padStart(6, 0);
+_elementsRefs.highScoreElem.textContent = localStorage.getItem('lion-high-score') ? localStorage.getItem('lion-high-score') : Math.floor('0').toString().padStart(6, 0);
 var hasBeatenScore = false;
 var isPaused = false;
-var playerImmunity = false;
 var immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
-scrollableTableElem.classList.add('hide-element');
-scrollableTableElem.style.display = 'none';
-worldElem.setAttribute('transition-style', 'in:circle:center');
-tickerContainerElem.classList.add('hide-element');
-tickerContainerElem.classList.remove('show-element');
+_elementsRefs.scrollableTableElem.classList.add('hide-element');
+_elementsRefs.scrollableTableElem.style.display = 'none';
+_elementsRefs.worldElem.setAttribute('transition-style', 'in:circle:center');
+_elementsRefs.tickerContainerElem.classList.add('hide-element');
+_elementsRefs.tickerContainerElem.classList.remove('show-element');
 var pauseIconButton = document.getElementById('pause-icon-button');
-
-// Function to toggle the pause state
-function togglePause() {
-  isPaused = !isPaused;
-  if (isPaused) {
-    pauseIconButton.src = _Play.default;
-  } else {
-    pauseIconButton.src = _Pause.default;
-    window.requestAnimationFrame(update);
-  }
-}
 var shareContainer = document.getElementById('share-container');
 var shareButton = document.getElementById('shareButton');
 shareContainer.addEventListener('mouseenter', function () {
@@ -5008,6 +6840,22 @@ shareContainer.addEventListener('mouseenter', function () {
 shareContainer.addEventListener('mouseleave', function () {
   shareButton.classList.remove('transparent-background');
 });
+
+// function typeLoadingText(elem) {
+//   setTimeout(() => {
+//     typeLettersWithoutSpaces(0, '...Oh no', elem, 100);
+//   }, 400);
+//   setTimeout(() => {
+//     // Set white-space CSS style to allow line breaks
+//     elem.style.whiteSpace = 'pre-line';
+//     // Add a line break before the second line
+//     elem.textContent += '\n';
+//     typeLettersWithoutSpaces(0, 'Gotta get to class!', elem, 100);
+//   }, 3000);
+// }
+
+// typeLoadingText(gameLoadingTextElem);
+
 function copyCurrentLink() {
   var input = document.createElement('input');
   input.value = window.location.href;
@@ -5030,20 +6878,60 @@ if (document.getElementById('copy-link-button')) {
 var pauseButton = document.getElementById('pauseButton');
 pauseButton.addEventListener('click', function () {
   togglePause();
+  if (_elementsRefs.pausedScreenElem.style.display === 'flex') {
+    _elementsRefs.pausedScreenElem.style.display = 'none';
+  } else {
+    _elementsRefs.pausedScreenElem.style.display = 'flex';
+  }
   pauseButton.blur();
 });
+var immunityTimeout;
 
 // Function to set player immunity
-function setPlayerImmunity() {
-  playerImmunity = true;
+function setTimedPlayerImmunity(duration) {
+  setPlayerImmunity(true);
+  // Clear any existing timeout
+  clearTimeout(immunityTimeout);
 
-  // Reset player immunity after the specified duration
-  setTimeout(function () {
-    playerImmunity = false;
-  }, immunityDuration);
+  // Set a new timeout
+  immunityTimeout = setTimeout(function () {
+    setPlayerImmunity(false);
+  }, duration ? duration : immunityDuration);
+
+  // Check if getHasStar is true, and cancel the timeout if needed
+  if (getHasStar()) {
+    clearTimeout(immunityTimeout);
+  }
 }
+idleIntervalId = setInterval(_dino.handleIdle, 300);
 function updateElements() {}
 var deltaAdjustment = 1;
+var currentSpeedScale = getSpeedScale();
+var isUpdatedSpeedScale = false;
+var decelerationFactor = 0.95; // Adjust the deceleration factor as needed
+
+function deleteLetters(index, elem, timeout) {
+  var text = elem.textContent;
+  if (index >= 0) {
+    elem.textContent = text.substring(0, index);
+    setTimeout(function () {
+      deleteLetters(index - 1, elem, timeout);
+    }, timeout); // Use the provided timeout
+  } else {}
+}
+function updateNotification(notification) {
+  var deleteLettersDelay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3000;
+  var typeLettersDelay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1000;
+  var timeout = 125;
+  setTimeout(function () {
+    typeLettersWithoutSpaces(0, notification, _elementsRefs.gameNotificationElem, 100);
+    // After a delay, start deleting the letters in reverse order
+
+    setTimeout(function () {
+      deleteLetters(_elementsRefs.gameNotificationElem.textContent.length - 1, _elementsRefs.gameNotificationElem, timeout);
+    }, deleteLettersDelay);
+  }, typeLettersDelay);
+}
 function update(time) {
   if (isPaused) {
     // Do nothing if the game is paused
@@ -5054,12 +6942,11 @@ function update(time) {
     window.requestAnimationFrame(update);
     return;
   }
-  var baseDelta = 5;
-
+  var baseDelta = 20;
   // let delta = time - lastTime;
   var delta = baseDelta;
-  if (collisionOccurred) {
-    setPlayerImmunity();
+  if (collisionOccurred && !getPlayerImmunity()) {
+    setTimedPlayerImmunity();
     togglePause();
     setTimeout(function () {
       collisionOccurred = false; // Reset the collision flag after the delay
@@ -5067,100 +6954,111 @@ function update(time) {
     }, 400);
     return; // Pause the update during the delay
   }
-
-  (0, _ground.updateGround)(delta, speedScale);
-  (0, _groundLayerThree.updateGroundLayerThree)(delta, speedScale);
-  (0, _groundLayerTwo.updateGroundLayerTwo)(delta, speedScale);
-  (0, _dino.updateDino)(delta, speedScale, gravityFallAdjustment, selectedStarter);
-  (0, _cactus.updateCactus)(delta, speedScale);
+  // Update based on the current phase
+  if (getCurrentPhase() === 1) {
+    (0, _phase.updatePhase1)(timer, delta, currentSpeedScale);
+  } else if (getCurrentPhase() === 'bonus') {
+    (0, _bonusPhase.updateBonusPhase)(timer, currentSpeedScale, delta);
+  } else if (getCurrentPhase() === 2) {
+    // currentSpeedScale *= decelerationFactor;
+    // // Ensure the speed scale doesn't go below 0.6
+    // currentSpeedScale = Math.max(currentSpeedScale, 0.5);
+    (0, _phase2.updatePhase2)(timer, currentSpeedScale, delta);
+  }
+  // updateGroundLayerTwoTwo(delta, currentSpeedScale);
+  (0, _bonusLayer.updateBonusLayer)(delta, currentSpeedScale);
+  (0, _ground.updateGround)(delta, currentSpeedScale);
+  (0, _groundLayerThree.updateGroundLayerThree)(delta, currentSpeedScale);
+  (0, _groundLayerTwo.updateGroundLayerTwo)(delta, currentSpeedScale);
+  // updateCactus(delta, currentSpeedScale);
+  // updateBird(delta, currentSpeedScale);
+  (0, _platform.updatePlatform)(delta, currentSpeedScale);
+  (0, _flag.updateFlag)(delta, currentSpeedScale);
+  (0, _updateInterfaceText.updateInterfaceText)(delta, currentSpeedScale);
+  // updateMultiplier(delta, currentSpeedScale);
+  // updateMagnet(delta, currentSpeedScale);
+  (0, _coin.updateCoin)(delta, currentSpeedScale);
+  (0, _dino.updateDino)(delta, currentSpeedScale, getGravityFallAdjustment(), getSelectedStarter());
   updateSpeedScale(delta);
   updateScore(delta);
-  (0, _scoreMultiplier.updateMultiplier)(delta, speedScale);
-  (0, _coin.updateCoin)(delta, speedScale);
   if (checkLose()) return handleLose();
   if (checkMultiplierCollision()) ;
   if (checkCoinCollision()) ;
+  if (checkStarCollision()) ;
+  if (checkCherryCollision()) ;
+  if (checkHeartCollision()) ;
+  if (checkMagnetCollision()) ;
+  if (checkLeafCollision()) ;
   lastTime = time;
   window.requestAnimationFrame(update);
 }
-function createOneUpText() {
+function createOneUpText(element) {
   _soundController.soundController.beatScore.play();
-  var playerContainer = document.querySelector('.player-container'); // Adjust the selector accordingly
-
   var newElement = document.createElement('div');
   newElement.classList.add('one-up', 'sans');
   newElement.style.position = 'absolute';
-  playerContainer.appendChild(newElement);
+  element.appendChild(newElement);
   newElement.textContent = '1UP';
-  setTimeout(function () {
-    // newElement.remove();
-  }, 600);
+  newElement.addEventListener('animationend', function () {
+    newElement.remove();
+  });
   return true;
 }
-function toggleElemOn(elem) {
-  var classList = elem.classList;
-  classList.remove('hide-element');
-  classList.add('show-element');
-}
-function toggleElemOff(elem) {
-  var classList = elem.classList;
-  classList.add('hide-element');
-  classList.remove('show-element');
-}
-var timerInterval;
-
-// Get the timer elements
-var timerProgress = document.getElementById('timerProgress');
-var multiplierTimer = 5000; // Set the initial time in milliseconds
 var currentComboScore = 0; // Initialize the current combo score variable
 
 function resetMultiplier() {
-  toggleElemOff(interfaceComboContainer);
-  toggleElemOff(currentComboScoreContainer);
-  clearInterval(timerInterval);
+  (0, _toggleElement.toggleElemOff)(_elementsRefs.interfaceComboContainer);
+  (0, _toggleElement.toggleElemOff)(_elementsRefs.currentComboScoreContainer);
+  clearInterval(getTimerInterval());
+  setTimerInterval(null);
   currentComboScore = 0;
-  timerProgress.style.width = '100%'; // Set the progress bar to full width
-  multiplierTimer = 5000; // Reset timer when it reaches 0
-  currentMultiplierElem.textContent = 'x1';
-  currentMultiplierScoreElem.textContent = '0';
-  multiplierRatio = 1;
+  _elementsRefs.timerProgress.style.width = '100%'; // Set the progress bar to full width
+  setMultiplierTimer(5000);
+  _elementsRefs.currentMultiplierElem.textContent = 'x1';
+  _elementsRefs.currentMultiplierScoreElem.textContent = '0';
+  setMultiplierRatio(1);
 }
 function startMultiplierTimer() {
-  clearInterval(timerInterval);
-  multiplierTimer = 5000; // Reset the timer to its initial value
+  clearInterval(getTimerInterval());
+  setMultiplierTimer(5000);
+  var timerInterval = setInterval(function () {
+    setMultiplierTimer(getMultiplierTimer() - 100); // Subtract 100 milliseconds (adjust as needed)
+    var progressValue = getMultiplierTimer() / 5000 * 100; // Calculate progress value
 
-  timerInterval = setInterval(function () {
-    multiplierTimer -= 100; // Subtract 100 milliseconds (adjust as needed)
-    var progressValue = multiplierTimer / 5000 * 100; // Calculate progress value
-
-    if (multiplierTimer <= 0) {
+    if (getMultiplierTimer() <= 0) {
       resetMultiplier();
     } else {
-      timerProgress.style.width = "".concat(progressValue, "%");
+      _elementsRefs.timerProgress.style.width = "".concat(progressValue, "%");
     }
   }, 100); // Update every 100 milliseconds
+  setTimerInterval(timerInterval);
 }
-
 function checkMultiplierCollision() {
   var dinoRect = (0, _dino.getDinoRect)();
   (0, _scoreMultiplier.getMultiplierRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
-      toggleElemOn(interfaceComboContainer);
-      toggleElemOn(currentComboScoreContainer);
-      _soundController.soundController.beatScore.play();
+      // soundController.beatScore.play();
       document.getElementById(element.id).remove();
-      clearInterval(timerInterval);
-      startMultiplierTimer();
+      var currentMultiplierRatio = getMultiplierRatio();
       // Multiply the existing multiplier by the newly collided multiplier
-      if (multiplierRatio === 1) {
-        multiplierRatio += parseInt(element.multiplier) - 1;
+      if (currentMultiplierRatio === 1) {
+        currentMultiplierRatio += parseInt(element.multiplier) - 1;
+        setMultiplierRatio(currentMultiplierRatio);
       } else {
-        multiplierRatio += parseInt(element.multiplier);
+        currentMultiplierRatio += parseInt(element.multiplier);
+        setMultiplierRatio(currentMultiplierRatio);
       }
-      currentMultiplierElem.textContent = "x".concat(multiplierRatio);
+      updateMultiplierInterface();
       return true;
     }
   });
+}
+function updateMultiplierInterface() {
+  (0, _toggleElement.toggleElemOn)(_elementsRefs.interfaceComboContainer);
+  (0, _toggleElement.toggleElemOn)(_elementsRefs.currentComboScoreContainer);
+  clearInterval(getTimerInterval());
+  startMultiplierTimer();
+  _elementsRefs.currentMultiplierElem.textContent = "x".concat(getMultiplierRatio());
 }
 var duration = 1000;
 var updateInterval = 50;
@@ -5179,7 +7077,7 @@ function checkCoinCollision() {
   (0, _coin.getCoinRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       var coinElement = document.getElementById(element.id);
-      if (coinElement.dataset.type === 'gold-coin' && goldCoinCounter < 14 && selectedStarter === 'Glasses') {
+      if (coinElement.dataset.type === 'gold-coin' && goldCoinCounter < 14 && getSelectedStarter() === 'Glasses') {
         // Increment the counter and update the value of the next red gem
         goldCoinCounter++;
         redGemMultiplier = goldCoinCounter;
@@ -5207,6 +7105,135 @@ function checkCoinCollision() {
     }
   });
 }
+function createOneUpTextAtPosition(position) {
+  _soundController.soundController.beatScore.play();
+  var newElement = document.createElement('div');
+  newElement.classList.add('one-up', 'moving-interface-text');
+  newElement.style.position = 'absolute';
+  newElement.dataset.interfaceText = true;
+  // Set the position based on the provided coordinates
+  newElement.style.top = "".concat(position.y - 100, "px");
+  _elementsRefs.worldElem.appendChild(newElement);
+  newElement.textContent = '1UP';
+
+  // Store the created element in the array
+  addInterfaceTextElem(newElement);
+
+  // Listen for the animationend event to remove the element
+  newElement.addEventListener('animationend', function () {
+    newElement.remove();
+    removeInterfaceTextElem(newElement);
+  });
+  return true;
+}
+function checkHeartCollision() {
+  var dinoRect = (0, _dino.getDinoRect)();
+  (0, _heart.getHeartRects)().some(function (element) {
+    if (isCollision(element.rect, dinoRect)) {
+      var collisionPosition = {
+        x: dinoRect.x,
+        y: dinoRect.y
+      };
+      var currentLives = parseInt(_elementsRefs.livesElem.textContent, 10);
+      currentLives += 1;
+      _elementsRefs.livesElem.textContent = currentLives;
+      var heartElement = document.getElementById(element.id);
+      createOneUpTextAtPosition(collisionPosition);
+      heartElement.remove();
+      // // Add a class to dinoElem
+
+      // // Set a timeout to remove the class after the star duration
+      // setTimeout(() => {
+
+      //   // Remove the class from dinoElem after the star duration
+      // }, 100);
+
+      return true;
+    }
+  });
+}
+function checkLeafCollision() {
+  var dinoRect = (0, _dino.getDinoRect)();
+  (0, _leaf.getLeafRects)().some(function (element) {
+    if (isCollision(element.rect, dinoRect)) {
+      var leaf = document.getElementById(element.id);
+      setHasLeaf(true);
+      setJumpCountLimit(4);
+      leaf.remove();
+      setTimeout(function () {
+        setHasLeaf(false);
+        setJumpCountLimit(1);
+      }, getLeafDuration());
+      return true;
+    }
+  });
+}
+function checkCherryCollision() {
+  var dinoRect = (0, _dino.getDinoRect)();
+  (0, _cherry.getCherryRects)().some(function (element) {
+    if (isCollision(element.rect, dinoRect)) {
+      var cherryElement = document.getElementById(element.id);
+      // Create a pickup text element
+      var newElement = document.createElement('div');
+      if (!(getCherryPoints() >= 8000)) {
+        if (cherryElement.dataset.points != getCherryPoints()) {
+          cherryElement.dataset.points = getCherryPoints();
+        }
+        setCherryPoints(getCherryPoints() * 2);
+      }
+      addPickupText(newElement, cherryElement);
+      cherryElement.remove();
+      return true;
+    }
+  });
+}
+function checkStarCollision() {
+  var dinoRect = (0, _dino.getDinoRect)();
+  (0, _star.getStarRects)().some(function (element) {
+    if (isCollision(element.rect, dinoRect)) {
+      var starElement = document.getElementById(element.id);
+      starElement.remove();
+      setHasStar(true);
+      // Add a class to dinoElem
+      _elementsRefs.dinoElem.classList.add('star-invincible');
+
+      // Set a timeout to remove the class after the star duration
+      setTimeout(function () {
+        setHasStar(false);
+        setPlayerImmunity(false);
+        // Remove the class from dinoElem after the star duration
+        _elementsRefs.dinoElem.classList.remove('star-invincible');
+      }, getStarDuration());
+      setTimedPlayerImmunity(getStarDuration());
+      return true;
+    }
+  });
+}
+function checkMagnetCollision() {
+  var dinoRect = (0, _dino.getDinoRect)();
+  (0, _magnet.getMagnetRects)().some(function (element) {
+    if (isCollision(element.rect, dinoRect)) {
+      var magnetElement = document.getElementById(element.id);
+      magnetElement.remove();
+      document.querySelectorAll('[data-coin]').forEach(function (coin) {
+        coin.dataset.locked = 'true';
+        coin.dataset.isMagnetLocked = 'true';
+        coin.dataset.isLocking === 'false';
+      });
+      return true;
+    }
+  });
+}
+
+// setTimeout(() => {
+//   collisionOccurred = false;
+//   dinoElem.classList.remove('flash-animation');
+//   dinoElem.classList.add('flash-light-animation');
+// }, 400);
+// setTimeout(() => {
+//   collisionOccurred = false;
+//   dinoElem.classList.remove('flash-light-animation');
+// }, 1600);
 
 // Function to create glasses buff div
 function createGlassesBuffDiv(imgSrc) {
@@ -5256,12 +7283,12 @@ function addPickupText(text, pickupElement) {
   randomArc(text);
   pickupElement.parentNode.insertBefore(text, pickupElement);
   var pickupPoints, points;
-
+  var currentMultiplierRatio = getMultiplierRatio();
   //case when glasses are starter
   if (pickupElement.dataset.type === 'red-gem' && redGemMultiplier !== 1) {
     var _pickupElement$datase;
     pickupPoints = (pickupElement === null || pickupElement === void 0 || (_pickupElement$datase = pickupElement.dataset) === null || _pickupElement$datase === void 0 ? void 0 : _pickupElement$datase.points) * redGemMultiplier;
-    points = pickupPoints * multiplierRatio;
+    points = pickupPoints * currentMultiplierRatio;
     redGemMultiplier = 1;
     goldCoinCounter = 0;
     var glassesBuffStackDiv = document.getElementById('glasses-buff');
@@ -5275,15 +7302,14 @@ function addPickupText(text, pickupElement) {
     }
   }
   //case when coins are starter
-  else if (selectedStarter === 'Coins' && pickupElement.dataset.type === 'gold-coin') {
+  else if (getSelectedStarter() === 'Coins' && pickupElement.dataset.type === 'gold-coin') {
     var _pickupElement$datase2;
     pickupPoints = Math.round((pickupElement === null || pickupElement === void 0 || (_pickupElement$datase2 = pickupElement.dataset) === null || _pickupElement$datase2 === void 0 ? void 0 : _pickupElement$datase2.points) / 2);
-    points = pickupPoints * multiplierRatio;
+    points = pickupPoints * currentMultiplierRatio;
   } else {
     var _pickupElement$datase3;
-    console.log(pickupElement.dataset.type);
     pickupPoints = pickupElement === null || pickupElement === void 0 || (_pickupElement$datase3 = pickupElement.dataset) === null || _pickupElement$datase3 === void 0 ? void 0 : _pickupElement$datase3.points;
-    points = pickupPoints * multiplierRatio;
+    points = pickupPoints * currentMultiplierRatio;
   }
   updateScoreWithPoints(points);
   var fontSize = calculateFontSize(points);
@@ -5291,35 +7317,37 @@ function addPickupText(text, pickupElement) {
   text.textContent = "+".concat(points);
   // Add a div inside the lastMultiplierScore
   var innerDiv = document.createElement('div');
-  innerDiv.textContent = "+".concat(pickupPoints, "x").concat(multiplierRatio);
+  innerDiv.textContent = "+".concat(pickupPoints, "x").concat(currentMultiplierRatio);
   innerDiv.classList.add('inner-plus-points', 'sans');
 
   // Check if there is an existing innerDiv, remove it if present
   var existingInnerDiv = lastMultiplierScore.querySelector('.inner-plus-points');
   if (existingInnerDiv) {
-    lastMultiplierScore.removeChild(existingInnerDiv);
+    existingInnerDiv.remove();
   }
 
   // Append the new innerDiv inside lastMultiplierScore
   lastMultiplierScore.appendChild(innerDiv);
-
-  // Remove the new innerDiv after 1 second
-  setTimeout(function () {
-    lastMultiplierScore.removeChild(innerDiv);
-  }, 1000);
+  if (innerDiv) {
+    // Remove the new innerDiv after 1 second
+    setTimeout(function () {
+      innerDiv.remove();
+    }, 1000);
+  }
 }
 var scoreSinceMilestone = 0;
 function updateScoreWithPoints(delta) {
   var initialScore = score;
   var increments = Math.ceil(duration / updateInterval);
   var incrementAmount = delta / increments;
+  var currentMultiplierRatio = getMultiplierRatio();
   var intervalId = setInterval(function () {
     score += incrementAmount;
     scoreSinceMilestone += incrementAmount;
-    scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
-    if (multiplierRatio > 1) {
+    _elementsRefs.scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+    if (currentMultiplierRatio > 1) {
       currentComboScore += incrementAmount;
-      currentMultiplierScoreElem.textContent = Math.floor(currentComboScore).toString().padStart(1, 0);
+      _elementsRefs.currentMultiplierScoreElem.textContent = Math.floor(currentComboScore).toString().padStart(1, 0);
     }
     if (score >= initialScore + delta) {
       // Stop the interval when the target score is reached
@@ -5330,49 +7358,51 @@ function updateScoreWithPoints(delta) {
 function checkLose() {
   //init dino rect
   var dinoRect = (0, _dino.getDinoRect)();
+  var cactusRects = (0, _cactus.getCactusRects)();
+  var birdRects = (0, _bird.getBirdRects)();
+  var allEnemyRects = [].concat(_toConsumableArray(cactusRects), _toConsumableArray(birdRects));
 
   //init enemy and player collision state
-  var isEnemyAndPlayerCollision = (0, _cactus.getCactusRects)().some(function (rect) {
+  var isEnemyAndPlayerCollision = allEnemyRects.some(function (rect) {
     return isCollision(rect, dinoRect);
   });
 
   //if no lives remain then lose
-  if (livesElem.textContent === '0') {
-    worldElem.setAttribute('transition-style', 'out:circle:hesitate');
-    worldElem.classList.remove('stop-time'); // Add the class to stop time
+  if (_elementsRefs.livesElem.textContent === '0') {
+    _elementsRefs.worldElem.setAttribute('transition-style', 'out:circle:hesitate');
+    _elementsRefs.worldElem.classList.remove('stop-time'); // Add the class to stop time
     return true;
   } //check if enemy and player are in colliding
-  else if (isEnemyAndPlayerCollision && !playerImmunity) {
+  else if (isEnemyAndPlayerCollision && !getPlayerImmunity() && !getHasStar()) {
     //check if player is not in previous collision state
     if (!collisionOccurred) {
       // decrement lives elem by 1
       _soundController.soundController.takeDamage.play();
-      var currentLives = parseInt(livesElem.textContent, 10);
+      var currentLives = parseInt(_elementsRefs.livesElem.textContent, 10);
       if (!isNaN(currentLives)) {
         currentLives -= 1;
-        livesElem.textContent = currentLives;
+        _elementsRefs.livesElem.textContent = currentLives;
       }
       resetMultiplier();
       //switch player collision state to true
       collisionOccurred = true;
       //set player to flash
-      dinoElem.classList.add('flash-animation');
+      _elementsRefs.dinoElem.classList.add('flash-animation');
       //set world update pause
-      worldElem.classList.add('stop-time'); // Add the class to stop time
+      _elementsRefs.worldElem.classList.add('stop-time'); // Add the class to stop time
       //set timeout for world update pause
 
       // // Set a timeout to reset player collision state and player flash
       setTimeout(function () {
-        collisionOccurred = false;
-        dinoElem.classList.remove('flash-animation');
-        dinoElem.classList.add('flash-light-animation');
+        _elementsRefs.dinoElem.classList.remove('flash-animation');
+        _elementsRefs.dinoElem.classList.add('flash-light-animation');
       }, 400);
       setTimeout(function () {
         collisionOccurred = false;
-        dinoElem.classList.remove('flash-light-animation');
+        _elementsRefs.dinoElem.classList.remove('flash-light-animation');
       }, 1600);
     }
-  }
+  } else if (isEnemyAndPlayerCollision && getPlayerImmunity()) {}
 }
 var muteButton = document.getElementById('muteButton');
 var soundControllerMuted = false;
@@ -5399,7 +7429,7 @@ function isCollision(rect1, rect2) {
   return rect1.left < rect2.right && rect1.top < rect2.bottom && rect1.right > rect2.left && rect1.bottom > rect2.top;
 }
 function updateSpeedScale(delta) {
-  speedScale += delta * SPEED_SCALE_INCREASE;
+  currentSpeedScale += delta * getSpeedScaleIncrease();
 }
 
 // Assuming you have the necessary elements in your HTML
@@ -5415,7 +7445,7 @@ function handleLevelUp() {
   // Increment the level
   var currentLevel = parseInt(levelDisplayElem.textContent, 10);
   levelDisplayElem.textContent = currentLevel + 1;
-  if (selectedStarter === 'Book Smart') {
+  if (getSelectedStarter() === 'Text book') {
     currentPassives.forEach(function (item) {
       var currentItem = collectableOptions.find(function (curItem) {
         return curItem.type === item.type;
@@ -5437,12 +7467,12 @@ function handleLevelUp() {
 function updateScore(delta) {
   score += delta * 0.01;
   scoreSinceMilestone += delta * 0.01;
-  scoreElem.textContent = Math.floor(score).toString().padStart(6, '0');
+  _elementsRefs.scoreElem.textContent = Math.floor(score).toString().padStart(6, '0');
 
   // Update the level bar
   var progress = scoreSinceMilestone / milestone * 100;
   levelBarElem.value = progress;
-  if (score > highScoreElem.textContent && !hasBeatenScore && highScoreElem.textContent !== '000000') {
+  if (score > _elementsRefs.highScoreElem.textContent && !hasBeatenScore && _elementsRefs.highScoreElem.textContent !== '000000') {
     _soundController.soundController.beatScore.play();
     hasBeatenScore = true;
   }
@@ -5451,37 +7481,46 @@ function updateScore(delta) {
   }
 }
 function handleCheckIfHighScore(score) {
-  if (score > highScoreElem.textContent) {
-    highScoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
-    localStorage.setItem('lion-high-score', highScoreElem.textContent);
+  if (score > _elementsRefs.highScoreElem.textContent) {
+    _elementsRefs.highScoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+    localStorage.setItem('lion-high-score', _elementsRefs.highScoreElem.textContent);
   }
   if (handleCheckLeaderboardHighScore(score)) {
     return true;
   }
 }
 function setUpElements() {
+  (0, _star.setupStar)();
   (0, _ground.setupGround)();
   (0, _groundLayerTwo.setupGroundLayerTwo)();
+  // setupGroundLayerTwoTwo();
   (0, _groundLayerThree.setupGroundLayerThree)();
+  (0, _bonusLayer.setupBonusLayer)();
   (0, _dino.setupDino)();
   (0, _cactus.setupCactus)();
+  (0, _bird.setupBird)();
   (0, _scoreMultiplier.setupMultiplier)();
   (0, _coin.setupCoin)();
+  (0, _platform.setupPlatform)();
+  (0, _magnet.setupMagnet)();
 }
 function handleStart() {
-  worldElem.setAttribute('transition-style', 'in:circle:center');
+  updateNotification("stage ".concat(getCurrentPhase(), "!"));
+  clearInterval(idleIntervalId); // Clear the interval
+  _elementsRefs.worldElem.setAttribute('transition-style', 'in:circle:center');
   lastTime = null;
   hasBeatenScore = false;
-  speedScale = 0.9;
   score = 0;
-  multiplierRatio = 1;
+  startTimer();
+  setMultiplierRatio(1);
+  var currentMultiplierRatio = getMultiplierRatio();
   setUpElements();
-  dinoElem.classList.remove('leap');
-  currentMultiplierElem.textContent = "x".concat(multiplierRatio);
-  livesElem.textContent = 10;
-  startScreenElem.classList.add('hide');
-  endScreenElem.classList.add('hide');
-  gameOverIconElem.classList.add('hide-element');
+  _elementsRefs.dinoElem.classList.remove('leap');
+  _elementsRefs.currentMultiplierElem.textContent = "x".concat(currentMultiplierRatio);
+  _elementsRefs.livesElem.textContent = 10;
+  _elementsRefs.startScreenElem.classList.add('hide');
+  _elementsRefs.endScreenElem.classList.add('hide');
+  _elementsRefs.gameOverIconElem.classList.add('hide-element');
   // Get the container element where the ticker items will be appended
   var tickerData = [{
     username: 'bap1',
@@ -5532,10 +7571,10 @@ function handleStart() {
     tickerItem.innerHTML = "".concat(item.username, " - ").concat(item.score);
     var tickerDivider = document.createElement('div');
     tickerDivider.classList.add('ticker-divider');
-    tickerElem.appendChild(tickerItem);
+    _elementsRefs.tickerElem.appendChild(tickerItem);
     // Add a divider after each item, except for the last one
     if (index < tickerData.length - 1) {
-      tickerElem.appendChild(tickerDivider);
+      _elementsRefs.tickerElem.appendChild(tickerDivider);
     }
   });
   tickerData.forEach(function (item, index) {
@@ -5544,10 +7583,10 @@ function handleStart() {
     tickerItem.innerHTML = "".concat(item.username, " - ").concat(item.score);
     var tickerDivider = document.createElement('div');
     tickerDivider.classList.add('ticker-divider');
-    tickerElem2.appendChild(tickerItem);
+    _elementsRefs.tickerElem2.appendChild(tickerItem);
     // Add a divider after each item, except for the last one
     if (index < tickerData.length - 1) {
-      tickerElem2.appendChild(tickerDivider);
+      _elementsRefs.tickerElem2.appendChild(tickerDivider);
     }
   });
   tickerData.forEach(function (item, index) {
@@ -5556,10 +7595,10 @@ function handleStart() {
     tickerItem.innerHTML = "".concat(item.username, " - ").concat(item.score);
     var tickerDivider = document.createElement('div');
     tickerDivider.classList.add('ticker-divider');
-    tickerElem3.appendChild(tickerItem);
+    _elementsRefs.tickerElem3.appendChild(tickerItem);
     // Add a divider after each item, except for the last one
     if (index < tickerData.length - 1) {
-      tickerElem3.appendChild(tickerDivider);
+      _elementsRefs.tickerElem3.appendChild(tickerDivider);
     }
   });
   // tickerContainerElem.classList.add('hide-element');
@@ -5567,10 +7606,46 @@ function handleStart() {
 
   window.requestAnimationFrame(update);
 }
+var timer = 0;
+var intervalId;
+function updateTimer() {
+  timer++;
+  _elementsRefs.currentGameTimerElem.textContent = formatTime(timer);
+}
+function formatTime(seconds) {
+  var minutes = Math.floor(seconds / 60);
+  var remainingSeconds = seconds % 60;
+  return "".concat(minutes, ":").concat(remainingSeconds < 10 ? '0' : '').concat(remainingSeconds);
+}
+function startTimer() {
+  intervalId = setInterval(updateTimer, 1000); // Update the timer every second
+}
+
+function stopTimer() {
+  clearInterval(intervalId);
+}
+
+// Function to toggle the pause state
+function togglePause() {
+  isPaused = !isPaused;
+  // const body = document.body;
+  if (isPaused) {
+    // body.classList.add('pause-animation');
+    pauseIconButton.src = _Play.default;
+    stopTimer(); // Pause the timer
+    _particleSystems.snow.togglePause();
+  } else {
+    // body.classList.remove('pause-animation');
+    pauseIconButton.src = _Pause.default;
+    _particleSystems.snow.togglePause();
+    startTimer(); // Start the timer or resume from where it left off
+    window.requestAnimationFrame(update);
+  }
+}
 function revealAchievementForm(index, score) {
-  gameOverIconElem.classList.add('hide-element');
+  _elementsRefs.gameOverIconElem.classList.add('hide-element');
   var rank = index + 2;
-  scoreNewHighScoreElem.textContent = Math.round(score);
+  _elementsRefs.scoreNewHighScoreElem.textContent = Math.round(score);
   var achievementRankElem = document.getElementById('achievement-rank-text');
   achievementRankElem.textContent = "".concat(rank).concat((0, _leaderboard.getSuffix)(rank));
   var achievementBlockElem = document.getElementById('achievement-block');
@@ -5578,8 +7653,8 @@ function revealAchievementForm(index, score) {
   var achievementInstructionsBlockElem = document.getElementById('achievement-instructions-block');
   var achievementFormElem = document.getElementById('achievement-form-block');
   var newHighScoreInput = document.getElementById('newHighScoreInput');
-  submitNewScoreFormElem.classList.remove('hide-form');
-  submitNewScoreFormElem.classList.add('show-form');
+  _elementsRefs.submitNewScoreFormElem.classList.remove('hide-form');
+  _elementsRefs.submitNewScoreFormElem.classList.add('show-form');
   setTimeout(function () {
     lionGameAchievementTitleElem.classList.remove('fade-out-text');
     lionGameAchievementTitleElem.classList.add('fade-in-text');
@@ -5630,7 +7705,7 @@ function _handleCheckLeaderboardHighScore() {
                 document.addEventListener('touchstart', handleStart, {
                   once: true
                 });
-                endScreenElem.classList.remove('hide');
+                _elementsRefs.endScreenElem.classList.remove('hide');
               }, 100);
               setTimeout(function () {
                 typeLetters(0);
@@ -5672,41 +7747,41 @@ function _handleSubmitNewScore() {
             _context2.next = 5;
             break;
           }
-          scoreErrorMessageElem.textContent = 'Enter a valid name!';
-          scoreErrorMessageElem.classList.remove('hide');
+          _elementsRefs.scoreErrorMessageElem.textContent = 'Enter a valid name!';
+          _elementsRefs.scoreErrorMessageElem.classList.remove('hide');
           return _context2.abrupt("return");
         case 5:
           _context2.next = 7;
-          return (0, _apis.handleNewHighScore)(userInput, trimmedOutExtraSpacesScore(scoreNewHighScoreElem.textContent));
+          return (0, _apis.handleNewHighScore)(userInput, trimmedOutExtraSpacesScore(_elementsRefs.scoreNewHighScoreElem.textContent));
         case 7:
           res = _context2.sent;
           if (!(res === 'user already exists')) {
             _context2.next = 14;
             break;
           }
-          scoreErrorMessageElem.textContent = res;
-          scoreErrorMessageElem.classList.remove('hide');
+          _elementsRefs.scoreErrorMessageElem.textContent = res;
+          _elementsRefs.scoreErrorMessageElem.classList.remove('hide');
           return _context2.abrupt("return");
         case 14:
-          submitNewScoreFormElem.classList.add('fade-out-text');
-          scrollableTableElem.style.display = 'flex';
+          _elementsRefs.submitNewScoreFormElem.classList.add('fade-out-text');
+          _elementsRefs.scrollableTableElem.style.display = 'flex';
           showLeaderboard = !showLeaderboard;
           leaderboardContent = document.getElementById('leaderboard-content');
           leaderboardContent.classList.remove('flicker-opacity-off');
           loading = true;
           runTypeLetters();
           showLeaderboard = !showLeaderboard;
-          worldElem.setAttribute('transition-style', '');
+          _elementsRefs.worldElem.setAttribute('transition-style', '');
           stopLoading();
-          scrollableTableElem.setAttribute('transition-style', 'in:wipe:left');
-          scrollableTableElem.classList.add('show-element');
+          _elementsRefs.scrollableTableElem.setAttribute('transition-style', 'in:wipe:left');
+          _elementsRefs.scrollableTableElem.classList.add('show-element');
           leaderboardContent.classList.add('translateX-right-to-left');
-          scrollableTableElem.classList.remove('hide-element');
+          _elementsRefs.scrollableTableElem.classList.remove('hide-element');
           setTimeout(function () {
             showLeaderboard = true;
-            scrollableTableElem.classList.remove('hide-element');
-            scrollableTableElem.classList.add('show-element');
-            scoreErrorMessageElem.classList.add('hide');
+            _elementsRefs.scrollableTableElem.classList.remove('hide-element');
+            _elementsRefs.scrollableTableElem.classList.add('show-element');
+            _elementsRefs.scoreErrorMessageElem.classList.add('hide');
           }, 3000);
         case 29:
         case "end":
@@ -5776,28 +7851,28 @@ function handleToggleLeaderboard() {
     loading = true;
     runTypeLetters();
     showLeaderboard = !showLeaderboard;
-    worldElem.setAttribute('transition-style', 'out:wipe:right');
+    _elementsRefs.worldElem.setAttribute('transition-style', 'out:wipe:right');
     var randomTimeout = Math.random() * (2800 - 1500) + 1500; // Random timeout between 1500ms and 2800ms
     setTimeout(function () {
       stopLoading();
-      scrollableTableElem.setAttribute('transition-style', 'in:wipe:left');
-      scrollableTableElem.classList.add('show-element');
+      _elementsRefs.scrollableTableElem.setAttribute('transition-style', 'in:wipe:left');
+      _elementsRefs.scrollableTableElem.classList.add('show-element');
       leaderboardContent.classList.add('translateX-right-to-left');
-      scrollableTableElem.classList.remove('hide-element');
+      _elementsRefs.scrollableTableElem.classList.remove('hide-element');
     }, randomTimeout);
   } else {
     handleStart();
     loading = true;
     runTypeLetters();
     showLeaderboard = !showLeaderboard;
-    scrollableTableElem.setAttribute('transition-style', 'out:wipe:right');
+    _elementsRefs.scrollableTableElem.setAttribute('transition-style', 'out:wipe:right');
     leaderboardContent.classList.add('flicker-opacity-off');
     setTimeout(function () {
       stopLoading();
-      scrollableTableElem.style.display = 'none';
-      worldElem.setAttribute('transition-style', 'in:wipe:left');
-      scrollableTableElem.classList.remove('show-element');
-      scrollableTableElem.classList.add('hide-element');
+      _elementsRefs.scrollableTableElem.style.display = 'none';
+      _elementsRefs.worldElem.setAttribute('transition-style', 'in:wipe:left');
+      _elementsRefs.scrollableTableElem.classList.remove('show-element');
+      _elementsRefs.scrollableTableElem.classList.add('hide-element');
     }, 1500);
   }
 }
@@ -5805,13 +7880,13 @@ function runTypeLetters() {
   if (!loading) {
     return;
   }
-  loadingTextElem.textContent = '';
-  typeLettersAny(0, '...', loadingTextElem, 120);
+  _elementsRefs.loadingTextElem.textContent = '';
+  typeLettersAny(0, '...', _elementsRefs.loadingTextElem, 120);
   var rerunDelay = 2700;
   setTimeout(runTypeLetters, rerunDelay);
 }
 function handleLose() {
-  gameOverTextElem.textContent = '';
+  _elementsRefs.gameOverTextElem.textContent = '';
   // tickerContainerElem.classList.add('show-element');
   // tickerContainerElem.classList.remove('hide-element');
   _soundController.soundController.die.play();
@@ -5825,8 +7900,8 @@ function setPixelToWorldScale() {
   } else {
     worldToPixelScale = window.innerHeight / WORLD_HEIGHT;
   }
-  worldElem.style.width = "".concat(WORLD_WIDTH * worldToPixelScale, "px");
-  worldElem.style.height = "".concat(WORLD_HEIGHT * worldToPixelScale, "px");
+  _elementsRefs.worldElem.style.width = "".concat(WORLD_WIDTH * worldToPixelScale, "px");
+  _elementsRefs.worldElem.style.height = "".concat(WORLD_HEIGHT * worldToPixelScale, "px");
 }
 function handleOrientationChange() {
   var blackScreen = document.getElementById('blackScreen');
@@ -5847,85 +7922,16 @@ handleOrientationChange();
 
 // Listen for orientation changes
 window.addEventListener('orientationchange', handleOrientationChange);
-
-//snow particle system
-var snow = {
-  el: '#snow',
-  density: 12500,
-  // higher = fewer bits
-  maxHSpeed: 1,
-  // How much do you want them to move horizontally
-  minFallSpeed: 0.5,
-  canvas: null,
-  ctx: null,
-  particles: [],
-  colors: [],
-  mp: 1,
-  quit: false,
-  init: function init() {
-    this.canvas = document.querySelector(this.el);
-    this.ctx = this.canvas.getContext('2d');
-    this.reset();
-    requestAnimationFrame(this.render.bind(this));
-    window.addEventListener('resize', this.reset.bind(this));
-  },
-  reset: function reset() {
-    this.w = window.innerWidth;
-    this.h = window.innerHeight;
-    this.canvas.width = this.w;
-    this.canvas.height = this.h;
-    this.particles = [];
-    this.mp = Math.ceil(this.w * this.h / this.density);
-    for (var i = 0; i < this.mp; i++) {
-      var size = Math.random() * 1.7 + 3;
-      this.particles.push({
-        x: Math.random() * this.w,
-        //x-coordinate
-        y: Math.random() * this.h,
-        //y-coordinate
-        w: size,
-        h: size,
-        vy: this.minFallSpeed + Math.random(),
-        //density
-        vx: Math.random() * this.maxHSpeed - this.maxHSpeed / 2,
-        fill: '#ffffff',
-        s: Math.random() * 0.2 - 0.1
-      });
-    }
-  },
-  render: function render() {
-    var _this = this;
-    this.ctx.clearRect(0, 0, this.w, this.h);
-    this.particles.forEach(function (p, i) {
-      p.y += p.vy;
-      p.x += p.vx;
-      _this.ctx.fillStyle = p.fill;
-      _this.ctx.fillRect(p.x, p.y, p.w, p.h);
-      if (p.x > _this.w + 5 || p.x < -5 || p.y > _this.h) {
-        p.x = Math.random() * _this.w;
-        p.y = -10;
-      }
-    });
-    if (this.quit) {
-      return;
-    }
-    requestAnimationFrame(this.render.bind(this));
-  },
-  destroy: function destroy() {
-    this.quit = true;
-  }
-};
-snow.init();
 var textToType = 'Game Over';
 function typeLetters(index) {
   if (index < textToType.length) {
-    gameOverTextElem.textContent += textToType.charAt(index);
+    _elementsRefs.gameOverTextElem.textContent += textToType.charAt(index);
     setTimeout(function () {
       return typeLetters(index + 1);
     }, 200); // Adjust the delay as needed
   } else {
-    gameOverIconElem.classList.remove('hide-element');
-    gameOverIconElem.classList.add('show-element');
+    _elementsRefs.gameOverIconElem.classList.remove('hide-element');
+    _elementsRefs.gameOverIconElem.classList.add('show-element');
   }
 }
 function typeLettersAny(index, text, elem, timeout) {
@@ -5958,25 +7964,30 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 var collectableOptions = exports.collectableOptions = [{
   type: 'gold-coin',
   weight: 0.3,
-  points: 13
+  points: 31
 }, {
   type: 'red-gem',
   weight: 0.1,
-  points: 45
+  points: 85
 }, {
   type: 'silver-coin',
   weight: 0.6,
-  points: 6
+  points: 16
+}, {
+  type: 'cherry',
+  weight: 0,
+  points: 1000
 }];
 
 //buff-effects
 
 function filetMignonEffect() {
   var rank = 1;
-  var currentLives = parseInt(livesElem.textContent, 10);
+  var currentLives = parseInt(_elementsRefs.livesElem.textContent, 10);
   currentLives += rank;
-  livesElem.textContent = currentLives;
-  createOneUpText();
+  _elementsRefs.livesElem.textContent = currentLives;
+  var playerContainer = document.querySelector('.player-container');
+  createOneUpText(playerContainer);
 }
 function trustyPocketWatchEffect() {
   var startRank = 0.4;
@@ -6024,9 +8035,10 @@ function getRandomCollectable() {
 }
 function sackOfCoinsEffect() {
   var totalPoints = 0;
+  var currentMultiplierRatio = getMultiplierRatio();
   for (var i = 0; i < 25; i++) {
     var randomCollectable = getRandomCollectable();
-    totalPoints += randomCollectable.points;
+    totalPoints += randomCollectable.points * currentMultiplierRatio;
   }
   updateScoreWithPoints(totalPoints);
 
@@ -6037,13 +8049,12 @@ function sackOfCoinsEffect() {
 function momsCookiesEffect() {
   updateScoreWithPoints(milestone);
 }
-var gravityFallAdjustment = 0.01;
 function reduceByPercentage(value, percentage) {
   return value * (1 - percentage);
 }
 function slowFallEffect() {
   var reductionPercentage = 0.3; // Adjust the percentage as needed
-  gravityFallAdjustment = reduceByPercentage(gravityFallAdjustment, reductionPercentage);
+  setGravityFallAdjustment(reduceByPercentage(getGravityFallAdjustment(), reductionPercentage));
 }
 function increaseByPercentage(value, percentage) {
   var multiplier = 1 + percentage / 100;
@@ -6107,7 +8118,7 @@ function amuletEffect(incrementAdjustment) {
 var selectedStarter;
 var currentPassives = [];
 function handleAddToCurrentPassives(effect, type, lastValue) {
-  if (selectedStarter === 'Book Smart') {
+  if (getSelectedStarter() === 'Text book') {
     currentPassives.push({
       effect: effect,
       lastValue: lastValue,
@@ -6121,15 +8132,15 @@ function booksSmartEffect() {
       console.log("".concat(ability.name, " - Level ").concat(ability.level, ", Value ").concat(ability.value));
     });
   }
-  selectedStarter = 'Book Smart';
+  setSelectedStarter('Text book');
 }
 function glassesEffect() {
-  selectedStarter = 'Glasses';
+  setSelectedStarter('Glasses');
 }
 function coinsEffect() {
-  selectedStarter = 'Coins';
+  setSelectedStarter('Coins');
 }
-},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png","./elements/buff.js":"../elements/buff.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerTwoTwo":"../elements/groundLayerTwoTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/bird.js":"../elements/bird.js","./elements/platform.js":"../elements/platform.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/magnet.js":"../elements/magnet.js","./elements/heart.js":"../elements/heart.js","./elements/leaf.js":"../elements/leaf.js","./elements/flag.js":"../elements/flag.js","./elements/star.js":"../elements/star.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png","./elements/buff.js":"../elements/buff.js","./game-state.js":"../game-state.js","./elements-refs":"../elements-refs.js","./utility/toggle-element.js":"../utility/toggle-element.js","./elements/particle-systems.js":"../elements/particle-systems.js","./phases/phase-properties.js":"../phases/phase-properties.js","./phases/phase1.js":"../phases/phase1.js","./phases/phase2.js":"../phases/phase2.js","./phases/bonus-phase.js":"../phases/bonus-phase.js","./elements/bonus-layer.js":"../elements/bonus-layer.js","./utility/update-interface-text.js":"../utility/update-interface-text.js","./interface-text-elems-state.js":"../interface-text-elems-state.js","./elements/cherry":"../elements/cherry.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -6154,7 +8165,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50364" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49925" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

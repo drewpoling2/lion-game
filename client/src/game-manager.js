@@ -4,6 +4,10 @@ import {
   setupGroundLayerTwo,
 } from './elements/groundLayerTwo';
 import {
+  updateGroundLayerTwoTwo,
+  setupGroundLayerTwoTwo,
+} from './elements/groundLayerTwoTwo';
+import {
   updateGroundLayerThree,
   setupGroundLayerThree,
 } from './elements/groundLayerThree';
@@ -12,12 +16,19 @@ import {
   setupDino,
   getDinoRect,
   setDinoLose,
+  handleIdle,
 } from './elements/dino.js';
 import {
   updateCactus,
   setupCactus,
   getCactusRects,
 } from './elements/cactus.js';
+import { updateBird, setupBird, getBirdRects } from './elements/bird.js';
+import {
+  updatePlatform,
+  setupPlatform,
+  getPlatformRects,
+} from './elements/platform.js';
 import { createLeaderboard, getSuffix } from './elements/leaderboard.js';
 import { soundController } from './utility/sound-controller.js';
 import {
@@ -31,6 +42,15 @@ import {
   updateMultiplier,
   getMultiplierRects,
 } from './elements/score-multiplier.js';
+import {
+  setupMagnet,
+  getMagnetRects,
+  updateMagnet,
+} from './elements/magnet.js';
+import { getHeartRects } from './elements/heart.js';
+import { getLeafRects } from './elements/leaf.js';
+import { getFlagRects, updateFlag } from './elements/flag.js';
+import { setupStar, updateStar, getStarRects } from './elements/star.js';
 import { setupCoin, updateCoin, getCoinRects } from './elements/coin.js';
 import muteImg from './public/imgs/icons/Speaker-Off.png';
 import unmuteImg from './public/imgs/icons/Speaker-On.png';
@@ -40,51 +60,82 @@ import glasses from './public/imgs/buffs/glasses.png';
 import redoImg from './public/imgs/icons/Redo.png';
 import foregroundImg from './public/imgs/backgrounds/Foreground-Trees.png';
 import { createBuffs, createStarterBuffs } from './elements/buff.js';
+import StateSingleton from './game-state.js';
+import {
+  worldElem,
+  scoreElem,
+  highScoreElem,
+  startScreenElem,
+  endScreenElem,
+  gameOverTextElem,
+  gameOverIconElem,
+  leaderboardElem,
+  scoreMultiplierElem,
+  scoreNewHighScoreElem,
+  scoreErrorMessageElem,
+  multiplierTimerElem,
+  tickerElem,
+  tickerElem2,
+  tickerElem3,
+  livesElem,
+  dinoElem,
+  scrollableTableElem,
+  currentMultiplierElem,
+  plusPointsElem,
+  tickerContainerElem,
+  loadingTextElem,
+  submitNewScoreFormElem,
+  interfaceComboContainer,
+  currentMultiplierScoreElem,
+  currentComboScoreContainer,
+  timerProgress,
+  currentGameTimerElem,
+  gameLoadingScreenElem,
+  gameLoadingTextElem,
+  gameNotificationElem,
+  pausedScreenElem,
+} from './elements-refs';
+import { toggleElemOff, toggleElemOn } from './utility/toggle-element.js';
+import { snow } from './elements/particle-systems.js';
+import { phases } from './phases/phase-properties.js';
+import { updatePhase1 } from './phases/phase1.js';
+import { updatePhase2 } from './phases/phase2.js';
+import { updateBonusPhase } from './phases/bonus-phase.js';
+import { setupBonusLayer, updateBonusLayer } from './elements/bonus-layer.js';
+import { updateInterfaceText } from './utility/update-interface-text.js';
+import InterfaceTextElemsSingleton from './interface-text-elems-state.js';
+import { getCherryRects } from './elements/cherry';
+const { removeInterfaceTextElem, addInterfaceTextElem } =
+  InterfaceTextElemsSingleton;
+const {
+  setMultiplierRatio,
+  getMultiplierRatio,
+  getTimerInterval,
+  setTimerInterval,
+  setMultiplierTimer,
+  getMultiplierTimer,
+  getSpeedScale,
+  getSpeedScaleIncrease,
+  getStarDuration,
+  getPlayerImmunity,
+  setPlayerImmunity,
+  getHasStar,
+  setHasStar,
+  getGravityFallAdjustment,
+  setGravityFallAdjustment,
+  getSelectedStarter,
+  setSelectedStarter,
+  getCurrentPhase,
+  setJumpCountLimit,
+  getLeafDuration,
+  setHasLeaf,
+  setCherryPoints,
+  getCherryPoints,
+} = StateSingleton;
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 45;
 export let SPEED_SCALE_INCREASE = 0.00001;
-let multiplierRatio = 1;
-const worldElem = document.querySelector('[data-world]');
-const scoreElem = document.querySelector('[data-score]');
-const highScoreElem = document.querySelector('[data-high-score]');
-const startScreenElem = document.querySelector('[data-start-screen]');
-const endScreenElem = document.querySelector('[data-game-over-screen]');
-const gameOverTextElem = document.querySelector('[data-game-over-text]');
-const gameOverIconElem = document.getElementById('game-over-icon');
-const leaderboardElem = document.querySelector('[data-leaderboard-body]');
-const scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
-const scoreNewHighScoreElem = document.querySelector(
-  '[data-score-new-high-score]'
-);
-const scoreErrorMessageElem = document.querySelector(
-  '[data-score-error-message]'
-);
-const multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
-const tickerElem = document.querySelector('[data-ticker]');
-const tickerElem2 = document.querySelector('[data-ticker2]');
-const tickerElem3 = document.querySelector('[data-ticker3]');
-export const livesElem = document.querySelector('[data-lives]');
-const dinoElem = document.querySelector('[data-dino]');
-const scrollableTableElem = document.querySelector('[data-scrollable-table]');
-const currentMultiplierElem = document.querySelector(
-  '[data-current-multiplier]'
-);
-const plusPointsElem = document.querySelector('[data-plus-points]');
-const tickerContainerElem = document.querySelector('[data-ticker-container]');
-const loadingTextElem = document.querySelector('[data-loading-text]');
-const submitNewScoreFormElem = document.querySelector(
-  '[data-submit-new-score-form]'
-);
 
-const interfaceComboContainer = document.getElementById(
-  'interface-combo-container'
-);
-const currentMultiplierScoreElem = document.querySelector(
-  '[data-current-multiplier-score]'
-);
-const currentComboScoreContainer = document.getElementById(
-  'current-combo-score-container'
-);
 let showLeaderboard = false;
 
 // const playAgainButtonElem = document.querySelector('[data-play-again]');
@@ -94,22 +145,21 @@ let showLeaderboard = false;
 // });
 setPixelToWorldScale();
 createLeaderboard(leaderboardElem);
-
+snow.init();
 window.addEventListener('resize', setPixelToWorldScale);
 document.addEventListener('keydown', handleStart, { once: true });
 document.addEventListener('touchstart', handleStart, { once: true });
 let lastTime;
-let speedScale;
 let score;
+let idleIntervalId;
 let collisionOccurred = false; // Flag to track collision
-let milestone = 500;
+let milestone = 100000;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
   : Math.floor('0').toString().padStart(6, 0);
 let hasBeatenScore = false;
 let isPaused = false;
-let playerImmunity = false;
 let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
 scrollableTableElem.classList.add('hide-element');
 scrollableTableElem.style.display = 'none';
@@ -117,17 +167,6 @@ worldElem.setAttribute('transition-style', 'in:circle:center');
 tickerContainerElem.classList.add('hide-element');
 tickerContainerElem.classList.remove('show-element');
 const pauseIconButton = document.getElementById('pause-icon-button');
-
-// Function to toggle the pause state
-export function togglePause() {
-  isPaused = !isPaused;
-  if (isPaused) {
-    pauseIconButton.src = playImg;
-  } else {
-    pauseIconButton.src = pauseImg;
-    window.requestAnimationFrame(update);
-  }
-}
 
 const shareContainer = document.getElementById('share-container');
 const shareButton = document.getElementById('shareButton');
@@ -139,6 +178,21 @@ shareContainer.addEventListener('mouseenter', () => {
 shareContainer.addEventListener('mouseleave', () => {
   shareButton.classList.remove('transparent-background');
 });
+
+// function typeLoadingText(elem) {
+//   setTimeout(() => {
+//     typeLettersWithoutSpaces(0, '...Oh no', elem, 100);
+//   }, 400);
+//   setTimeout(() => {
+//     // Set white-space CSS style to allow line breaks
+//     elem.style.whiteSpace = 'pre-line';
+//     // Add a line break before the second line
+//     elem.textContent += '\n';
+//     typeLettersWithoutSpaces(0, 'Gotta get to class!', elem, 100);
+//   }, 3000);
+// }
+
+// typeLoadingText(gameLoadingTextElem);
 
 function copyCurrentLink() {
   var input = document.createElement('input');
@@ -166,22 +220,75 @@ if (document.getElementById('copy-link-button')) {
 const pauseButton = document.getElementById('pauseButton');
 pauseButton.addEventListener('click', function () {
   togglePause();
+  if (pausedScreenElem.style.display === 'flex') {
+    pausedScreenElem.style.display = 'none';
+  } else {
+    pausedScreenElem.style.display = 'flex';
+  }
   pauseButton.blur();
 });
 
-// Function to set player immunity
-function setPlayerImmunity() {
-  playerImmunity = true;
+let immunityTimeout;
 
-  // Reset player immunity after the specified duration
-  setTimeout(() => {
-    playerImmunity = false;
-  }, immunityDuration);
+// Function to set player immunity
+function setTimedPlayerImmunity(duration) {
+  setPlayerImmunity(true);
+  // Clear any existing timeout
+  clearTimeout(immunityTimeout);
+
+  // Set a new timeout
+  immunityTimeout = setTimeout(
+    () => {
+      setPlayerImmunity(false);
+    },
+    duration ? duration : immunityDuration
+  );
+
+  // Check if getHasStar is true, and cancel the timeout if needed
+  if (getHasStar()) {
+    clearTimeout(immunityTimeout);
+  }
 }
+
+idleIntervalId = setInterval(handleIdle, 300);
 
 function updateElements() {}
 
 let deltaAdjustment = 1;
+let currentSpeedScale = getSpeedScale();
+let isUpdatedSpeedScale = false;
+let decelerationFactor = 0.95; // Adjust the deceleration factor as needed
+
+function deleteLetters(index, elem, timeout) {
+  const text = elem.textContent;
+  if (index >= 0) {
+    elem.textContent = text.substring(0, index);
+    setTimeout(() => {
+      deleteLetters(index - 1, elem, timeout);
+    }, timeout); // Use the provided timeout
+  } else {
+  }
+}
+
+export function updateNotification(
+  notification,
+  deleteLettersDelay = 3000,
+  typeLettersDelay = 1000
+) {
+  const timeout = 125;
+  setTimeout(() => {
+    typeLettersWithoutSpaces(0, notification, gameNotificationElem, 100);
+    // After a delay, start deleting the letters in reverse order
+
+    setTimeout(() => {
+      deleteLetters(
+        gameNotificationElem.textContent.length - 1,
+        gameNotificationElem,
+        timeout
+      );
+    }, deleteLettersDelay);
+  }, typeLettersDelay);
+}
 
 function update(time) {
   if (isPaused) {
@@ -195,12 +302,11 @@ function update(time) {
     return;
   }
 
-  let baseDelta = 5;
-
+  let baseDelta = 20;
   // let delta = time - lastTime;
   let delta = baseDelta;
-  if (collisionOccurred) {
-    setPlayerImmunity();
+  if (collisionOccurred && !getPlayerImmunity()) {
+    setTimedPlayerImmunity();
     togglePause();
     setTimeout(() => {
       collisionOccurred = false; // Reset the collision flag after the delay
@@ -208,107 +314,122 @@ function update(time) {
     }, 400);
     return; // Pause the update during the delay
   }
-
-  updateGround(delta, speedScale);
-  updateGroundLayerThree(delta, speedScale);
-  updateGroundLayerTwo(delta, speedScale);
-  updateDino(delta, speedScale, gravityFallAdjustment, selectedStarter);
-  updateCactus(delta, speedScale);
+  // Update based on the current phase
+  if (getCurrentPhase() === 1) {
+    updatePhase1(timer, delta, currentSpeedScale);
+  } else if (getCurrentPhase() === 'bonus') {
+    updateBonusPhase(timer, currentSpeedScale, delta);
+  } else if (getCurrentPhase() === 2) {
+    // currentSpeedScale *= decelerationFactor;
+    // // Ensure the speed scale doesn't go below 0.6
+    // currentSpeedScale = Math.max(currentSpeedScale, 0.5);
+    updatePhase2(timer, currentSpeedScale, delta);
+  }
+  // updateGroundLayerTwoTwo(delta, currentSpeedScale);
+  updateBonusLayer(delta, currentSpeedScale);
+  updateGround(delta, currentSpeedScale);
+  updateGroundLayerThree(delta, currentSpeedScale);
+  updateGroundLayerTwo(delta, currentSpeedScale);
+  // updateCactus(delta, currentSpeedScale);
+  // updateBird(delta, currentSpeedScale);
+  updatePlatform(delta, currentSpeedScale);
+  updateFlag(delta, currentSpeedScale);
+  updateInterfaceText(delta, currentSpeedScale);
+  // updateMultiplier(delta, currentSpeedScale);
+  // updateMagnet(delta, currentSpeedScale);
+  updateCoin(delta, currentSpeedScale);
+  updateDino(
+    delta,
+    currentSpeedScale,
+    getGravityFallAdjustment(),
+    getSelectedStarter()
+  );
   updateSpeedScale(delta);
   updateScore(delta);
-  updateMultiplier(delta, speedScale);
-  updateCoin(delta, speedScale);
+
   if (checkLose()) return handleLose();
   if (checkMultiplierCollision());
   if (checkCoinCollision());
+  if (checkStarCollision());
+  if (checkCherryCollision());
+  if (checkHeartCollision());
+  if (checkMagnetCollision());
+  if (checkLeafCollision());
   lastTime = time;
   window.requestAnimationFrame(update);
 }
 
-function createOneUpText() {
+function createOneUpText(element) {
   soundController.beatScore.play();
-
-  const playerContainer = document.querySelector('.player-container'); // Adjust the selector accordingly
-
   const newElement = document.createElement('div');
   newElement.classList.add('one-up', 'sans');
   newElement.style.position = 'absolute';
-  playerContainer.appendChild(newElement);
+  element.appendChild(newElement);
   newElement.textContent = '1UP';
-  setTimeout(() => {
-    // newElement.remove();
-  }, 600);
+  newElement.addEventListener('animationend', () => {
+    newElement.remove();
+  });
   return true;
 }
 
-function toggleElemOn(elem) {
-  const classList = elem.classList;
-  classList.remove('hide-element');
-  classList.add('show-element');
-}
-function toggleElemOff(elem) {
-  const classList = elem.classList;
-  classList.add('hide-element');
-  classList.remove('show-element');
-}
-
-let timerInterval;
-
-// Get the timer elements
-const timerProgress = document.getElementById('timerProgress');
-
-let multiplierTimer = 5000; // Set the initial time in milliseconds
 let currentComboScore = 0; // Initialize the current combo score variable
 
 function resetMultiplier() {
   toggleElemOff(interfaceComboContainer);
   toggleElemOff(currentComboScoreContainer);
-  clearInterval(timerInterval);
+  clearInterval(getTimerInterval());
+  setTimerInterval(null);
   currentComboScore = 0;
   timerProgress.style.width = '100%'; // Set the progress bar to full width
-  multiplierTimer = 5000; // Reset timer when it reaches 0
+  setMultiplierTimer(5000);
   currentMultiplierElem.textContent = 'x1';
   currentMultiplierScoreElem.textContent = '0';
-  multiplierRatio = 1;
+  setMultiplierRatio(1);
 }
 
 function startMultiplierTimer() {
-  clearInterval(timerInterval);
+  clearInterval(getTimerInterval());
+  setMultiplierTimer(5000);
+  const timerInterval = setInterval(() => {
+    setMultiplierTimer(getMultiplierTimer() - 100); // Subtract 100 milliseconds (adjust as needed)
+    const progressValue = (getMultiplierTimer() / 5000) * 100; // Calculate progress value
 
-  multiplierTimer = 5000; // Reset the timer to its initial value
-
-  timerInterval = setInterval(() => {
-    multiplierTimer -= 100; // Subtract 100 milliseconds (adjust as needed)
-    const progressValue = (multiplierTimer / 5000) * 100; // Calculate progress value
-
-    if (multiplierTimer <= 0) {
+    if (getMultiplierTimer() <= 0) {
       resetMultiplier();
     } else {
       timerProgress.style.width = `${progressValue}%`;
     }
   }, 100); // Update every 100 milliseconds
+  setTimerInterval(timerInterval);
 }
 
 function checkMultiplierCollision() {
   const dinoRect = getDinoRect();
   getMultiplierRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
-      toggleElemOn(interfaceComboContainer);
-      toggleElemOn(currentComboScoreContainer);
-      soundController.beatScore.play();
+      // soundController.beatScore.play();
       document.getElementById(element.id).remove();
-      clearInterval(timerInterval);
-      startMultiplierTimer();
+      let currentMultiplierRatio = getMultiplierRatio();
       // Multiply the existing multiplier by the newly collided multiplier
-      if (multiplierRatio === 1) {
-        multiplierRatio += parseInt(element.multiplier) - 1;
+      if (currentMultiplierRatio === 1) {
+        currentMultiplierRatio += parseInt(element.multiplier) - 1;
+        setMultiplierRatio(currentMultiplierRatio);
       } else {
-        multiplierRatio += parseInt(element.multiplier);
+        currentMultiplierRatio += parseInt(element.multiplier);
+        setMultiplierRatio(currentMultiplierRatio);
       }
-      currentMultiplierElem.textContent = `x${multiplierRatio}`;
+      updateMultiplierInterface();
       return true;
     }
   });
+}
+
+export function updateMultiplierInterface() {
+  toggleElemOn(interfaceComboContainer);
+  toggleElemOn(currentComboScoreContainer);
+  clearInterval(getTimerInterval());
+  startMultiplierTimer();
+  currentMultiplierElem.textContent = `x${getMultiplierRatio()}`;
 }
 
 const duration = 1000;
@@ -338,7 +459,7 @@ function checkCoinCollision() {
       if (
         coinElement.dataset.type === 'gold-coin' &&
         goldCoinCounter < 14 &&
-        selectedStarter === 'Glasses'
+        getSelectedStarter() === 'Glasses'
       ) {
         // Increment the counter and update the value of the next red gem
         goldCoinCounter++;
@@ -370,6 +491,141 @@ function checkCoinCollision() {
     }
   });
 }
+
+function createOneUpTextAtPosition(position) {
+  soundController.beatScore.play();
+  const newElement = document.createElement('div');
+  newElement.classList.add('one-up', 'moving-interface-text');
+  newElement.style.position = 'absolute';
+  newElement.dataset.interfaceText = true;
+  // Set the position based on the provided coordinates
+  newElement.style.top = `${position.y - 100}px`;
+  worldElem.appendChild(newElement);
+  newElement.textContent = '1UP';
+
+  // Store the created element in the array
+  addInterfaceTextElem(newElement);
+
+  // Listen for the animationend event to remove the element
+  newElement.addEventListener('animationend', () => {
+    newElement.remove();
+    removeInterfaceTextElem(newElement);
+  });
+
+  return true;
+}
+
+function checkHeartCollision() {
+  const dinoRect = getDinoRect();
+  getHeartRects().some((element) => {
+    if (isCollision(element.rect, dinoRect)) {
+      const collisionPosition = { x: dinoRect.x, y: dinoRect.y };
+
+      let currentLives = parseInt(livesElem.textContent, 10);
+      currentLives += 1;
+      livesElem.textContent = currentLives;
+      const heartElement = document.getElementById(element.id);
+      createOneUpTextAtPosition(collisionPosition);
+      heartElement.remove();
+      // // Add a class to dinoElem
+
+      // // Set a timeout to remove the class after the star duration
+      // setTimeout(() => {
+
+      //   // Remove the class from dinoElem after the star duration
+      // }, 100);
+
+      return true;
+    }
+  });
+}
+
+function checkLeafCollision() {
+  const dinoRect = getDinoRect();
+  getLeafRects().some((element) => {
+    if (isCollision(element.rect, dinoRect)) {
+      const leaf = document.getElementById(element.id);
+      setHasLeaf(true);
+      setJumpCountLimit(4);
+      leaf.remove();
+      setTimeout(() => {
+        setHasLeaf(false);
+        setJumpCountLimit(1);
+      }, getLeafDuration());
+      return true;
+    }
+  });
+}
+
+function checkCherryCollision() {
+  const dinoRect = getDinoRect();
+  getCherryRects().some((element) => {
+    if (isCollision(element.rect, dinoRect)) {
+      const cherryElement = document.getElementById(element.id);
+      // Create a pickup text element
+      const newElement = document.createElement('div');
+      if (!(getCherryPoints() >= 8000)) {
+        if (cherryElement.dataset.points != getCherryPoints()) {
+          cherryElement.dataset.points = getCherryPoints();
+        }
+        setCherryPoints(getCherryPoints() * 2);
+      }
+      addPickupText(newElement, cherryElement);
+      cherryElement.remove();
+      return true;
+    }
+  });
+}
+
+function checkStarCollision() {
+  const dinoRect = getDinoRect();
+  getStarRects().some((element) => {
+    if (isCollision(element.rect, dinoRect)) {
+      const starElement = document.getElementById(element.id);
+      starElement.remove();
+      setHasStar(true);
+      // Add a class to dinoElem
+      dinoElem.classList.add('star-invincible');
+
+      // Set a timeout to remove the class after the star duration
+      setTimeout(() => {
+        setHasStar(false);
+        setPlayerImmunity(false);
+        // Remove the class from dinoElem after the star duration
+        dinoElem.classList.remove('star-invincible');
+      }, getStarDuration());
+      setTimedPlayerImmunity(getStarDuration());
+
+      return true;
+    }
+  });
+}
+
+function checkMagnetCollision() {
+  const dinoRect = getDinoRect();
+  getMagnetRects().some((element) => {
+    if (isCollision(element.rect, dinoRect)) {
+      const magnetElement = document.getElementById(element.id);
+      magnetElement.remove();
+      document.querySelectorAll('[data-coin]').forEach((coin) => {
+        coin.dataset.locked = 'true';
+        coin.dataset.isMagnetLocked = 'true';
+        coin.dataset.isLocking === 'false';
+      });
+      return true;
+    }
+  });
+}
+
+// setTimeout(() => {
+//   collisionOccurred = false;
+//   dinoElem.classList.remove('flash-animation');
+//   dinoElem.classList.add('flash-light-animation');
+// }, 400);
+// setTimeout(() => {
+//   collisionOccurred = false;
+//   dinoElem.classList.remove('flash-light-animation');
+// }, 1600);
 
 // Function to create glasses buff div
 function createGlassesBuffDiv(imgSrc) {
@@ -415,7 +671,6 @@ function updateGlassesBuffDiv(counter) {
       glassesBuffDiv.classList.remove('hide-element');
       glassesBuffDiv.classList.add('show-element');
     }
-
     glassesBuffStackDiv.textContent = counter;
   }
 }
@@ -432,11 +687,11 @@ function addPickupText(text, pickupElement) {
   randomArc(text);
   pickupElement.parentNode.insertBefore(text, pickupElement);
   let pickupPoints, points;
-
+  let currentMultiplierRatio = getMultiplierRatio();
   //case when glasses are starter
   if (pickupElement.dataset.type === 'red-gem' && redGemMultiplier !== 1) {
     pickupPoints = pickupElement?.dataset?.points * redGemMultiplier;
-    points = pickupPoints * multiplierRatio;
+    points = pickupPoints * currentMultiplierRatio;
     redGemMultiplier = 1;
     goldCoinCounter = 0;
     const glassesBuffStackDiv = document.getElementById('glasses-buff');
@@ -452,15 +707,14 @@ function addPickupText(text, pickupElement) {
   }
   //case when coins are starter
   else if (
-    selectedStarter === 'Coins' &&
+    getSelectedStarter() === 'Coins' &&
     pickupElement.dataset.type === 'gold-coin'
   ) {
     pickupPoints = Math.round(pickupElement?.dataset?.points / 2);
-    points = pickupPoints * multiplierRatio;
+    points = pickupPoints * currentMultiplierRatio;
   } else {
-    console.log(pickupElement.dataset.type);
     pickupPoints = pickupElement?.dataset?.points;
-    points = pickupPoints * multiplierRatio;
+    points = pickupPoints * currentMultiplierRatio;
   }
   updateScoreWithPoints(points);
   const fontSize = calculateFontSize(points);
@@ -468,38 +722,40 @@ function addPickupText(text, pickupElement) {
   text.textContent = `+${points}`;
   // Add a div inside the lastMultiplierScore
   const innerDiv = document.createElement('div');
-  innerDiv.textContent = `+${pickupPoints}x${multiplierRatio}`;
+  innerDiv.textContent = `+${pickupPoints}x${currentMultiplierRatio}`;
   innerDiv.classList.add('inner-plus-points', 'sans');
 
   // Check if there is an existing innerDiv, remove it if present
   const existingInnerDiv =
     lastMultiplierScore.querySelector('.inner-plus-points');
   if (existingInnerDiv) {
-    lastMultiplierScore.removeChild(existingInnerDiv);
+    existingInnerDiv.remove();
   }
 
   // Append the new innerDiv inside lastMultiplierScore
   lastMultiplierScore.appendChild(innerDiv);
 
-  // Remove the new innerDiv after 1 second
-  setTimeout(() => {
-    lastMultiplierScore.removeChild(innerDiv);
-  }, 1000);
+  if (innerDiv) {
+    // Remove the new innerDiv after 1 second
+    setTimeout(() => {
+      innerDiv.remove();
+    }, 1000);
+  }
 }
 
 let scoreSinceMilestone = 0;
 
-function updateScoreWithPoints(delta) {
+export function updateScoreWithPoints(delta) {
   const initialScore = score;
   const increments = Math.ceil(duration / updateInterval);
   const incrementAmount = delta / increments;
-
+  let currentMultiplierRatio = getMultiplierRatio();
   const intervalId = setInterval(() => {
     score += incrementAmount;
     scoreSinceMilestone += incrementAmount;
     scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
 
-    if (multiplierRatio > 1) {
+    if (currentMultiplierRatio > 1) {
       currentComboScore += incrementAmount;
       currentMultiplierScoreElem.textContent = Math.floor(currentComboScore)
         .toString()
@@ -516,8 +772,13 @@ function checkLose() {
   //init dino rect
   const dinoRect = getDinoRect();
 
+  const cactusRects = getCactusRects();
+  const birdRects = getBirdRects();
+
+  const allEnemyRects = [...cactusRects, ...birdRects];
+
   //init enemy and player collision state
-  const isEnemyAndPlayerCollision = getCactusRects().some((rect) =>
+  const isEnemyAndPlayerCollision = allEnemyRects.some((rect) =>
     isCollision(rect, dinoRect)
   );
 
@@ -527,7 +788,7 @@ function checkLose() {
     worldElem.classList.remove('stop-time'); // Add the class to stop time
     return true;
   } //check if enemy and player are in colliding
-  else if (isEnemyAndPlayerCollision && !playerImmunity) {
+  else if (isEnemyAndPlayerCollision && !getPlayerImmunity() && !getHasStar()) {
     //check if player is not in previous collision state
     if (!collisionOccurred) {
       // decrement lives elem by 1
@@ -548,7 +809,6 @@ function checkLose() {
 
       // // Set a timeout to reset player collision state and player flash
       setTimeout(() => {
-        collisionOccurred = false;
         dinoElem.classList.remove('flash-animation');
         dinoElem.classList.add('flash-light-animation');
       }, 400);
@@ -557,6 +817,7 @@ function checkLose() {
         dinoElem.classList.remove('flash-light-animation');
       }, 1600);
     }
+  } else if (isEnemyAndPlayerCollision && getPlayerImmunity()) {
   }
 }
 
@@ -582,7 +843,7 @@ muteButton.addEventListener('click', function () {
   }
 });
 
-function isCollision(rect1, rect2) {
+export function isCollision(rect1, rect2) {
   return (
     rect1.left < rect2.right &&
     rect1.top < rect2.bottom &&
@@ -592,7 +853,7 @@ function isCollision(rect1, rect2) {
 }
 
 function updateSpeedScale(delta) {
-  speedScale += delta * SPEED_SCALE_INCREASE;
+  currentSpeedScale += delta * getSpeedScaleIncrease();
 }
 
 // Assuming you have the necessary elements in your HTML
@@ -610,7 +871,7 @@ function handleLevelUp() {
   // Increment the level
   const currentLevel = parseInt(levelDisplayElem.textContent, 10);
   levelDisplayElem.textContent = currentLevel + 1;
-  if (selectedStarter === 'Book Smart') {
+  if (getSelectedStarter() === 'Text book') {
     currentPassives.forEach((item) => {
       const currentItem = collectableOptions.find(
         (curItem) => curItem.type === item.type
@@ -665,25 +926,34 @@ function handleCheckIfHighScore(score) {
 }
 
 function setUpElements() {
+  setupStar();
   setupGround();
   setupGroundLayerTwo();
+  // setupGroundLayerTwoTwo();
   setupGroundLayerThree();
+  setupBonusLayer();
   setupDino();
   setupCactus();
+  setupBird();
   setupMultiplier();
   setupCoin();
+  setupPlatform();
+  setupMagnet();
 }
 
 function handleStart() {
+  updateNotification(`stage ${getCurrentPhase()}!`);
+  clearInterval(idleIntervalId); // Clear the interval
   worldElem.setAttribute('transition-style', 'in:circle:center');
   lastTime = null;
   hasBeatenScore = false;
-  speedScale = 0.9;
   score = 0;
-  multiplierRatio = 1;
+  startTimer();
+  setMultiplierRatio(1);
+  let currentMultiplierRatio = getMultiplierRatio();
   setUpElements();
   dinoElem.classList.remove('leap');
-  currentMultiplierElem.textContent = `x${multiplierRatio}`;
+  currentMultiplierElem.textContent = `x${currentMultiplierRatio}`;
   livesElem.textContent = 10;
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
@@ -757,6 +1027,46 @@ function handleStart() {
   // tickerContainerElem.classList.remove('show-element');
 
   window.requestAnimationFrame(update);
+}
+
+let timer = 0;
+let intervalId;
+
+function updateTimer() {
+  timer++;
+  currentGameTimerElem.textContent = formatTime(timer);
+}
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+}
+
+function startTimer() {
+  intervalId = setInterval(updateTimer, 1000); // Update the timer every second
+}
+
+function stopTimer() {
+  clearInterval(intervalId);
+}
+
+// Function to toggle the pause state
+export function togglePause() {
+  isPaused = !isPaused;
+  // const body = document.body;
+  if (isPaused) {
+    // body.classList.add('pause-animation');
+    pauseIconButton.src = playImg;
+    stopTimer(); // Pause the timer
+    snow.togglePause();
+  } else {
+    // body.classList.remove('pause-animation');
+    pauseIconButton.src = pauseImg;
+    snow.togglePause();
+    startTimer(); // Start the timer or resume from where it left off
+    window.requestAnimationFrame(update);
+  }
 }
 
 function revealAchievementForm(index, score) {
@@ -1056,71 +1366,6 @@ handleOrientationChange();
 // Listen for orientation changes
 window.addEventListener('orientationchange', handleOrientationChange);
 
-//snow particle system
-const snow = {
-  el: '#snow',
-  density: 12500, // higher = fewer bits
-  maxHSpeed: 1, // How much do you want them to move horizontally
-  minFallSpeed: 0.5,
-  canvas: null,
-  ctx: null,
-  particles: [],
-  colors: [],
-  mp: 1,
-  quit: false,
-  init() {
-    this.canvas = document.querySelector(this.el);
-    this.ctx = this.canvas.getContext('2d');
-    this.reset();
-    requestAnimationFrame(this.render.bind(this));
-    window.addEventListener('resize', this.reset.bind(this));
-  },
-  reset() {
-    this.w = window.innerWidth;
-    this.h = window.innerHeight;
-    this.canvas.width = this.w;
-    this.canvas.height = this.h;
-    this.particles = [];
-    this.mp = Math.ceil((this.w * this.h) / this.density);
-    for (let i = 0; i < this.mp; i++) {
-      let size = Math.random() * 1.7 + 3;
-      this.particles.push({
-        x: Math.random() * this.w, //x-coordinate
-        y: Math.random() * this.h, //y-coordinate
-        w: size,
-        h: size,
-        vy: this.minFallSpeed + Math.random(), //density
-        vx: Math.random() * this.maxHSpeed - this.maxHSpeed / 2,
-        fill: '#ffffff',
-        s: Math.random() * 0.2 - 0.1,
-      });
-    }
-  },
-
-  render() {
-    this.ctx.clearRect(0, 0, this.w, this.h);
-    this.particles.forEach((p, i) => {
-      p.y += p.vy;
-      p.x += p.vx;
-      this.ctx.fillStyle = p.fill;
-      this.ctx.fillRect(p.x, p.y, p.w, p.h);
-      if (p.x > this.w + 5 || p.x < -5 || p.y > this.h) {
-        p.x = Math.random() * this.w;
-        p.y = -10;
-      }
-    });
-    if (this.quit) {
-      return;
-    }
-    requestAnimationFrame(this.render.bind(this));
-  },
-  destroy() {
-    this.quit = true;
-  },
-};
-
-snow.init();
-
 const textToType = 'Game Over';
 
 function typeLetters(index) {
@@ -1163,9 +1408,10 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 }
 
 export let collectableOptions = [
-  { type: 'gold-coin', weight: 0.3, points: 13 },
-  { type: 'red-gem', weight: 0.1, points: 45 },
-  { type: 'silver-coin', weight: 0.6, points: 6 },
+  { type: 'gold-coin', weight: 0.3, points: 31 },
+  { type: 'red-gem', weight: 0.1, points: 85 },
+  { type: 'silver-coin', weight: 0.6, points: 16 },
+  { type: 'cherry', weight: 0, points: 1000 },
 ];
 
 //buff-effects
@@ -1176,7 +1422,8 @@ function filetMignonEffect() {
   let currentLives = parseInt(livesElem.textContent, 10);
   currentLives += rank;
   livesElem.textContent = currentLives;
-  createOneUpText();
+  const playerContainer = document.querySelector('.player-container');
+  createOneUpText(playerContainer);
 }
 
 function trustyPocketWatchEffect() {
@@ -1220,10 +1467,11 @@ function getRandomCollectable() {
 
 function sackOfCoinsEffect() {
   let totalPoints = 0;
+  let currentMultiplierRatio = getMultiplierRatio();
 
   for (let i = 0; i < 25; i++) {
     const randomCollectable = getRandomCollectable();
-    totalPoints += randomCollectable.points;
+    totalPoints += randomCollectable.points * currentMultiplierRatio;
   }
 
   updateScoreWithPoints(totalPoints);
@@ -1237,17 +1485,14 @@ function momsCookiesEffect() {
   updateScoreWithPoints(milestone);
 }
 
-let gravityFallAdjustment = 0.01;
-
 function reduceByPercentage(value, percentage) {
   return value * (1 - percentage);
 }
 
 function slowFallEffect() {
   const reductionPercentage = 0.3; // Adjust the percentage as needed
-  gravityFallAdjustment = reduceByPercentage(
-    gravityFallAdjustment,
-    reductionPercentage
+  setGravityFallAdjustment(
+    reduceByPercentage(getGravityFallAdjustment(), reductionPercentage)
   );
 }
 
@@ -1352,7 +1597,7 @@ let selectedStarter;
 let currentPassives = [];
 
 function handleAddToCurrentPassives(effect, type, lastValue) {
-  if (selectedStarter === 'Book Smart') {
+  if (getSelectedStarter() === 'Text book') {
     currentPassives.push({
       effect: effect,
       lastValue: lastValue,
@@ -1369,15 +1614,15 @@ function booksSmartEffect() {
       );
     });
   }
-  selectedStarter = 'Book Smart';
+  setSelectedStarter('Text book');
 }
 
 function glassesEffect() {
-  selectedStarter = 'Glasses';
+  setSelectedStarter('Glasses');
 }
 
 function coinsEffect() {
-  selectedStarter = 'Coins';
+  setSelectedStarter('Coins');
 }
 
 export { booksSmartEffect, glassesEffect, coinsEffect };
