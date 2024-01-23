@@ -6,7 +6,7 @@ import {
 import StateSingleton from '../game-state';
 import { worldElem, dinoElem } from '../elements-refs.js';
 import { isCollision, updateNotification } from '../game-manager.js';
-import { getDinoRect } from './dino.js';
+import { getDinoRect } from './player-controller.js';
 const {
   getGroundSpeed,
   getCurrentPhase,

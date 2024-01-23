@@ -6,7 +6,7 @@ import {
 import bush1 from '../public/imgs/obstacles/bushes/Bush-1.png';
 import rock1 from '../public/imgs/obstacles/rocks/Rock-1.png';
 import rock2 from '../public/imgs/obstacles/rocks/Rock-2.png';
-import { getDinoRect } from './dino';
+import { getDinoRect } from './player-controller';
 import { isCollision, updateMultiplierInterface } from '../game-manager';
 import StateSingleton from '../game-state';
 import {
@@ -178,7 +178,7 @@ export function updateCactus(delta, speedScale) {
     ) {
       if (getPlayerImmunity() && getHasStar()) {
         const text = document.createElement('div');
-        text.classList.add('cactus-plus-points');
+        text.classList.add('enemy-plus-points');
         text.style.position = 'absolute';
         text.style.left = cactus.offsetLeft + 'px';
         text.style.top = cactus.offsetTop - 70 + 'px';
@@ -186,8 +186,11 @@ export function updateCactus(delta, speedScale) {
         const points = getMultiplierRatio() * getObstaclePoints();
         text.textContent = `+${points}`;
         updateScoreWithPoints(points);
-        cactus.classList.add('cactus-die');
+        cactus.classList.add('enemy-die');
         cactus.dataset.scoreUpdated = true;
+        text.addEventListener('animationend', () => {
+          text.remove();
+        });
         // After the transition, remove the cactus
         cactus.addEventListener('animationend', () => {
           cactus.remove();

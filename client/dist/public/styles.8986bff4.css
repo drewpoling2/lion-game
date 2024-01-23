@@ -352,15 +352,18 @@ body.pause-animation * {
 }
 
 .star-invincible {
-  animation: starInvincible 0.23s infinite; /* Adjust the duration and other properties as needed */
+  animation: starInvincible 0.23s step-start infinite; /* Adjust the duration and other properties as needed */
 }
 
 @keyframes starInvincible {
-  from {
+  0% {
     filter: grayscale(0%) brightness(100%) saturate(100%) invert(0);
   }
-  to {
+  50% {
     filter: grayscale(0%) brightness(110%) saturate(120%) invert(1);
+  }
+  0% {
+    filter: grayscale(0%) brightness(100%) saturate(100%) invert(0);
   }
 }
 
@@ -1373,7 +1376,12 @@ progress[value]::-moz-progress-bar {
   }
 }
 
-.cactus-die {
+.penguin-die {
+  background-image: url('/Penguin-Fall-1.99de7b84.png') !important;
+  animation: cactusDie 1s ease-in-out forwards !important;
+}
+
+.enemy-die {
   animation: cactusDie 1s ease-in-out forwards;
 }
 
@@ -1436,11 +1444,12 @@ progress[value]::-moz-progress-bar {
   align-items: flex-end;
 }
 
-.cactus-plus-points {
+.enemy-plus-points {
+  text-shadow: 1px 2px 0 #000;
   width: fit-content;
   -webkit-text-stroke: 0.5px white; /* width and color */
   color: white;
-  animation: fadeUpNoArc 0.6s forwards; /* Animation for fade in with upward translate */
+  animation: fadeUpNoArc 0.6s linear; /* Animation for fade in with upward translate */
   transition: opacity 0.6s; /* Add a transition for the opacity property over 1 second */
 }
 
@@ -1454,7 +1463,7 @@ progress[value]::-moz-progress-bar {
     transform: translateY(-70px) scale(1);
   }
   100% {
-    opacity: 1;
+    opacity: 0;
     transform: translateY(-120px) scale(1);
   }
 }
@@ -1493,21 +1502,6 @@ progress[value]::-moz-progress-bar {
   color: white;
   animation: fadeInUp 0.6s forwards; /* Animation for fade in with upward translate */
   transition: opacity 0.6s; /* Add a transition for the opacity property over 1 second */
-}
-
-@keyframes fadeUpNoArc {
-  0% {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(-80px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(-130px);
-  }
 }
 
 .one-up {
@@ -2338,7 +2332,7 @@ progress[value]::-moz-progress-bar {
   position: absolute;
   left: calc(var(--left) * 1%);
   bottom: calc(var(--bottom) * 1%);
-  animation-timing-function: step-start; /* Use step-start for instant transitions */
+  animation-timing-function: step-end; /* Use step-start for instant transitions */
 }
 
 .flag-animation {
@@ -2392,6 +2386,143 @@ progress[value]::-moz-progress-bar {
   }
 }
 
+.walking-penguin {
+  width: 50px;
+  height: 60px !important;
+  background-position: bottom;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: penguinWalk 0.55s step-end infinite; /* Use step-start for instant transitions */
+}
+@keyframes penguinWalk {
+  0% {
+    background-image: url('/Walking-Penguin-1.d110ff57.png');
+  }
+  16.6667% {
+    background-image: url('/Walking-Penguin-2.e22f9a98.png');
+  }
+  33.3333% {
+    background-image: url('/Walking-Penguin-3.482ecabb.png');
+  }
+  50% {
+    background-image: url('/Walking-Penguin-4.66add5fb.png');
+  }
+  66.6667% {
+    background-image: url('/Walking-Penguin-5.793bc7e3.png');
+  }
+  83.3333% {
+    background-image: url('/Walking-Penguin-6.a0e15231.png');
+  }
+  100% {
+    background-image: url('/Walking-Penguin-1.d110ff57.png');
+  }
+}
+
+.spinning-penguin {
+  width: 40px;
+  height: 5% !important;
+  background-position: bottom;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: penguinSlide 0.9s step-end infinite; /* Use step-start for instant transitions */
+}
+
+@keyframes penguinSlide {
+  0% {
+    background-image: url('/Sliding-Penguin-1.82dac815.png');
+  }
+  14.2857% {
+    background-image: url('/Sliding-Penguin-2.2cc3d2d1.png');
+  }
+  28.5714% {
+    background-image: url('/Sliding-Penguin-3.a1d961c2.png');
+  }
+  42.8571% {
+    background-image: url('/Sliding-Penguin-4.11ed4842.png');
+  }
+  57.1428% {
+    background-image: url('/Sliding-Penguin-5.56fe5d3a.png');
+  }
+  71.4285% {
+    background-image: url('/Sliding-Penguin-6.225a5c22.png');
+  }
+  85.7142% {
+    background-image: url('/Sliding-Penguin-7.9d1f221e.png');
+  }
+  100% {
+    background-image: url('/Sliding-Penguin-1.82dac815.png');
+  }
+}
+
+.dive-penguin {
+  width: 40px;
+  height: 20px;
+  background-position: bottom;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: penguinDive 0.3s ease-in-out;
+}
+
+@keyframes penguinDive {
+  0% {
+    transform: translateY(0px);
+    background-image: url('/Flap-1.2d756188.png');
+  }
+  50% {
+    transform: translateY(-15px);
+    background-image: url('/Flap-2.703907d2.png');
+  }
+  100% {
+    transform: translateY(0px);
+    background-image: url('/Flap-1.2d756188.png');
+  }
+}
+
+.idle-penguin {
+  width: 40px;
+  height: 20px;
+  background-position: bottom;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: penguinIdle 0.2s infinite ease-in-out;
+}
+
+@keyframes penguinIdle {
+  0% {
+    background-image: url('/Idle-Penguin-1.3f75e122.png');
+  }
+  50% {
+    background-image: url('/Idle-Penguin-2.9733851b.png');
+  }
+  100% {
+    background-image: url('/Idle-Penguin-1.3f75e122.png');
+  }
+}
+
+.rolling-penguin {
+  width: 35px;
+  height: 20px;
+  background-position: bottom;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: penguinRolling 0.45s infinite ease-in-out;
+}
+
+@keyframes penguinRolling {
+  0% {
+    background-image: url('/Rolling-Penguin-4.8a7b8d0c.png');
+  }
+  33% {
+    background-image: url('/Rolling-Penguin-3.f5c8ca4b.png');
+  }
+  66% {
+    background-image: url('/Rolling-Penguin-2.56c3723a.png');
+  }
+  100% {
+    background-image: url('/Rolling-Penguin-1.614b20c1.png');
+  }
+}
+
 .flying-penguin {
   width: 35px;
   height: 20px;
@@ -2424,6 +2555,13 @@ progress[value]::-moz-progress-bar {
   100% {
     transform: translateY(-10.5px);
   }
+}
+
+.ground-enemy {
+  --bottom: 20;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
 }
 
 .bird {

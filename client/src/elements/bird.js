@@ -3,7 +3,7 @@ import {
   incrementCustomProperty,
   getCustomProperty,
 } from '../utility/updateCustomProperty';
-import { getDinoRect } from './dino';
+import { getDinoRect } from './player-controller';
 import { isCollision, updateMultiplierInterface } from '../game-manager';
 import StateSingleton from '../game-state';
 import {
@@ -176,7 +176,7 @@ export function updateBird(delta, speedScale) {
     ) {
       if (getPlayerImmunity() && getHasStar()) {
         const text = document.createElement('div');
-        text.classList.add('bird-plus-points');
+        text.classList.add('enemy-plus-points');
         text.style.position = 'absolute';
         text.style.left = bird.offsetLeft + 'px';
         text.style.top = bird.offsetTop - 70 + 'px';
@@ -184,7 +184,7 @@ export function updateBird(delta, speedScale) {
         const points = getMultiplierRatio() * getObstaclePoints();
         text.textContent = `+${points}`;
         updateScoreWithPoints(points);
-        bird.classList.add('bird-die');
+        bird.classList.add('enemy-die');
         bird.dataset.scoreUpdated = true;
         // After the transition, remove the bird
         bird.addEventListener('animationend', () => {

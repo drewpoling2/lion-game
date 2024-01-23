@@ -17,12 +17,17 @@ import {
   getDinoRect,
   setDinoLose,
   handleIdle,
-} from './elements/dino.js';
+} from './elements/player-controller.js';
 import {
   updateCactus,
   setupCactus,
   getCactusRects,
 } from './elements/cactus.js';
+import {
+  updateGroundEnemy,
+  setupGroundEnemy,
+  getGroundEnemyRects,
+} from './elements/ground-enemy';
 import { updateBird, setupBird, getBirdRects } from './elements/bird.js';
 import {
   updatePlatform,
@@ -290,6 +295,23 @@ export function updateNotification(
   }, typeLettersDelay);
 }
 
+function checkCollisions() {
+  if (checkLose()) return handleLose();
+  checkMultiplierCollision();
+  checkCoinCollision();
+  checkStarCollision();
+  checkCherryCollision();
+  checkHeartCollision();
+  checkMagnetCollision();
+  checkLeafCollision();
+}
+
+const phaseUpdateFunctions = {
+  1: updatePhase1,
+  bonus: updateBonusPhase,
+  2: updatePhase2,
+};
+
 function update(time) {
   if (isPaused) {
     // Do nothing if the game is paused
@@ -302,7 +324,7 @@ function update(time) {
     return;
   }
 
-  let baseDelta = 20;
+  let baseDelta = 15;
   // let delta = time - lastTime;
   let delta = baseDelta;
   if (collisionOccurred && !getPlayerImmunity()) {
@@ -314,30 +336,25 @@ function update(time) {
     }, 400);
     return; // Pause the update during the delay
   }
-  // Update based on the current phase
-  if (getCurrentPhase() === 1) {
-    updatePhase1(timer, delta, currentSpeedScale);
-  } else if (getCurrentPhase() === 'bonus') {
-    updateBonusPhase(timer, currentSpeedScale, delta);
-  } else if (getCurrentPhase() === 2) {
-    // currentSpeedScale *= decelerationFactor;
-    // // Ensure the speed scale doesn't go below 0.6
-    // currentSpeedScale = Math.max(currentSpeedScale, 0.5);
-    updatePhase2(timer, currentSpeedScale, delta);
+
+  const updateFunction = phaseUpdateFunctions[getCurrentPhase()];
+  if (updateFunction) {
+    updateFunction(timer, delta, currentSpeedScale);
   }
-  // updateGroundLayerTwoTwo(delta, currentSpeedScale);
+  updateGroundLayerTwoTwo(delta, currentSpeedScale);
   updateBonusLayer(delta, currentSpeedScale);
   updateGround(delta, currentSpeedScale);
   updateGroundLayerThree(delta, currentSpeedScale);
   updateGroundLayerTwo(delta, currentSpeedScale);
   // updateCactus(delta, currentSpeedScale);
   // updateBird(delta, currentSpeedScale);
+  // updateGroundEnemy(delta, currentSpeedScale);
   updatePlatform(delta, currentSpeedScale);
-  updateFlag(delta, currentSpeedScale);
+  // updateFlag(delta, currentSpeedScale);
   updateInterfaceText(delta, currentSpeedScale);
   // updateMultiplier(delta, currentSpeedScale);
   // updateMagnet(delta, currentSpeedScale);
-  updateCoin(delta, currentSpeedScale);
+  // updateCoin(delta, currentSpeedScale);
   updateDino(
     delta,
     currentSpeedScale,
@@ -347,14 +364,7 @@ function update(time) {
   updateSpeedScale(delta);
   updateScore(delta);
 
-  if (checkLose()) return handleLose();
-  if (checkMultiplierCollision());
-  if (checkCoinCollision());
-  if (checkStarCollision());
-  if (checkCherryCollision());
-  if (checkHeartCollision());
-  if (checkMagnetCollision());
-  if (checkLeafCollision());
+  checkCollisions();
   lastTime = time;
   window.requestAnimationFrame(update);
 }
@@ -774,8 +784,8 @@ function checkLose() {
 
   const cactusRects = getCactusRects();
   const birdRects = getBirdRects();
-
-  const allEnemyRects = [...cactusRects, ...birdRects];
+  const groundEnemyRects = getGroundEnemyRects();
+  const allEnemyRects = [...cactusRects, ...birdRects, ...groundEnemyRects];
 
   //init enemy and player collision state
   const isEnemyAndPlayerCollision = allEnemyRects.some((rect) =>
@@ -926,18 +936,33 @@ function handleCheckIfHighScore(score) {
 }
 
 function setUpElements() {
-  setupStar();
+  setupGroundElements();
+  setupObstacles();
+  setupCharacters();
+  setupPowerUps();
+  setupPlatform();
+}
+
+function setupGroundElements() {
   setupGround();
   setupGroundLayerTwo();
-  // setupGroundLayerTwoTwo();
   setupGroundLayerThree();
   setupBonusLayer();
-  setupDino();
+}
+
+function setupObstacles() {
   setupCactus();
   setupBird();
+  setupGroundEnemy();
+}
+
+function setupCharacters() {
+  setupDino();
+}
+
+function setupPowerUps() {
   setupMultiplier();
   setupCoin();
-  setupPlatform();
   setupMagnet();
 }
 

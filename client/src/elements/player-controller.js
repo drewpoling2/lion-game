@@ -16,10 +16,11 @@ import lionIdleImg3 from '../public/imgs/nittany-lion/rest-animation/Rest-3.png'
 import { soundController } from '../utility/sound-controller.js';
 import { collectableOptions } from '../game-manager.js';
 import StateSingleton from '../game-state.js';
-const { getHasLeaf, getJumpCountLimit } = StateSingleton;
+const { getHasLeaf, getJumpCountLimit, getGravityFallAdjustment } =
+  StateSingleton;
 const dinoElem = document.querySelector('[data-dino]');
 const dinoImg = document.querySelector('.dino-img');
-const JUMP_SPEED = 0.21;
+const JUMP_SPEED = 0.245;
 const DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
 const GRAVITY = 0.0009;
 const DINO_FRAME_COUNT = 4;
@@ -53,10 +54,14 @@ export function setupDino() {
   // Function to check if the device is a mobile device
   if (isMobileDevice()) {
     document.removeEventListener('touchstart', onJump);
+    document.removeEventListener('touchend', onJumpEnd);
     document.addEventListener('touchstart', onJump);
+    document.addEventListener('touchend', onJumpEnd);
     document.addEventListener('touchstart', onDive);
   } else {
     document.removeEventListener('keydown', onJump);
+    document.removeEventListener('keyup', onJumpEnd);
+    document.addEventListener('keyup', onJumpEnd);
     document.addEventListener('keydown', onJump);
     document.addEventListener('keydown', onDive);
   }
@@ -145,7 +150,7 @@ function handleRun(delta, speedScale, selectedStarter) {
     if (dinoRect.left >= currentPlatformRect.right) {
       dropOffPlatform = true;
       const currentBottom = getCustomProperty(dinoElem, '--bottom');
-      yVelocity -= GRAVITY * delta; // Increase or decrease gravityAdjustment as needed
+      yVelocity -= GRAVITY * delta - getGravityFallAdjustment() / 6; // Increase or decrease gravityAdjustment as needed
       incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
       if (currentBottom <= BOTTOM_ANCHOR) {
         setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
@@ -163,7 +168,7 @@ function handleRun(delta, speedScale, selectedStarter) {
   }
   if (dropOffPlatform === true) {
     const currentBottom = getCustomProperty(dinoElem, '--bottom');
-    yVelocity -= GRAVITY * delta; // Increase or decrease gravityAdjustment as needed
+    yVelocity -= GRAVITY * delta - getGravityFallAdjustment() / 6; // Increase or decrease gravityAdjustment as needed
     incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
     if (currentBottom <= BOTTOM_ANCHOR) {
       setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
@@ -198,6 +203,32 @@ function handleRun(delta, speedScale, selectedStarter) {
   currentFrameTime += delta * speedScale;
 }
 
+function isCollidingWithPlatforms() {
+  // Check for collision with the top surface of platforms
+  const dinoRect = getDinoRect();
+  const platforms = document.querySelectorAll('[data-platform]');
+  platforms.forEach((platform) => {
+    const platformRect = platform.getBoundingClientRect();
+    if (
+      dinoRect.bottom >= platformRect.top &&
+      dinoRect.bottom <= platformRect.bottom &&
+      dinoRect.right > platformRect.left &&
+      dinoRect.left < platformRect.right
+    ) {
+      endJump();
+
+      // Collision with the top surface of a platform
+      dinoElem.style.bottom = platformRect.top;
+      collisionDetected = true;
+
+      currentPlatformId = platform.id;
+    }
+  });
+}
+
+let jumpStartTime;
+let maxJumpTime = 90; // Maximum duration for the jump in milliseconds
+let minJumpTime = 70; // Minimum jump time in milliseconds
 let currentPlatformId; // Variable to store the ID of the current platform
 let collisionDetected = false;
 let isFalling = false;
@@ -221,33 +252,15 @@ function handleJump(delta, gravityFallAdjustment = 0.01) {
 
   if (isFalling) {
     // Check for collision with the top surface of platforms
-    const dinoRect = getDinoRect();
-    const platforms = document.querySelectorAll('[data-platform]');
-    platforms.forEach((platform) => {
-      const platformRect = platform.getBoundingClientRect();
-
-      if (
-        dinoRect.bottom >= platformRect.top &&
-        dinoRect.bottom <= platformRect.bottom &&
-        dinoRect.right > platformRect.left &&
-        dinoRect.left < platformRect.right
-      ) {
-        endJump();
-
-        // Collision with the top surface of a platform
-        dinoElem.style.bottom = platformRect.top;
-        collisionDetected = true;
-
-        currentPlatformId = platform.id;
-      }
-    });
+    isCollidingWithPlatforms();
   }
 
+  // Check for collision with the ground or platforms
   if (currentBottom <= BOTTOM_ANCHOR) {
     setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);
-    endJump();
     canDoubleJump = true;
     jumpCount = 0;
+    endJump();
   }
 
   if (jumpCount === 1 && canDoubleJump) {
@@ -256,6 +269,7 @@ function handleJump(delta, gravityFallAdjustment = 0.01) {
   }
 }
 
+//handles jump key press event
 function onJump(e) {
   if (
     (e.code !== 'Space' && e.type !== 'touchstart') ||
@@ -264,10 +278,36 @@ function onJump(e) {
     return;
   endJump();
   startJump(newSelectedStarter);
+
+  // Record the timestamp when the jump key is pressed
+  jumpStartTime = Date.now();
   soundController.jump.play();
-  yVelocity = JUMP_SPEED;
   isJumping = true;
+  yVelocity = JUMP_SPEED;
   jumpCount++;
+}
+
+//handles jump key release event
+function onJumpEnd(e) {
+  if ((e.code !== 'Space' && e.type !== 'touchend') || isFalling) return;
+
+  // Calculate the time the jump key has been held down
+  let jumpTime = Date.now() - jumpStartTime;
+
+  // Ensure jumpTime is not lower than minJumpTime
+  jumpTime = Math.max(jumpTime, minJumpTime);
+
+  if (maxJumpTime >= jumpTime + 5) {
+    // Calculate jump strength based on jump time
+    let jumpStrength = Math.min(jumpTime / maxJumpTime, 1); // Normalize between 0 and 1
+    jumpStrength = Math.pow(jumpStrength, 2); // Apply a power function for smoother acceleration
+
+    // Calculate jump velocity
+    const jumpVelocity = JUMP_SPEED * jumpStrength;
+
+    // Set the yVelocity to the calculated jump velocity
+    yVelocity = jumpVelocity;
+  }
 }
 
 const DIVE_SPEED = 0.2; // Adjust the dive speed as needed

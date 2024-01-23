@@ -5,7 +5,7 @@ import {
 } from '../utility/updateCustomProperty';
 import cloud1Img from '../public/imgs/cloud/Cloud-1.png';
 import cloud2Img from '../public/imgs/cloud/Cloud-2.png';
-import { getDinoRect } from './dino';
+import { getDinoRect } from './player-controller';
 import { isCollision, updateMultiplierInterface } from '../game-manager';
 import StateSingleton from '../game-state';
 import ItemDropStateSingleton from '../item-drop-state';
@@ -196,7 +196,7 @@ function createPlatform(newPosition) {
   setCustomProperty(
     parentContainer,
     '--bottom',
-    `${randomNumberBetween(45, 52)}`
+    `${randomNumberBetween(45, 45)}`
   );
   worldElem.append(parentContainer);
 }

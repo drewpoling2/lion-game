@@ -2,11 +2,11 @@
 const ItemDropStateSingleton = (function () {
   //default state
   let state = {
-    // star: { weight: 8 },
+    star: { weight: 8 },
     // magnet: { weight: 4 },
     // heart: { weight: 12 },
     // leaf: { weight: 12 },
-    cherry: { weight: 12 },
+    // cherry: { weight: 12 },
     // empty: { weight: 2 },
   };
 

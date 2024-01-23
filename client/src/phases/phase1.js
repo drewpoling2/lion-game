@@ -14,6 +14,7 @@ export function updatePhase1(timer) {
     isCactusRunning: true,
     isCoinRunning: true,
     isPlatformRunning: true,
+    isGroundEnemyRunning: true,
   });
 
   if (timer > getPhaseTimerInterval()) {

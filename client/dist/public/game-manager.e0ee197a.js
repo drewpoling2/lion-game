@@ -184,18 +184,20 @@ var StateSingleton = function (_ref) {
     cherryPoints: 1000,
     obstaclePoints: 5,
     lastPhase: 0,
-    gravityFallAdjustment: 0.006,
+    gravityFallAdjustment: 0.021,
     selectedStarter: null,
     //elements
     isCoinsRunning: true,
     isPlatformRunning: false,
     isCactusRunning: false,
     isBirdRunning: true,
+    isGroundEnemyRunning: true,
     //world
     isGroundRunning: true,
     isGroundLayer2Running: true,
     isGroundLayer3Running: true,
     groundSpeed: 0.04,
+    groundEnemySpeedFactor: 0.05,
     isFlagCreated: true,
     platformSpeed: 0.05,
     //items
@@ -210,6 +212,12 @@ var StateSingleton = function (_ref) {
     isMagnetItem: false
   };
   return _ref = {
+    getIsGroundEnemyRunning: function getIsGroundEnemyRunning() {
+      return state.isGroundEnemyRunning;
+    },
+    setIsGroundEnemyRunning: function setIsGroundEnemyRunning(newIsGroundEnemyRunning) {
+      state.isGroundEnemyRunning = newIsGroundEnemyRunning;
+    },
     getCherryPoints: function getCherryPoints() {
       return state.cherryPoints;
     },
@@ -251,6 +259,12 @@ var StateSingleton = function (_ref) {
     },
     setGroundSpeed: function setGroundSpeed(newGroundSpeed) {
       state.groundSpeed = newGroundSpeed;
+    },
+    getGroundEnemySpeedFactor: function getGroundEnemySpeedFactor() {
+      return state.groundEnemySpeedFactor;
+    },
+    setGroundEnemySpeedFactor: function setGroundEnemySpeedFactor(newGroundEnemySpeedFactor) {
+      state.groundEnemySpeedFactor = newGroundEnemySpeedFactor;
     },
     getIsMultiplierRunning: function getIsMultiplierRunning() {
       return state.isMultiplierRunning;
@@ -3780,7 +3794,7 @@ var soundController = exports.soundController = {
     volume: 0
   })
 };
-},{"howler":"../node_modules/howler/dist/howler.js"}],"../elements/dino.js":[function(require,module,exports) {
+},{"howler":"../node_modules/howler/dist/howler.js"}],"../elements/player-controller.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3806,10 +3820,11 @@ var _gameManager = require("../game-manager.js");
 var _gameState = _interopRequireDefault(require("../game-state.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 var getHasLeaf = _gameState.default.getHasLeaf,
-  getJumpCountLimit = _gameState.default.getJumpCountLimit;
+  getJumpCountLimit = _gameState.default.getJumpCountLimit,
+  getGravityFallAdjustment = _gameState.default.getGravityFallAdjustment;
 var dinoElem = document.querySelector('[data-dino]');
 var dinoImg = document.querySelector('.dino-img');
-var JUMP_SPEED = 0.21;
+var JUMP_SPEED = 0.245;
 var DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
 var GRAVITY = 0.0009;
 var DINO_FRAME_COUNT = 4;
@@ -3839,10 +3854,14 @@ function setupDino() {
   // Function to check if the device is a mobile device
   if (isMobileDevice()) {
     document.removeEventListener('touchstart', onJump);
+    document.removeEventListener('touchend', onJumpEnd);
     document.addEventListener('touchstart', onJump);
+    document.addEventListener('touchend', onJumpEnd);
     document.addEventListener('touchstart', onDive);
   } else {
     document.removeEventListener('keydown', onJump);
+    document.removeEventListener('keyup', onJumpEnd);
+    document.addEventListener('keyup', onJumpEnd);
     document.addEventListener('keydown', onJump);
     document.addEventListener('keydown', onDive);
   }
@@ -3912,7 +3931,7 @@ function handleRun(delta, speedScale, selectedStarter) {
     if (dinoRect.left >= currentPlatformRect.right) {
       dropOffPlatform = true;
       var currentBottom = (0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom');
-      yVelocity -= GRAVITY * delta; // Increase or decrease gravityAdjustment as needed
+      yVelocity -= GRAVITY * delta - getGravityFallAdjustment() / 6; // Increase or decrease gravityAdjustment as needed
       (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
       if (currentBottom <= BOTTOM_ANCHOR) {
         (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
@@ -3930,7 +3949,7 @@ function handleRun(delta, speedScale, selectedStarter) {
   }
   if (dropOffPlatform === true) {
     var _currentBottom = (0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom');
-    yVelocity -= GRAVITY * delta; // Increase or decrease gravityAdjustment as needed
+    yVelocity -= GRAVITY * delta - getGravityFallAdjustment() / 6; // Increase or decrease gravityAdjustment as needed
     (0, _updateCustomProperty.incrementCustomProperty)(dinoElem, '--bottom', yVelocity * delta);
     if (_currentBottom <= BOTTOM_ANCHOR) {
       (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
@@ -3964,6 +3983,25 @@ function handleRun(delta, speedScale, selectedStarter) {
   }
   currentFrameTime += delta * speedScale;
 }
+function isCollidingWithPlatforms() {
+  // Check for collision with the top surface of platforms
+  var dinoRect = getDinoRect();
+  var platforms = document.querySelectorAll('[data-platform]');
+  platforms.forEach(function (platform) {
+    var platformRect = platform.getBoundingClientRect();
+    if (dinoRect.bottom >= platformRect.top && dinoRect.bottom <= platformRect.bottom && dinoRect.right > platformRect.left && dinoRect.left < platformRect.right) {
+      endJump();
+
+      // Collision with the top surface of a platform
+      dinoElem.style.bottom = platformRect.top;
+      collisionDetected = true;
+      currentPlatformId = platform.id;
+    }
+  });
+}
+var jumpStartTime;
+var maxJumpTime = 90; // Maximum duration for the jump in milliseconds
+var minJumpTime = 70; // Minimum jump time in milliseconds
 var currentPlatformId; // Variable to store the ID of the current platform
 var collisionDetected = false;
 var isFalling = false;
@@ -3983,39 +4021,56 @@ function handleJump(delta) {
   var currentBottom = (0, _updateCustomProperty.getCustomProperty)(dinoElem, '--bottom');
   if (isFalling) {
     // Check for collision with the top surface of platforms
-    var dinoRect = getDinoRect();
-    var platforms = document.querySelectorAll('[data-platform]');
-    platforms.forEach(function (platform) {
-      var platformRect = platform.getBoundingClientRect();
-      if (dinoRect.bottom >= platformRect.top && dinoRect.bottom <= platformRect.bottom && dinoRect.right > platformRect.left && dinoRect.left < platformRect.right) {
-        endJump();
-
-        // Collision with the top surface of a platform
-        dinoElem.style.bottom = platformRect.top;
-        collisionDetected = true;
-        currentPlatformId = platform.id;
-      }
-    });
+    isCollidingWithPlatforms();
   }
+
+  // Check for collision with the ground or platforms
   if (currentBottom <= BOTTOM_ANCHOR) {
     (0, _updateCustomProperty.setCustomProperty)(dinoElem, '--bottom', BOTTOM_ANCHOR);
-    endJump();
     canDoubleJump = true;
     jumpCount = 0;
+    endJump();
   }
   if (jumpCount === 1 && canDoubleJump) {
     yVelocity = DOUBLE_JUMP_SPEED;
     canDoubleJump = false;
   }
 }
+
+//handles jump key press event
 function onJump(e) {
   if (e.code !== 'Space' && e.type !== 'touchstart' || isJumping && jumpCount >= getJumpCountLimit()) return;
   endJump();
   startJump(newSelectedStarter);
+
+  // Record the timestamp when the jump key is pressed
+  jumpStartTime = Date.now();
   _soundController.soundController.jump.play();
-  yVelocity = JUMP_SPEED;
   isJumping = true;
+  yVelocity = JUMP_SPEED;
   jumpCount++;
+}
+
+//handles jump key release event
+function onJumpEnd(e) {
+  if (e.code !== 'Space' && e.type !== 'touchend' || isFalling) return;
+
+  // Calculate the time the jump key has been held down
+  var jumpTime = Date.now() - jumpStartTime;
+
+  // Ensure jumpTime is not lower than minJumpTime
+  jumpTime = Math.max(jumpTime, minJumpTime);
+  if (maxJumpTime >= jumpTime + 5) {
+    // Calculate jump strength based on jump time
+    var jumpStrength = Math.min(jumpTime / maxJumpTime, 1); // Normalize between 0 and 1
+    jumpStrength = Math.pow(jumpStrength, 2); // Apply a power function for smoother acceleration
+
+    // Calculate jump velocity
+    var jumpVelocity = JUMP_SPEED * jumpStrength;
+
+    // Set the yVelocity to the calculated jump velocity
+    yVelocity = jumpVelocity;
+  }
 }
 var DIVE_SPEED = 0.2; // Adjust the dive speed as needed
 var isDiving = false;
@@ -4135,7 +4190,7 @@ var _updateCustomProperty = require("../utility/updateCustomProperty");
 var _Bush = _interopRequireDefault(require("../public/imgs/obstacles/bushes/Bush-1.png"));
 var _Rock = _interopRequireDefault(require("../public/imgs/obstacles/rocks/Rock-1.png"));
 var _Rock2 = _interopRequireDefault(require("../public/imgs/obstacles/rocks/Rock-2.png"));
-var _dino = require("./dino");
+var _playerController = require("./player-controller");
 var _gameManager = require("../game-manager");
 var _gameState = _interopRequireDefault(require("../game-state"));
 var _elementsRefs = require("../elements-refs");
@@ -4213,7 +4268,7 @@ function updateCactus(delta, speedScale) {
     var comboIncremented = cactus.dataset.comboIncremented === 'true';
 
     // Get positions of the dinosaur and cactus
-    var dinoRect = (0, _dino.getDinoRect)();
+    var dinoRect = (0, _playerController.getDinoRect)();
     var cactusRect = cactus.getBoundingClientRect();
 
     // Calculate distance
@@ -4282,7 +4337,7 @@ function updateCactus(delta, speedScale) {
     if (!cactus.dataset.hadCollision && collision === true && !cactus.dataset.scoreUpdated) {
       if (getPlayerImmunity() && getHasStar()) {
         var text = document.createElement('div');
-        text.classList.add('cactus-plus-points');
+        text.classList.add('enemy-plus-points');
         text.style.position = 'absolute';
         text.style.left = cactus.offsetLeft + 'px';
         text.style.top = cactus.offsetTop - 70 + 'px';
@@ -4290,8 +4345,11 @@ function updateCactus(delta, speedScale) {
         var points = getMultiplierRatio() * getObstaclePoints();
         text.textContent = "+".concat(points);
         (0, _gameManager.updateScoreWithPoints)(points);
-        cactus.classList.add('cactus-die');
+        cactus.classList.add('enemy-die');
         cactus.dataset.scoreUpdated = true;
+        text.addEventListener('animationend', function () {
+          text.remove();
+        });
         // After the transition, remove the cactus
         cactus.addEventListener('animationend', function () {
           cactus.remove();
@@ -4377,7 +4435,7 @@ function createCactus(newPosition, groupId) {
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/obstacles/bushes/Bush-1.png":"imgs/obstacles/bushes/Bush-1.png","../public/imgs/obstacles/rocks/Rock-1.png":"imgs/obstacles/rocks/Rock-1.png","../public/imgs/obstacles/rocks/Rock-2.png":"imgs/obstacles/rocks/Rock-2.png","./dino":"../elements/dino.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../elements-refs":"../elements-refs.js","../utility/toggle-element":"../utility/toggle-element.js"}],"imgs/cloud/Cloud-1.png":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/obstacles/bushes/Bush-1.png":"imgs/obstacles/bushes/Bush-1.png","../public/imgs/obstacles/rocks/Rock-1.png":"imgs/obstacles/rocks/Rock-1.png","../public/imgs/obstacles/rocks/Rock-2.png":"imgs/obstacles/rocks/Rock-2.png","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../elements-refs":"../elements-refs.js","../utility/toggle-element":"../utility/toggle-element.js"}],"imgs/cloud/Cloud-1.png":[function(require,module,exports) {
 module.exports = "/Cloud-1.fd6d161e.png";
 },{}],"imgs/cloud/Cloud-2.png":[function(require,module,exports) {
 module.exports = "/Cloud-2.0d1d9676.png";
@@ -4392,13 +4450,13 @@ exports.default = void 0;
 var ItemDropStateSingleton = function () {
   //default state
   var state = {
-    // star: { weight: 8 },
+    star: {
+      weight: 8
+    }
     // magnet: { weight: 4 },
     // heart: { weight: 12 },
     // leaf: { weight: 12 },
-    cherry: {
-      weight: 12
-    }
+    // cherry: { weight: 12 },
     // empty: { weight: 2 },
   };
 
@@ -4447,7 +4505,7 @@ exports.updatePlatform = updatePlatform;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
 var _Cloud = _interopRequireDefault(require("../public/imgs/cloud/Cloud-1.png"));
 var _Cloud2 = _interopRequireDefault(require("../public/imgs/cloud/Cloud-2.png"));
-var _dino = require("./dino");
+var _playerController = require("./player-controller");
 var _gameManager = require("../game-manager");
 var _gameState = _interopRequireDefault(require("../game-state"));
 var _itemDropState = _interopRequireDefault(require("../item-drop-state"));
@@ -4510,7 +4568,7 @@ var distanceThreshold = 200; // Adjust this threshold as needed
 function updatePlatform(delta, speedScale) {
   document.querySelectorAll('[data-platform]').forEach(function (platform) {
     // Get positions of the dinosaur and platform
-    var dinoRect = (0, _dino.getDinoRect)();
+    var dinoRect = (0, _playerController.getDinoRect)();
     var platformRect = platform.getBoundingClientRect();
 
     // Calculate distance
@@ -4614,7 +4672,7 @@ function createPlatform(newPosition) {
   platform.id = "platform-".concat(Math.random());
   parentContainer.append(platform);
   (0, _updateCustomProperty.setCustomProperty)(parentContainer, '--left', newPosition);
-  (0, _updateCustomProperty.setCustomProperty)(parentContainer, '--bottom', "".concat(randomNumberBetween(45, 52)));
+  (0, _updateCustomProperty.setCustomProperty)(parentContainer, '--bottom', "".concat(randomNumberBetween(45, 45)));
   worldElem.append(parentContainer);
 }
 function randomNumberBetween(min, max) {
@@ -4654,7 +4712,254 @@ function getRandomWeighted(item) {
   // Default case (fallback)
   return keys[keys.length - 1];
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/cloud/Cloud-1.png":"imgs/cloud/Cloud-1.png","../public/imgs/cloud/Cloud-2.png":"imgs/cloud/Cloud-2.png","./dino":"../elements/dino.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","../utility/child-items":"../utility/child-items.js"}],"../elements/bird.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/cloud/Cloud-1.png":"imgs/cloud/Cloud-1.png","../public/imgs/cloud/Cloud-2.png":"imgs/cloud/Cloud-2.png","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","../utility/child-items":"../utility/child-items.js"}],"../elements/ground-enemy.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getGroundEnemyRects = getGroundEnemyRects;
+exports.setupGroundEnemy = setupGroundEnemy;
+exports.updateGroundEnemy = updateGroundEnemy;
+var _updateCustomProperty = require("../utility/updateCustomProperty");
+var _playerController = require("./player-controller");
+var _gameManager = require("../game-manager");
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _elementsRefs = require("../elements-refs");
+var _toggleElement = require("../utility/toggle-element");
+var _platform = require("./platform");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var setMultiplierRatio = _gameState.default.setMultiplierRatio,
+  getMultiplierRatio = _gameState.default.getMultiplierRatio,
+  getPlayerImmunity = _gameState.default.getPlayerImmunity,
+  getHasStar = _gameState.default.getHasStar,
+  getObstaclePoints = _gameState.default.getObstaclePoints,
+  getIsGroundEnemyRunning = _gameState.default.getIsGroundEnemyRunning,
+  getGroundSpeed = _gameState.default.getGroundSpeed,
+  getGroundEnemySpeedFactor = _gameState.default.getGroundEnemySpeedFactor;
+var enemyPositions = [];
+var SPEED = getGroundSpeed() + getGroundEnemySpeedFactor();
+var GROUND_ENEMY_INTERVAL_MIN = 500;
+var GROUND_ENEMY_INTERVAL_MAX = 1700;
+var worldElem = document.querySelector('[data-world]');
+var nextGroundEnemyTime;
+function setupGroundEnemy() {
+  nextGroundEnemyTime = GROUND_ENEMY_INTERVAL_MIN;
+  document.querySelectorAll('[data-ground-enemy]').forEach(function (groundEnemy) {
+    groundEnemy.remove();
+  });
+}
+function isPositionOccupied(position) {
+  return enemyPositions.includes(position);
+}
+var groupIdCounter = 0; // Counter to generate unique groupIds
+
+function generateRandomEnemy() {
+  var minEnemy = 1;
+  var maxEnemy = 1; // Adjust the range as needed
+  var groupId; // Declare groupId outside the loop
+
+  var numberOfEnemy = randomNumberBetween(minEnemy, maxEnemy);
+  if (numberOfEnemy >= minEnemy) {
+    groupId = groupIdCounter++;
+    for (var i = 0; i < numberOfEnemy; i++) {
+      var newPosition = void 0;
+      do {
+        newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
+      } while (isPositionOccupied(newPosition));
+      enemyPositions.push({
+        position: newPosition,
+        groupId: groupId
+      });
+      createGroundEnemy(newPosition, groupId);
+    }
+  } else {
+    var _newPosition;
+    do {
+      _newPosition = randomNumberBetween(95, 103); // Adjust the range of positions as needed
+    } while (isPositionOccupied(_newPosition));
+    enemyPositions.push({
+      position: _newPosition
+    });
+    createGroundEnemy(_newPosition);
+  }
+
+  // Clear cacti positions for the next round (optional)
+  enemyPositions.length = 0;
+}
+var distanceThreshold = 200; // Adjust this threshold as needed
+var groundEnemyGroups = new Map(); // Declare cactusGroups outside the updateCactus function
+
+function updateGroundEnemy(delta, speedScale) {
+  document.querySelectorAll('[data-ground-enemy]').forEach(function (groundEnemy) {
+    // Get positions of the dinosaur and ground-enemy
+    var dinoRect = (0, _playerController.getDinoRect)();
+    var groundEnemyRect = groundEnemy.getBoundingClientRect();
+
+    // Calculate distance
+    var distance = Math.sqrt(Math.pow(dinoRect.x - groundEnemyRect.x, 2) + Math.pow(dinoRect.y - groundEnemyRect.y, 2));
+    var collision = (0, _gameManager.isCollision)(dinoRect, groundEnemyRect);
+    // Check if the groundEnemy belongs to a group
+    var groupId = groundEnemy.dataset.groupId;
+    var isGrouped = groupId !== undefined;
+
+    // Initialize groupFlags to an empty object
+    var groupFlags = {};
+
+    // Check if the dinosaur is within the threshold near the bird
+    var isDinoNearGroundEnemy = distance < distanceThreshold;
+    // Check if there was a collision in the previous frame
+    var hadCollision = groundEnemy.dataset.hadCollision === 'true';
+
+    // Check if the groundEnemy has moved past the dinosaur
+    var hasPassedDino = groundEnemyRect.right < dinoRect.left;
+    if (isGrouped) {
+      // Check if this groundEnemy belongs to a group
+      if (!groundEnemyGroups.has(groupId)) {
+        // If the group does not exist, create it
+        groundEnemyGroups.set(groupId, {
+          isDinoNear: false,
+          hadCollision: false,
+          comboIncremented: false
+        });
+      }
+
+      // Update the group's flags based on individual groundEnemies
+      groupFlags = groundEnemyGroups.get(groupId);
+
+      // Update the flags for this groundEnemy in the group
+      groupFlags.isDinoNear = groupFlags.isDinoNear || groundEnemy.dataset.isDinoNear === 'true';
+      groupFlags.hadCollision = groupFlags.hadCollision || hadCollision;
+
+      // Check if the groundEnemy has moved past the dinosaur within the group
+      groupFlags.hasPassedDino = groupFlags.hasPassedDino || hasPassedDino;
+    }
+    if (isDinoNearGroundEnemy) {
+      // If the dinosaur is within the threshold, set the flag to true
+      groundEnemy.dataset.isDinoNear = 'true';
+    } else {
+      // If the dinosaur is not within the threshold, set the flag to false
+      groundEnemy.dataset.isDinoNear = 'false';
+    }
+    if (isGrouped && groupFlags.isDinoNear && !groupFlags.hadCollision && groupFlags.hasPassedDino && !groupFlags.comboIncremented) {
+      // Increment combo only if there was no collision in the previous frame
+      // and the groundEnemy group has moved past the dinosaur without a new collision
+      var currentMultiplierRatio = getMultiplierRatio();
+      setMultiplierRatio(currentMultiplierRatio += 1);
+      (0, _gameManager.updateMultiplierInterface)();
+      // const newElement = document.createElement('div');
+      // newElement.classList.add('one-up');
+      // newElement.style.position = 'absolute';
+      // newElement.textContent = '+1x';
+      // groundEnemy.appendChild(newElement);
+      // setTimeout(() => {
+      //   newElement.remove();
+      // }, 600);
+      // Set the comboIncremented flag for the entire group
+      groupFlags.comboIncremented = true;
+    }
+    if (!groundEnemy.dataset.hadCollision && collision === true && !groundEnemy.dataset.scoreUpdated) {
+      if (getPlayerImmunity() && getHasStar()) {
+        var text = document.createElement('div');
+        text.classList.add('enemy-plus-points');
+        text.style.position = 'absolute';
+        text.style.left = groundEnemy.offsetLeft + 'px';
+        text.style.top = groundEnemy.offsetTop - 70 + 'px';
+        groundEnemy.parentNode.insertBefore(text, groundEnemy);
+        var points = getMultiplierRatio() * getObstaclePoints();
+        text.textContent = "+".concat(points);
+        (0, _gameManager.updateScoreWithPoints)(points);
+        groundEnemy.classList.add('penguin-die');
+        groundEnemy.dataset.scoreUpdated = true;
+        text.addEventListener('animationend', function () {
+          text.remove();
+        });
+        // After the transition, remove the groundEnemy
+        groundEnemy.addEventListener('animationend', function () {
+          groundEnemy.remove();
+        });
+      } else {
+        groundEnemy.dataset.hadCollision = true;
+      }
+    }
+    var extraSpeedFactor = parseFloat(groundEnemy.dataset.groundEnemyExtraSpeedFactor || 0);
+    (0, _updateCustomProperty.incrementCustomProperty)(groundEnemy, '--left', delta * speedScale * -1 * (SPEED + extraSpeedFactor));
+    if ((0, _updateCustomProperty.getCustomProperty)(groundEnemy, '--left') <= -100) {
+      groundEnemy.remove();
+    }
+  });
+  if (nextGroundEnemyTime <= 0 && getIsGroundEnemyRunning()) {
+    generateRandomEnemy();
+    nextGroundEnemyTime = randomNumberBetween(GROUND_ENEMY_INTERVAL_MIN, GROUND_ENEMY_INTERVAL_MAX) / speedScale;
+  }
+  nextGroundEnemyTime -= delta;
+}
+function getGroundEnemyRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-ground-enemy]')).map(function (groundEnemy) {
+    return groundEnemy.getBoundingClientRect();
+  });
+}
+
+// Array of possible groundEnemy images with associated weights
+var groundEnemyObj = {
+  rollingPenguin: {
+    weight: 1,
+    class: 'idle-penguin',
+    speedFactor: -0.05
+  },
+  spinningPenguin: {
+    weight: 1,
+    class: 'spinning-penguin',
+    speedFactor: 0
+  },
+  walkingPenguin: {
+    weight: 1,
+    class: 'walking-penguin',
+    speedFactor: -0.035
+  }
+  // Add more image sources with corresponding weights
+};
+
+var normalizedGroundEnemyWeights = (0, _platform.normalizeWeights)(groundEnemyObj);
+function createGroundEnemy(newPosition, groupId) {
+  var randomBuffKey = (0, _platform.getRandomWeighted)(normalizedGroundEnemyWeights);
+  console.log(randomBuffKey);
+  var groundEnemy = document.createElement('div');
+  groundEnemy.dataset.groundEnemy = true;
+  groundEnemy.dataset.groundEnemyType = randomBuffKey;
+  groundEnemy.classList.add('ground-enemy', groundEnemyObj[randomBuffKey].class, 'game-element');
+  if (groundEnemyObj[randomBuffKey].speedFactor) {
+    groundEnemy.dataset.groundEnemyExtraSpeedFactor = groundEnemyObj[randomBuffKey].speedFactor;
+  } else groundEnemy.dataset.groundEnemyExtraSpeedFactor = 0;
+  (0, _updateCustomProperty.setCustomProperty)(groundEnemy, '--left', newPosition);
+  (0, _updateCustomProperty.setCustomProperty)(groundEnemy, 'height', '8%');
+
+  // Set the groupId as a data attribute on the groundEnemy element
+  groundEnemy.dataset.groupId = groupId;
+  worldElem.append(groundEnemy);
+  if (randomBuffKey == 'rollingPenguin') {
+    setTimeout(function () {
+      groundEnemy.classList.remove('idle-penguin');
+      groundEnemy.classList.add('dive-penguin');
+    }, 1000);
+    groundEnemy.addEventListener('animationend', function () {
+      // Animation ends, add 'rolling-penguin' class
+      groundEnemy.classList.remove('dive-penguin');
+      groundEnemy.classList.add('rolling-penguin');
+      groundEnemy.dataset.groundEnemyExtraSpeedFactor = 0;
+    });
+  }
+}
+function randomNumberBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../elements-refs":"../elements-refs.js","../utility/toggle-element":"../utility/toggle-element.js","./platform":"../elements/platform.js"}],"../elements/bird.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4664,7 +4969,7 @@ exports.getBirdRects = getBirdRects;
 exports.setupBird = setupBird;
 exports.updateBird = updateBird;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
-var _dino = require("./dino");
+var _playerController = require("./player-controller");
 var _gameManager = require("../game-manager");
 var _gameState = _interopRequireDefault(require("../game-state"));
 var _elementsRefs = require("../elements-refs");
@@ -4742,7 +5047,7 @@ function updateBird(delta, speedScale) {
     var comboIncremented = bird.dataset.comboIncremented === 'true';
 
     // Get positions of the dinosaur and bird
-    var dinoRect = (0, _dino.getDinoRect)();
+    var dinoRect = (0, _playerController.getDinoRect)();
     var birdRect = bird.getBoundingClientRect();
 
     // Calculate distance
@@ -4811,7 +5116,7 @@ function updateBird(delta, speedScale) {
     if (!bird.dataset.hadCollision && collision === true && !bird.dataset.scoreUpdated) {
       if (getPlayerImmunity() && getHasStar()) {
         var text = document.createElement('div');
-        text.classList.add('bird-plus-points');
+        text.classList.add('enemy-plus-points');
         text.style.position = 'absolute';
         text.style.left = bird.offsetLeft + 'px';
         text.style.top = bird.offsetTop - 70 + 'px';
@@ -4819,7 +5124,7 @@ function updateBird(delta, speedScale) {
         var points = getMultiplierRatio() * getObstaclePoints();
         text.textContent = "+".concat(points);
         (0, _gameManager.updateScoreWithPoints)(points);
-        bird.classList.add('bird-die');
+        bird.classList.add('enemy-die');
         bird.dataset.scoreUpdated = true;
         // After the transition, remove the bird
         bird.addEventListener('animationend', function () {
@@ -4869,7 +5174,7 @@ function createBird(newPosition, groupId) {
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./dino":"../elements/dino.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../elements-refs":"../elements-refs.js","../utility/toggle-element":"../utility/toggle-element.js","./platform":"../elements/platform.js"}],"../apis.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../elements-refs":"../elements-refs.js","../utility/toggle-element":"../utility/toggle-element.js","./platform":"../elements/platform.js"}],"../apis.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5387,7 +5692,7 @@ var _updateCustomProperty = require("../utility/updateCustomProperty.js");
 var _gameState = _interopRequireDefault(require("../game-state"));
 var _elementsRefs = require("../elements-refs.js");
 var _gameManager = require("../game-manager.js");
-var _dino = require("./dino.js");
+var _playerController = require("./player-controller.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -5404,7 +5709,7 @@ var hasAlreadyPassedFlag;
 function updateFlag(delta, speedScale) {
   document.querySelectorAll('[data-flag]').forEach(function (flag) {
     var flagRect = flag.getBoundingClientRect();
-    var collision = (0, _gameManager.isCollision)((0, _dino.getDinoRect)(), flagRect);
+    var collision = (0, _gameManager.isCollision)((0, _playerController.getDinoRect)(), flagRect);
     var flagLeft = parseFloat(getComputedStyle(flag).left);
     var dinoLeft = parseFloat(getComputedStyle(_elementsRefs.dinoElem).left);
     var passedFlag = dinoLeft > flagLeft;
@@ -5447,7 +5752,7 @@ function createFlag() {
   (0, _updateCustomProperty.setCustomProperty)(flag, '--left', 100);
   _elementsRefs.worldElem.append(flag);
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state":"../game-state.js","../elements-refs.js":"../elements-refs.js","../game-manager.js":"../game-manager.js","./dino.js":"../elements/dino.js"}],"../elements/star.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state":"../game-state.js","../elements-refs.js":"../elements-refs.js","../game-manager.js":"../game-manager.js","./player-controller.js":"../elements/player-controller.js"}],"../elements/star.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5518,7 +5823,7 @@ exports.getCoinRects = getCoinRects;
 exports.setupCoin = setupCoin;
 exports.updateCoin = updateCoin;
 var _updateCustomProperty = require("../utility/updateCustomProperty");
-var _dino = require("./dino");
+var _playerController = require("./player-controller");
 var _gameManager = require("../game-manager");
 var _gameState = _interopRequireDefault(require("../game-state"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -5546,7 +5851,7 @@ function setupCoin() {
 function updateCoin(delta, speedScale) {
   document.querySelectorAll('[data-coin]').forEach(function (coin) {
     // Get positions of the dinosaur and coin
-    var dinoRect = (0, _dino.getDinoRect)();
+    var dinoRect = (0, _playerController.getDinoRect)();
     var coinRect = coin.getBoundingClientRect();
     // Calculate distance
     var distance = Math.sqrt(Math.pow(dinoRect.x - coinRect.x, 2) + Math.pow(dinoRect.y - coinRect.y, 2));
@@ -5657,7 +5962,7 @@ function getRandomKeyframe() {
   // Return a random number between 0 and 100 (percentage)
   return Math.floor(Math.random() * 101);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./dino":"../elements/dino.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
 module.exports = "/Speaker-Off.c6acac34.png";
 },{}],"imgs/icons/Speaker-On.png":[function(require,module,exports) {
 module.exports = "/Speaker-On.4eca78fe.png";
@@ -6508,7 +6813,8 @@ function updatePhase1(timer) {
   updateState({
     isCactusRunning: true,
     isCoinRunning: true,
-    isPlatformRunning: true
+    isPlatformRunning: true,
+    isGroundEnemyRunning: true
   });
   if (timer > getPhaseTimerInterval()) {
     console.log("Phase ".concat(getCurrentPhase(), " complete"));
@@ -6724,8 +7030,9 @@ var _ground = require("./elements/ground.js");
 var _groundLayerTwo = require("./elements/groundLayerTwo");
 var _groundLayerTwoTwo = require("./elements/groundLayerTwoTwo");
 var _groundLayerThree = require("./elements/groundLayerThree");
-var _dino = require("./elements/dino.js");
+var _playerController = require("./elements/player-controller.js");
 var _cactus = require("./elements/cactus.js");
+var _groundEnemy = require("./elements/ground-enemy");
 var _bird = require("./elements/bird.js");
 var _platform = require("./elements/platform.js");
 var _leaderboard = require("./elements/leaderboard.js");
@@ -6903,7 +7210,7 @@ function setTimedPlayerImmunity(duration) {
     clearTimeout(immunityTimeout);
   }
 }
-idleIntervalId = setInterval(_dino.handleIdle, 300);
+idleIntervalId = setInterval(_playerController.handleIdle, 300);
 function updateElements() {}
 var deltaAdjustment = 1;
 var currentSpeedScale = getSpeedScale();
@@ -6932,6 +7239,21 @@ function updateNotification(notification) {
     }, deleteLettersDelay);
   }, typeLettersDelay);
 }
+function checkCollisions() {
+  if (checkLose()) return handleLose();
+  checkMultiplierCollision();
+  checkCoinCollision();
+  checkStarCollision();
+  checkCherryCollision();
+  checkHeartCollision();
+  checkMagnetCollision();
+  checkLeafCollision();
+}
+var phaseUpdateFunctions = {
+  1: _phase.updatePhase1,
+  bonus: _bonusPhase.updateBonusPhase,
+  2: _phase2.updatePhase2
+};
 function update(time) {
   if (isPaused) {
     // Do nothing if the game is paused
@@ -6942,7 +7264,7 @@ function update(time) {
     window.requestAnimationFrame(update);
     return;
   }
-  var baseDelta = 20;
+  var baseDelta = 15;
   // let delta = time - lastTime;
   var delta = baseDelta;
   if (collisionOccurred && !getPlayerImmunity()) {
@@ -6954,41 +7276,29 @@ function update(time) {
     }, 400);
     return; // Pause the update during the delay
   }
-  // Update based on the current phase
-  if (getCurrentPhase() === 1) {
-    (0, _phase.updatePhase1)(timer, delta, currentSpeedScale);
-  } else if (getCurrentPhase() === 'bonus') {
-    (0, _bonusPhase.updateBonusPhase)(timer, currentSpeedScale, delta);
-  } else if (getCurrentPhase() === 2) {
-    // currentSpeedScale *= decelerationFactor;
-    // // Ensure the speed scale doesn't go below 0.6
-    // currentSpeedScale = Math.max(currentSpeedScale, 0.5);
-    (0, _phase2.updatePhase2)(timer, currentSpeedScale, delta);
+
+  var updateFunction = phaseUpdateFunctions[getCurrentPhase()];
+  if (updateFunction) {
+    updateFunction(timer, delta, currentSpeedScale);
   }
-  // updateGroundLayerTwoTwo(delta, currentSpeedScale);
+  (0, _groundLayerTwoTwo.updateGroundLayerTwoTwo)(delta, currentSpeedScale);
   (0, _bonusLayer.updateBonusLayer)(delta, currentSpeedScale);
   (0, _ground.updateGround)(delta, currentSpeedScale);
   (0, _groundLayerThree.updateGroundLayerThree)(delta, currentSpeedScale);
   (0, _groundLayerTwo.updateGroundLayerTwo)(delta, currentSpeedScale);
   // updateCactus(delta, currentSpeedScale);
   // updateBird(delta, currentSpeedScale);
+  // updateGroundEnemy(delta, currentSpeedScale);
   (0, _platform.updatePlatform)(delta, currentSpeedScale);
-  (0, _flag.updateFlag)(delta, currentSpeedScale);
+  // updateFlag(delta, currentSpeedScale);
   (0, _updateInterfaceText.updateInterfaceText)(delta, currentSpeedScale);
   // updateMultiplier(delta, currentSpeedScale);
   // updateMagnet(delta, currentSpeedScale);
-  (0, _coin.updateCoin)(delta, currentSpeedScale);
-  (0, _dino.updateDino)(delta, currentSpeedScale, getGravityFallAdjustment(), getSelectedStarter());
+  // updateCoin(delta, currentSpeedScale);
+  (0, _playerController.updateDino)(delta, currentSpeedScale, getGravityFallAdjustment(), getSelectedStarter());
   updateSpeedScale(delta);
   updateScore(delta);
-  if (checkLose()) return handleLose();
-  if (checkMultiplierCollision()) ;
-  if (checkCoinCollision()) ;
-  if (checkStarCollision()) ;
-  if (checkCherryCollision()) ;
-  if (checkHeartCollision()) ;
-  if (checkMagnetCollision()) ;
-  if (checkLeafCollision()) ;
+  checkCollisions();
   lastTime = time;
   window.requestAnimationFrame(update);
 }
@@ -7034,7 +7344,7 @@ function startMultiplierTimer() {
   setTimerInterval(timerInterval);
 }
 function checkMultiplierCollision() {
-  var dinoRect = (0, _dino.getDinoRect)();
+  var dinoRect = (0, _playerController.getDinoRect)();
   (0, _scoreMultiplier.getMultiplierRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       // soundController.beatScore.play();
@@ -7073,7 +7383,7 @@ function calculateFontSize(points) {
 var goldCoinCounter = 0;
 var redGemMultiplier = 1;
 function checkCoinCollision() {
-  var dinoRect = (0, _dino.getDinoRect)();
+  var dinoRect = (0, _playerController.getDinoRect)();
   (0, _coin.getCoinRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       var coinElement = document.getElementById(element.id);
@@ -7127,7 +7437,7 @@ function createOneUpTextAtPosition(position) {
   return true;
 }
 function checkHeartCollision() {
-  var dinoRect = (0, _dino.getDinoRect)();
+  var dinoRect = (0, _playerController.getDinoRect)();
   (0, _heart.getHeartRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       var collisionPosition = {
@@ -7153,7 +7463,7 @@ function checkHeartCollision() {
   });
 }
 function checkLeafCollision() {
-  var dinoRect = (0, _dino.getDinoRect)();
+  var dinoRect = (0, _playerController.getDinoRect)();
   (0, _leaf.getLeafRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       var leaf = document.getElementById(element.id);
@@ -7169,7 +7479,7 @@ function checkLeafCollision() {
   });
 }
 function checkCherryCollision() {
-  var dinoRect = (0, _dino.getDinoRect)();
+  var dinoRect = (0, _playerController.getDinoRect)();
   (0, _cherry.getCherryRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       var cherryElement = document.getElementById(element.id);
@@ -7188,7 +7498,7 @@ function checkCherryCollision() {
   });
 }
 function checkStarCollision() {
-  var dinoRect = (0, _dino.getDinoRect)();
+  var dinoRect = (0, _playerController.getDinoRect)();
   (0, _star.getStarRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       var starElement = document.getElementById(element.id);
@@ -7210,7 +7520,7 @@ function checkStarCollision() {
   });
 }
 function checkMagnetCollision() {
-  var dinoRect = (0, _dino.getDinoRect)();
+  var dinoRect = (0, _playerController.getDinoRect)();
   (0, _magnet.getMagnetRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       var magnetElement = document.getElementById(element.id);
@@ -7357,10 +7667,11 @@ function updateScoreWithPoints(delta) {
 }
 function checkLose() {
   //init dino rect
-  var dinoRect = (0, _dino.getDinoRect)();
+  var dinoRect = (0, _playerController.getDinoRect)();
   var cactusRects = (0, _cactus.getCactusRects)();
   var birdRects = (0, _bird.getBirdRects)();
-  var allEnemyRects = [].concat(_toConsumableArray(cactusRects), _toConsumableArray(birdRects));
+  var groundEnemyRects = (0, _groundEnemy.getGroundEnemyRects)();
+  var allEnemyRects = [].concat(_toConsumableArray(cactusRects), _toConsumableArray(birdRects), _toConsumableArray(groundEnemyRects));
 
   //init enemy and player collision state
   var isEnemyAndPlayerCollision = allEnemyRects.some(function (rect) {
@@ -7490,18 +7801,29 @@ function handleCheckIfHighScore(score) {
   }
 }
 function setUpElements() {
-  (0, _star.setupStar)();
+  setupGroundElements();
+  setupObstacles();
+  setupCharacters();
+  setupPowerUps();
+  (0, _platform.setupPlatform)();
+}
+function setupGroundElements() {
   (0, _ground.setupGround)();
   (0, _groundLayerTwo.setupGroundLayerTwo)();
-  // setupGroundLayerTwoTwo();
   (0, _groundLayerThree.setupGroundLayerThree)();
   (0, _bonusLayer.setupBonusLayer)();
-  (0, _dino.setupDino)();
+}
+function setupObstacles() {
   (0, _cactus.setupCactus)();
   (0, _bird.setupBird)();
+  (0, _groundEnemy.setupGroundEnemy)();
+}
+function setupCharacters() {
+  (0, _playerController.setupDino)();
+}
+function setupPowerUps() {
   (0, _scoreMultiplier.setupMultiplier)();
   (0, _coin.setupCoin)();
-  (0, _platform.setupPlatform)();
   (0, _magnet.setupMagnet)();
 }
 function handleStart() {
@@ -7890,7 +8212,7 @@ function handleLose() {
   // tickerContainerElem.classList.add('show-element');
   // tickerContainerElem.classList.remove('hide-element');
   _soundController.soundController.die.play();
-  (0, _dino.setDinoLose)();
+  (0, _playerController.setDinoLose)();
   handleCheckIfHighScore(score);
 }
 function setPixelToWorldScale() {
@@ -8140,7 +8462,7 @@ function glassesEffect() {
 function coinsEffect() {
   setSelectedStarter('Coins');
 }
-},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerTwoTwo":"../elements/groundLayerTwoTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/dino.js":"../elements/dino.js","./elements/cactus.js":"../elements/cactus.js","./elements/bird.js":"../elements/bird.js","./elements/platform.js":"../elements/platform.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/magnet.js":"../elements/magnet.js","./elements/heart.js":"../elements/heart.js","./elements/leaf.js":"../elements/leaf.js","./elements/flag.js":"../elements/flag.js","./elements/star.js":"../elements/star.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png","./elements/buff.js":"../elements/buff.js","./game-state.js":"../game-state.js","./elements-refs":"../elements-refs.js","./utility/toggle-element.js":"../utility/toggle-element.js","./elements/particle-systems.js":"../elements/particle-systems.js","./phases/phase-properties.js":"../phases/phase-properties.js","./phases/phase1.js":"../phases/phase1.js","./phases/phase2.js":"../phases/phase2.js","./phases/bonus-phase.js":"../phases/bonus-phase.js","./elements/bonus-layer.js":"../elements/bonus-layer.js","./utility/update-interface-text.js":"../utility/update-interface-text.js","./interface-text-elems-state.js":"../interface-text-elems-state.js","./elements/cherry":"../elements/cherry.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerTwoTwo":"../elements/groundLayerTwoTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/player-controller.js":"../elements/player-controller.js","./elements/cactus.js":"../elements/cactus.js","./elements/ground-enemy":"../elements/ground-enemy.js","./elements/bird.js":"../elements/bird.js","./elements/platform.js":"../elements/platform.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/magnet.js":"../elements/magnet.js","./elements/heart.js":"../elements/heart.js","./elements/leaf.js":"../elements/leaf.js","./elements/flag.js":"../elements/flag.js","./elements/star.js":"../elements/star.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png","./elements/buff.js":"../elements/buff.js","./game-state.js":"../game-state.js","./elements-refs":"../elements-refs.js","./utility/toggle-element.js":"../utility/toggle-element.js","./elements/particle-systems.js":"../elements/particle-systems.js","./phases/phase-properties.js":"../phases/phase-properties.js","./phases/phase1.js":"../phases/phase1.js","./phases/phase2.js":"../phases/phase2.js","./phases/bonus-phase.js":"../phases/bonus-phase.js","./elements/bonus-layer.js":"../elements/bonus-layer.js","./utility/update-interface-text.js":"../utility/update-interface-text.js","./interface-text-elems-state.js":"../interface-text-elems-state.js","./elements/cherry":"../elements/cherry.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -8165,7 +8487,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49925" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50788" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -14,7 +14,7 @@ const StateSingleton = (function () {
 
     obstaclePoints: 5,
     lastPhase: 0,
-    gravityFallAdjustment: 0.006,
+    gravityFallAdjustment: 0.021,
     selectedStarter: null,
 
     //elements
@@ -22,12 +22,14 @@ const StateSingleton = (function () {
     isPlatformRunning: false,
     isCactusRunning: false,
     isBirdRunning: true,
+    isGroundEnemyRunning: true,
 
     //world
     isGroundRunning: true,
     isGroundLayer2Running: true,
     isGroundLayer3Running: true,
     groundSpeed: 0.04,
+    groundEnemySpeedFactor: 0.05,
     isFlagCreated: true,
     platformSpeed: 0.05,
 
@@ -44,6 +46,12 @@ const StateSingleton = (function () {
   };
 
   return {
+    getIsGroundEnemyRunning: function () {
+      return state.isGroundEnemyRunning;
+    },
+    setIsGroundEnemyRunning: function (newIsGroundEnemyRunning) {
+      state.isGroundEnemyRunning = newIsGroundEnemyRunning;
+    },
     getCherryPoints: function () {
       return state.cherryPoints;
     },
@@ -85,6 +93,12 @@ const StateSingleton = (function () {
     },
     setGroundSpeed: function (newGroundSpeed) {
       state.groundSpeed = newGroundSpeed;
+    },
+    getGroundEnemySpeedFactor: function () {
+      return state.groundEnemySpeedFactor;
+    },
+    setGroundEnemySpeedFactor: function (newGroundEnemySpeedFactor) {
+      state.groundEnemySpeedFactor = newGroundEnemySpeedFactor;
     },
     getIsMultiplierRunning: function () {
       return state.isMultiplierRunning;

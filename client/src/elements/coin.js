@@ -3,7 +3,7 @@ import {
   incrementCustomProperty,
   getCustomProperty,
 } from '../utility/updateCustomProperty';
-import { getDinoRect } from './dino';
+import { getDinoRect } from './player-controller';
 import { collectableOptions } from '../game-manager';
 import StateSingleton from '../game-state';
 
