@@ -1,12 +1,22 @@
+import StateSingleton from './game-state';
+
+const {
+  setIsStarColliding,
+  setIsMagnetColliding,
+  setIsHeartColliding,
+  setIsLeafColliding,
+  setIsCherryColliding,
+} = StateSingleton;
+
 // state.js
 const ItemDropStateSingleton = (function () {
   //default state
   let state = {
-    star: { weight: 8 },
-    // magnet: { weight: 4 },
-    // heart: { weight: 12 },
-    // leaf: { weight: 12 },
-    // cherry: { weight: 12 },
+    star: { weight: 8, colliderSetter: setIsStarColliding },
+    // magnet: { weight: 4, colliderSetter: setIsMagnetColliding },
+    heart: { weight: 12, colliderSetter: setIsHeartColliding },
+    // leaf: { weight: 12, colliderSetter: setIsLeafColliding },
+    // cherry: { weight: 12, colliderSetter: setIsCherryColliding },
     // empty: { weight: 2 },
   };
 

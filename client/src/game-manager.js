@@ -99,6 +99,7 @@ import {
   gameLoadingTextElem,
   gameNotificationElem,
   pausedScreenElem,
+  bonusElem,
 } from './elements-refs';
 import { toggleElemOff, toggleElemOn } from './utility/toggle-element.js';
 import { snow } from './elements/particle-systems.js';
@@ -110,6 +111,8 @@ import { setupBonusLayer, updateBonusLayer } from './elements/bonus-layer.js';
 import { updateInterfaceText } from './utility/update-interface-text.js';
 import InterfaceTextElemsSingleton from './interface-text-elems-state.js';
 import { getCherryRects } from './elements/cherry';
+import { setupCrate, updateCrate } from './elements/crate.js';
+import { updateGroundQue } from './elements/groundQue.js';
 const { removeInterfaceTextElem, addInterfaceTextElem } =
   InterfaceTextElemsSingleton;
 const {
@@ -136,6 +139,12 @@ const {
   setHasLeaf,
   setCherryPoints,
   getCherryPoints,
+  getIsCherryColliding,
+  getIsStarColliding,
+  getIsHeartColliding,
+  getIsMagnetColliding,
+  getIsLeafColliding,
+  getIsGroundLayer2Running,
 } = StateSingleton;
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 45;
@@ -299,11 +308,21 @@ function checkCollisions() {
   if (checkLose()) return handleLose();
   checkMultiplierCollision();
   checkCoinCollision();
-  checkStarCollision();
-  checkCherryCollision();
-  checkHeartCollision();
-  checkMagnetCollision();
-  checkLeafCollision();
+  if (getIsStarColliding()) {
+    checkStarCollision();
+  }
+  if (getIsCherryColliding()) {
+    checkCherryCollision();
+  }
+  if (getIsHeartColliding()) {
+    checkHeartCollision();
+  }
+  if (getIsMagnetColliding()) {
+    checkMagnetCollision();
+  }
+  if (getIsLeafColliding()) {
+    checkLeafCollision();
+  }
 }
 
 const phaseUpdateFunctions = {
@@ -342,19 +361,20 @@ function update(time) {
     updateFunction(timer, delta, currentSpeedScale);
   }
   updateGroundLayerTwoTwo(delta, currentSpeedScale);
-  updateBonusLayer(delta, currentSpeedScale);
+  // updateBonusLayer(delta, currentSpeedScale);
   updateGround(delta, currentSpeedScale);
   updateGroundLayerThree(delta, currentSpeedScale);
   updateGroundLayerTwo(delta, currentSpeedScale);
-  // updateCactus(delta, currentSpeedScale);
+  updateCactus(delta, currentSpeedScale);
   // updateBird(delta, currentSpeedScale);
   // updateGroundEnemy(delta, currentSpeedScale);
-  updatePlatform(delta, currentSpeedScale);
-  // updateFlag(delta, currentSpeedScale);
+  // updatePlatform(delta, currentSpeedScale);
+  updateFlag(delta, currentSpeedScale);
   updateInterfaceText(delta, currentSpeedScale);
   // updateMultiplier(delta, currentSpeedScale);
   // updateMagnet(delta, currentSpeedScale);
-  // updateCoin(delta, currentSpeedScale);
+  updateCoin(delta, currentSpeedScale);
+  // updateCrate(delta, currentSpeedScale);
   updateDino(
     delta,
     currentSpeedScale,
@@ -363,7 +383,7 @@ function update(time) {
   );
   updateSpeedScale(delta);
   updateScore(delta);
-
+  updateGroundQue(delta, currentSpeedScale);
   checkCollisions();
   lastTime = time;
   window.requestAnimationFrame(update);
@@ -411,6 +431,10 @@ function startMultiplierTimer() {
     }
   }, 100); // Update every 100 milliseconds
   setTimerInterval(timerInterval);
+}
+
+export function checkForCrateItem(element) {
+  if (element.dataset.crateItem && !element.dataset.itemLocked) return false;
 }
 
 function checkMultiplierCollision() {
@@ -690,7 +714,11 @@ const lastMultiplierScore = document.querySelector(
 );
 
 function addPickupText(text, pickupElement) {
-  text.classList.add('plus-points', 'sans');
+  if (!getIsGroundLayer2Running()) {
+    text.classList.add('plus-points-navy', 'sans');
+  } else {
+    text.classList.add('plus-points', 'sans');
+  }
   text.style.position = 'absolute';
   text.style.left = pickupElement.offsetLeft + 'px';
   text.style.top = pickupElement.offsetTop - 70 + 'px';
@@ -941,6 +969,7 @@ function setUpElements() {
   setupCharacters();
   setupPowerUps();
   setupPlatform();
+  setupCrate();
 }
 
 function setupGroundElements() {

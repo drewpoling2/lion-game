@@ -135,30 +135,7 @@ function setCustomProperty(elem, prop, value) {
 function incrementCustomProperty(elem, prop, inc) {
   setCustomProperty(elem, prop, getCustomProperty(elem, prop) + inc);
 }
-},{}],"../elements/ground.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.setupGround = setupGround;
-exports.updateGround = updateGround;
-var _updateCustomProperty = require("../utility/updateCustomProperty.js");
-var SPEED = 0.04;
-var groundElems = document.querySelectorAll('[data-ground]');
-function setupGround() {
-  (0, _updateCustomProperty.setCustomProperty)(groundElems[0], '--left', 0);
-  (0, _updateCustomProperty.setCustomProperty)(groundElems[1], '--left', 250);
-}
-function updateGround(delta, speedScale) {
-  groundElems.forEach(function (ground) {
-    (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
-    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -250) {
-      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 500);
-    }
-  });
-}
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js"}],"../game-state.js":[function(require,module,exports) {
+},{}],"../game-state.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -192,6 +169,7 @@ var StateSingleton = function (_ref) {
     isCactusRunning: false,
     isBirdRunning: true,
     isGroundEnemyRunning: true,
+    isCrateRunning: true,
     //world
     isGroundRunning: true,
     isGroundLayer2Running: true,
@@ -199,8 +177,14 @@ var StateSingleton = function (_ref) {
     groundSpeed: 0.04,
     groundEnemySpeedFactor: 0.05,
     isFlagCreated: true,
-    platformSpeed: 0.05,
+    platformSpeed: 0.035,
     //items
+    platformCoinIntervalMax: 2000,
+    platformCoinIntervalMin: 1000,
+    groundCoinIntervalMin: 50,
+    groundCoinIntervalMax: 1000,
+    cactusIntervalMin: 900,
+    cactusIntervalMax: 1400,
     isMultiplierRunning: false,
     isMagnetRunning: false,
     isStarRunning: false,
@@ -209,9 +193,94 @@ var StateSingleton = function (_ref) {
     hasStar: false,
     hasLeaf: false,
     leafDuration: 10000,
-    isMagnetItem: false
+    isMagnetItem: false,
+    isStarColliding: true,
+    isMagnetColliding: true,
+    isCherryColliding: true,
+    isLeafColliding: true,
+    isHeartColliding: true,
+    groundSpawnReady: true,
+    nextGroundSpawnType: ''
   };
   return _ref = {
+    getGroundSpawnReady: function getGroundSpawnReady() {
+      return state.groundSpawnReady;
+    },
+    setGroundSpawnReady: function setGroundSpawnReady(newGroundSpawnReady) {
+      state.groundSpawnReady = newGroundSpawnReady;
+    },
+    getCactusIntervalMin: function getCactusIntervalMin() {
+      return state.cactusIntervalMin;
+    },
+    setCactusIntervalMin: function setCactusIntervalMin(newCactusIntervalMin) {
+      state.cactusIntervalMin = newCactusIntervalMin;
+    },
+    getCactusIntervalMax: function getCactusIntervalMax() {
+      return state.cactusIntervalMax;
+    },
+    setCactusIntervalMax: function setCactusIntervalMax(newCactusIntervalMax) {
+      state.cactusIntervalMax = newCactusIntervalMax;
+    },
+    getNextGroundSpawnType: function getNextGroundSpawnType() {
+      return state.nextGroundSpawnType;
+    },
+    setNextGroundSpawnType: function setNextGroundSpawnType(newNextGroundSpawnType) {
+      state.nextGroundSpawnType = newNextGroundSpawnType;
+    },
+    getPlatformCoinIntervalMin: function getPlatformCoinIntervalMin() {
+      return state.platformCoinIntervalMin;
+    },
+    setPlatformCoinIntervalMax: function setPlatformCoinIntervalMax(newPlatformCoinIntervalMax) {
+      state.platformCoinIntervalMax = newPlatformCoinIntervalMax;
+    },
+    getGroundCoinMinInterval: function getGroundCoinMinInterval() {
+      return state.groundCoinIntervalMin;
+    },
+    setGroundCoinMinInterval: function setGroundCoinMinInterval(newGroundCoinMinInterval) {
+      state.groundCoinIntervalMin = newGroundCoinMinInterval;
+    },
+    getGroundCoinMaxInterval: function getGroundCoinMaxInterval() {
+      return state.groundCoinIntervalMax;
+    },
+    setGroundCoinMaxInterval: function setGroundCoinMaxInterval(newGroundCoinMaxInterval) {
+      state.groundCoinIntervalMax = newGroundCoinMaxInterval;
+    },
+    getIsHeartColliding: function getIsHeartColliding() {
+      return state.isHeartColliding;
+    },
+    setIsHeartColliding: function setIsHeartColliding(newIsHeartColliding) {
+      state.isHeartColliding = newIsHeartColliding;
+    },
+    getIsLeafColliding: function getIsLeafColliding() {
+      return state.isLeafColliding;
+    },
+    setIsLeafColliding: function setIsLeafColliding(newIsLeafColliding) {
+      state.isLeafColliding = newIsLeafColliding;
+    },
+    getIsStarColliding: function getIsStarColliding() {
+      return state.isStarColliding;
+    },
+    setIsStarColliding: function setIsStarColliding(newIsStarColliding) {
+      state.isStarColliding = newIsStarColliding;
+    },
+    getIsMagnetColliding: function getIsMagnetColliding() {
+      return state.isMagnetColliding;
+    },
+    setIsMagnetColliding: function setIsMagnetColliding(newIsMagnetColliding) {
+      state.isMagnetColliding = newIsMagnetColliding;
+    },
+    getIsCherryColliding: function getIsCherryColliding() {
+      return state.isCherryColliding;
+    },
+    setIsCherryColliding: function setIsCherryColliding(newIsCherryColliding) {
+      state.isCherryColliding = newIsCherryColliding;
+    },
+    getIsCrateRunning: function getIsCrateRunning() {
+      return state.isCrateRunning;
+    },
+    setIsCrateRunning: function setIsCrateRunning(newIsCrateRunning) {
+      state.isCrateRunning = newIsCrateRunning;
+    },
     getIsGroundEnemyRunning: function getIsGroundEnemyRunning() {
       return state.isGroundEnemyRunning;
     },
@@ -410,7 +479,33 @@ var _default = exports.default = StateSingleton; // // To get the current phase
 // StateSingleton.setCurrentPhase(2);
 // // To update other properties in the state object
 // StateSingleton.updateState({ someProperty: 'new value' });
-},{}],"../elements/groundLayerTwo.js":[function(require,module,exports) {
+},{}],"../elements/ground.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setupGround = setupGround;
+exports.updateGround = updateGround;
+var _updateCustomProperty = require("../utility/updateCustomProperty.js");
+var _gameState = _interopRequireDefault(require("../game-state.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getGroundSpeed = _gameState.default.getGroundSpeed;
+var SPEED = getGroundSpeed();
+var groundElems = document.querySelectorAll('[data-ground]');
+function setupGround() {
+  (0, _updateCustomProperty.setCustomProperty)(groundElems[0], '--left', 0);
+  (0, _updateCustomProperty.setCustomProperty)(groundElems[1], '--left', 250);
+}
+function updateGround(delta, speedScale) {
+  groundElems.forEach(function (ground) {
+    (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(ground, '--left') <= -250) {
+      (0, _updateCustomProperty.incrementCustomProperty)(ground, '--left', 500);
+    }
+  });
+}
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state.js":"../game-state.js"}],"../elements/groundLayerTwo.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4125,7 +4220,7 @@ module.exports = "/Rock-2.61467632.png";
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.worldElem = exports.timerProgress = exports.tickerElem3 = exports.tickerElem2 = exports.tickerElem = exports.tickerContainerElem = exports.submitNewScoreFormElem = exports.startScreenElem = exports.scrollableTableElem = exports.scoreNewHighScoreElem = exports.scoreMultiplierElem = exports.scoreErrorMessageElem = exports.scoreElem = exports.plusPointsElem = exports.pausedScreenElem = exports.multiplierTimerElem = exports.loadingTextElem = exports.livesElem = exports.leaderboardElem = exports.interfaceComboContainer = exports.highScoreElem = exports.gameOverTextElem = exports.gameOverIconElem = exports.gameNotificationElem = exports.gameLoadingTextElem = exports.gameLoadingScreenElem = exports.endScreenElem = exports.dinoElem = exports.currentMultiplierScoreElem = exports.currentMultiplierElem = exports.currentGameTimerElem = exports.currentComboScoreContainer = void 0;
+exports.worldElem = exports.timerProgress = exports.tickerElem3 = exports.tickerElem2 = exports.tickerElem = exports.tickerContainerElem = exports.submitNewScoreFormElem = exports.startScreenElem = exports.scrollableTableElem = exports.scoreNewHighScoreElem = exports.scoreMultiplierElem = exports.scoreErrorMessageElem = exports.scoreElem = exports.plusPointsElem = exports.pausedScreenElem = exports.multiplierTimerElem = exports.loadingTextElem = exports.livesElem = exports.leaderboardElem = exports.interfaceComboContainer = exports.highScoreElem = exports.gameOverTextElem = exports.gameOverIconElem = exports.gameNotificationElem = exports.gameLoadingTextElem = exports.gameLoadingScreenElem = exports.endScreenElem = exports.dinoElem = exports.currentMultiplierScoreElem = exports.currentMultiplierElem = exports.currentGameTimerElem = exports.currentComboScoreContainer = exports.bonusElem = void 0;
 // sharedElements.js
 var worldElem = exports.worldElem = document.querySelector('[data-world]');
 var scoreElem = exports.scoreElem = document.querySelector('[data-score]');
@@ -4157,6 +4252,7 @@ var timerProgress = exports.timerProgress = document.getElementById('timerProgre
 var currentGameTimerElem = exports.currentGameTimerElem = document.querySelector('[data-current-game-timer]');
 var gameLoadingScreenElem = exports.gameLoadingScreenElem = document.querySelector('[data-game-loading-screen]');
 var gameLoadingTextElem = exports.gameLoadingTextElem = document.querySelector('[data-game-loading-text]');
+var bonusElem = exports.bonusElem = document.querySelector('[data-bonus]');
 var gameNotificationElem = exports.gameNotificationElem = document.querySelector('[data-notification-screen]');
 var pausedScreenElem = exports.pausedScreenElem = document.querySelector('[data-paused-screen]');
 },{}],"../utility/toggle-element.js":[function(require,module,exports) {
@@ -4177,12 +4273,253 @@ function toggleElemOff(elem) {
   classList.add('hide-element');
   classList.remove('show-element');
 }
-},{}],"../elements/cactus.js":[function(require,module,exports) {
+},{}],"../elements/coin.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.createCoins = createCoins;
+exports.getCoinRects = getCoinRects;
+exports.getRandomKeyframe = getRandomKeyframe;
+exports.moveItemToPlayer = moveItemToPlayer;
+exports.setupCoin = setupCoin;
+exports.updateCoin = updateCoin;
+var _updateCustomProperty = require("../utility/updateCustomProperty");
+var _playerController = require("./player-controller");
+var _gameManager = require("../game-manager");
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _groundQue = require("./groundQue");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var getMagnetSpeedFactor = _gameState.default.getMagnetSpeedFactor,
+  getIsCoinsRunning = _gameState.default.getIsCoinsRunning,
+  getGroundSpeed = _gameState.default.getGroundSpeed,
+  getPlatformSpeed = _gameState.default.getPlatformSpeed,
+  getGroundCoinMaxInterval = _gameState.default.getGroundCoinMaxInterval,
+  getGroundCoinMinInterval = _gameState.default.getGroundCoinMinInterval;
+var SPEED = getGroundSpeed();
+var worldElem = document.querySelector('[data-world]');
+var nextCoinTime;
+var isCoinSpawned = true;
+function setupCoin() {
+  nextCoinTime = getGroundCoinMinInterval();
+  document.querySelectorAll('[data-coin]').forEach(function (coin) {
+    coin.remove();
+  });
+}
+function moveItemToPlayer(dinoRect, item, itemRect, distance, delta) {
+  var extraFactor = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
+  // Enter the locking phase
+  if (item.dataset.isLocking === 'false') {
+    var angle = Math.atan2(dinoRect.y - itemRect.y, dinoRect.x - itemRect.x);
+    var distanceFactor = 0.0005 * distance;
+    var speed = SPEED * delta * distanceFactor;
+    // Additional logic to move the coin in the opposite direction before locking
+    var oppositeDirectionX = Math.cos(angle) * speed * -1 * 2;
+    var oppositeDirectionY = Math.sin(angle) * speed * 2;
+    (0, _updateCustomProperty.incrementCustomProperty)(item, '--left', oppositeDirectionX);
+    (0, _updateCustomProperty.incrementCustomProperty)(item, '--bottom', oppositeDirectionY);
+    setTimeout(function () {
+      item.dataset.locked = 'true';
+      item.dataset.isLocking = 'true';
+    }, item.dataset.isLockingDuration); // Adjust the timeout duration as needed
+  } else {
+    //lock the coin on the player
+    item.dataset.locked = 'true';
+    var _angle = Math.atan2(dinoRect.y - itemRect.y, dinoRect.x - itemRect.x);
+    var magneticSpeedFactor = item.dataset.isMagnetLocked === 'true' ? item.dataset.isMagnetSpeedFactor : 1;
+    var _distanceFactor = extraFactor + 0.0025 * distance;
+    var _speed = SPEED * delta * magneticSpeedFactor + _distanceFactor;
+
+    // Calculate incremental movement based on angle and speed
+    var deltaX = Math.cos(_angle) * _speed;
+    var deltaY = Math.sin(_angle) * _speed;
+
+    // Update coin position incrementally
+    (0, _updateCustomProperty.incrementCustomProperty)(item, '--left', deltaX);
+    (0, _updateCustomProperty.incrementCustomProperty)(item, '--bottom', deltaY * -1);
+  }
+}
+function updateCoin(delta, speedScale) {
+  document.querySelectorAll('[data-coin]').forEach(function (coin) {
+    // Get positions of the dinosaur and coin
+    var dinoRect = (0, _playerController.getDinoRect)();
+    var coinRect = coin.getBoundingClientRect();
+    // Calculate distance
+    var distance = Math.sqrt(Math.pow(dinoRect.x - coinRect.x, 2) + Math.pow(dinoRect.y - coinRect.y, 2));
+
+    // If the distance is less than 40px, move the coin towards the dinosaur
+    if (coin.dataset.locked === 'true' || distance < 225) {
+      moveItemToPlayer(dinoRect, coin, coinRect, distance, delta);
+    } else {
+      // Move the coin to the left if not close to the dinosaur
+      if (coin.dataset.cloudChild) {
+        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', delta * speedScale * getPlatformSpeed() * -1);
+      } else {
+        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', delta * speedScale * SPEED * -1);
+      }
+    }
+
+    // Remove the coin if it goes off the screen
+    if ((0, _updateCustomProperty.getCustomProperty)(coin, '--left') <= -100) {
+      coin.remove();
+    }
+  });
+  if (nextCoinTime <= 0 && getIsCoinsRunning()) {
+    (0, _groundQue.addToSpawnQueue)('coin');
+    isCoinSpawned = false;
+    nextCoinTime = randomNumberBetween(getGroundCoinMinInterval(), getGroundCoinMaxInterval()) / speedScale;
+  }
+  nextCoinTime -= delta;
+}
+function getCoinRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-coin]')).map(function (coin) {
+    return {
+      id: coin.id,
+      rect: coin.getBoundingClientRect()
+    };
+  });
+}
+function createCoins() {
+  isCoinSpawned = true;
+  // Calculate the total weight
+  var totalWeight = _gameManager.collectableOptions.reduce(function (sum, item) {
+    return sum + item.weight;
+  }, 0);
+
+  // Generate a random number between 0 and totalWeight
+  var randomWeight = Math.random() * totalWeight;
+
+  // Select a random collectable based on the weighted probabilities
+  var cumulativeWeight = 0;
+  var selectedCollectable;
+  var _iterator = _createForOfIteratorHelper(_gameManager.collectableOptions),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var item = _step.value;
+      cumulativeWeight += item.weight;
+      if (randomWeight <= cumulativeWeight) {
+        selectedCollectable = item;
+        break;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+  var element = document.createElement('div');
+  element.dataset.coin = true;
+  element.dataset.type = selectedCollectable.type;
+  element.dataset.locked = 'false';
+  element.dataset.isLocking = 'false';
+  element.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
+  element.dataset.isLockingDuration = randomNumberBetween(100, 300);
+  element.dataset.points = selectedCollectable.points;
+  element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
+  element.id = Math.random().toString(16).slice(2);
+  (0, _updateCustomProperty.setCustomProperty)(element, '--left', 100);
+  var initialKeyframe = getRandomKeyframe();
+  element.style.animationDelay = "-".concat(initialKeyframe, "%");
+  worldElem.append(element);
+}
+function randomNumberBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+function getRandomKeyframe() {
+  // Return a random number between 0 and 100 (percentage)
+  return Math.floor(Math.random() * 101);
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","./groundQue":"../elements/groundQue.js"}],"../elements/groundQue.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.addToSpawnQueue = addToSpawnQueue;
+exports.spawnNextItem = spawnNextItem;
+exports.updateGroundQue = updateGroundQue;
+var _coin = require("./coin");
+var _cactus = require("./cactus");
+var _gameState = _interopRequireDefault(require("../game-state"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var setNextGroundSpawnType = _gameState.default.setNextGroundSpawnType,
+  getGroundSpawnReady = _gameState.default.getGroundSpawnReady,
+  setGroundSpawnReady = _gameState.default.setGroundSpawnReady;
+var spawnFunctions = {
+  cactus: _cactus.generateRandomCacti,
+  coin: _coin.createCoins
+};
+var spawnQueue = []; // Queue to store items waiting to be spawned
+var spawnDelay;
+var lastTypeSpawned;
+function addToSpawnQueue(spawnType) {
+  // Add the spawnType to the queue
+  spawnQueue.push(spawnType);
+  // If no item is currently being spawned, start spawning
+}
+
+function spawnNextItem(delta, speedScale) {
+  // Check if there are items in the spawn queue
+  if (spawnQueue.length > 0) {
+    setGroundSpawnReady(false);
+    // Get the next item from the queue
+    var nextSpawnType = spawnQueue.shift();
+    setNextGroundSpawnType(nextSpawnType);
+    // Set the flag to indicate that an item is currently being spawned
+
+    // Call the appropriate function based on the spawnType
+    if (spawnFunctions[nextSpawnType]) {
+      console.log(lastTypeSpawned, nextSpawnType);
+
+      // Adjust the spawn delay based on the types of items in the queue
+      if (nextSpawnType === 'cactus' && lastTypeSpawned === 'coin' || nextSpawnType === 'coin' && lastTypeSpawned === 'cactus' || nextSpawnType === 'cactus' && lastTypeSpawned === 'cactus') {
+        // If a cactus is followed by a coin or cactus followed by cactus, add a delay
+        spawnDelay = 5000 / (delta * speedScale);
+      } else {
+        // Otherwise, use the default delay
+        spawnDelay = 0;
+      }
+      setTimeout(function () {
+        lastTypeSpawned = nextSpawnType;
+        setGroundSpawnReady(true);
+        spawnFunctions[nextSpawnType]();
+      }, spawnDelay);
+      // After the delay and spawning, call spawnNextItem to spawn the next item in the queue
+    } else {
+      // Handle unknown spawn types or add additional types
+    }
+  } else {
+    return;
+    // No items in the queue, reset the flag
+  }
+}
+
+// Example usage:
+// addToSpawnQueue('cactus');
+// addToSpawnQueue('coin');
+
+function updateGroundQue(delta, speedScale) {
+  console.log(spawnQueue);
+  if (getGroundSpawnReady()) {
+    spawnNextItem(delta, speedScale);
+  }
+}
+},{"./coin":"../elements/coin.js","./cactus":"../elements/cactus.js","../game-state":"../game-state.js"}],"../elements/cactus.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.generateRandomCacti = generateRandomCacti;
 exports.getCactusRects = getCactusRects;
 exports.setupCactus = setupCactus;
 exports.updateCactus = updateCactus;
@@ -4195,6 +4532,7 @@ var _gameManager = require("../game-manager");
 var _gameState = _interopRequireDefault(require("../game-state"));
 var _elementsRefs = require("../elements-refs");
 var _toggleElement = require("../utility/toggle-element");
+var _groundQue = require("./groundQue");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -4208,15 +4546,15 @@ var setMultiplierRatio = _gameState.default.setMultiplierRatio,
   getPlayerImmunity = _gameState.default.getPlayerImmunity,
   getHasStar = _gameState.default.getHasStar,
   getObstaclePoints = _gameState.default.getObstaclePoints,
-  getIsCactusRunning = _gameState.default.getIsCactusRunning;
+  getIsCactusRunning = _gameState.default.getIsCactusRunning,
+  getCactusIntervalMax = _gameState.default.getCactusIntervalMax,
+  getCactusIntervalMin = _gameState.default.getCactusIntervalMin,
+  getGroundSpeed = _gameState.default.getGroundSpeed;
 var cactiPositions = [];
-var SPEED = 0.04;
-var CACTUS_INTERVAL_MIN = 500;
-var CACTUS_INTERVAL_MAX = 2000;
 var worldElem = document.querySelector('[data-world]');
 var nextCactusTime;
 function setupCactus() {
-  nextCactusTime = CACTUS_INTERVAL_MIN;
+  nextCactusTime = getCactusIntervalMin();
   document.querySelectorAll('[data-cactus]').forEach(function (cactus) {
     cactus.remove();
   });
@@ -4225,8 +4563,10 @@ function isPositionOccupied(position) {
   return cactiPositions.includes(position);
 }
 var groupIdCounter = 0; // Counter to generate unique groupIds
-
+var isCactusSpawned = true;
 function generateRandomCacti() {
+  isCactusSpawned = true;
+  console.log('cactus spawned');
   var minCacti = 1;
   var maxCacti = 2; // Adjust the range as needed
   var groupId; // Declare groupId outside the loop
@@ -4358,14 +4698,15 @@ function updateCactus(delta, speedScale) {
         cactus.dataset.hadCollision = true;
       }
     }
-    (0, _updateCustomProperty.incrementCustomProperty)(cactus, '--left', delta * speedScale * SPEED * -1);
+    (0, _updateCustomProperty.incrementCustomProperty)(cactus, '--left', delta * speedScale * getGroundSpeed() * -1);
     if ((0, _updateCustomProperty.getCustomProperty)(cactus, '--left') <= -100) {
       cactus.remove();
     }
   });
   if (nextCactusTime <= 0 && getIsCactusRunning()) {
-    generateRandomCacti();
-    nextCactusTime = randomNumberBetween(CACTUS_INTERVAL_MIN, CACTUS_INTERVAL_MAX) / speedScale;
+    (0, _groundQue.addToSpawnQueue)('cactus');
+    isCactusSpawned = false;
+    nextCactusTime = randomNumberBetween(getCactusIntervalMin(), getCactusIntervalMax()) / speedScale;
   }
   nextCactusTime -= delta;
 }
@@ -4435,7 +4776,7 @@ function createCactus(newPosition, groupId) {
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/obstacles/bushes/Bush-1.png":"imgs/obstacles/bushes/Bush-1.png","../public/imgs/obstacles/rocks/Rock-1.png":"imgs/obstacles/rocks/Rock-1.png","../public/imgs/obstacles/rocks/Rock-2.png":"imgs/obstacles/rocks/Rock-2.png","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../elements-refs":"../elements-refs.js","../utility/toggle-element":"../utility/toggle-element.js"}],"imgs/cloud/Cloud-1.png":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/obstacles/bushes/Bush-1.png":"imgs/obstacles/bushes/Bush-1.png","../public/imgs/obstacles/rocks/Rock-1.png":"imgs/obstacles/rocks/Rock-1.png","../public/imgs/obstacles/rocks/Rock-2.png":"imgs/obstacles/rocks/Rock-2.png","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../elements-refs":"../elements-refs.js","../utility/toggle-element":"../utility/toggle-element.js","./groundQue":"../elements/groundQue.js"}],"imgs/cloud/Cloud-1.png":[function(require,module,exports) {
 module.exports = "/Cloud-1.fd6d161e.png";
 },{}],"imgs/cloud/Cloud-2.png":[function(require,module,exports) {
 module.exports = "/Cloud-2.0d1d9676.png";
@@ -4446,17 +4787,29 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+var _gameState = _interopRequireDefault(require("./game-state"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var setIsStarColliding = _gameState.default.setIsStarColliding,
+  setIsMagnetColliding = _gameState.default.setIsMagnetColliding,
+  setIsHeartColliding = _gameState.default.setIsHeartColliding,
+  setIsLeafColliding = _gameState.default.setIsLeafColliding,
+  setIsCherryColliding = _gameState.default.setIsCherryColliding;
+
 // state.js
 var ItemDropStateSingleton = function () {
   //default state
   var state = {
     star: {
-      weight: 8
+      weight: 8,
+      colliderSetter: setIsStarColliding
+    },
+    // magnet: { weight: 4, colliderSetter: setIsMagnetColliding },
+    heart: {
+      weight: 12,
+      colliderSetter: setIsHeartColliding
     }
-    // magnet: { weight: 4 },
-    // heart: { weight: 12 },
-    // leaf: { weight: 12 },
-    // cherry: { weight: 12 },
+    // leaf: { weight: 12, colliderSetter: setIsLeafColliding },
+    // cherry: { weight: 12, colliderSetter: setIsCherryColliding },
     // empty: { weight: 2 },
   };
 
@@ -4470,7 +4823,7 @@ var ItemDropStateSingleton = function () {
   };
 }();
 var _default = exports.default = ItemDropStateSingleton;
-},{}],"../utility/child-items.js":[function(require,module,exports) {
+},{"./game-state":"../game-state.js"}],"../utility/child-items.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4510,7 +4863,9 @@ var _gameManager = require("../game-manager");
 var _gameState = _interopRequireDefault(require("../game-state"));
 var _itemDropState = _interopRequireDefault(require("../item-drop-state"));
 var _childItems = require("../utility/child-items");
+var _coin = require("./coin");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -4521,7 +4876,7 @@ var getIsPlatformRunning = _gameState.default.getIsPlatformRunning,
   getPlatformSpeed = _gameState.default.getPlatformSpeed;
 var getItemDropState = _itemDropState.default.getItemDropState;
 var platformPositions = [];
-var SPEED = 0.035;
+var SPEED = getPlatformSpeed();
 var platform_INTERVAL_MIN = 1000;
 var platform_INTERVAL_MAX = 1500;
 var worldElem = document.querySelector('[data-world]');
@@ -4674,6 +5029,7 @@ function createPlatform(newPosition) {
   (0, _updateCustomProperty.setCustomProperty)(parentContainer, '--left', newPosition);
   (0, _updateCustomProperty.setCustomProperty)(parentContainer, '--bottom', "".concat(randomNumberBetween(45, 45)));
   worldElem.append(parentContainer);
+  createCoinsOnPlatform(parentContainer);
 }
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -4712,7 +5068,53 @@ function getRandomWeighted(item) {
   // Default case (fallback)
   return keys[keys.length - 1];
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/cloud/Cloud-1.png":"imgs/cloud/Cloud-1.png","../public/imgs/cloud/Cloud-2.png":"imgs/cloud/Cloud-2.png","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","../utility/child-items":"../utility/child-items.js"}],"../elements/ground-enemy.js":[function(require,module,exports) {
+function createCoinsOnPlatform(parent) {
+  // Calculate the total weight
+  var totalWeight = _gameManager.collectableOptions.reduce(function (sum, item) {
+    return sum + item.weight;
+  }, 0);
+
+  // Generate a random number between 0 and totalWeight
+  var randomWeight = Math.random() * totalWeight;
+
+  // Select a random collectable based on the weighted probabilities
+  var cumulativeWeight = 0;
+  var selectedCollectable;
+  var _iterator = _createForOfIteratorHelper(_gameManager.collectableOptions),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var item = _step.value;
+      cumulativeWeight += item.weight;
+      if (randomWeight <= cumulativeWeight) {
+        selectedCollectable = item;
+        break;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+  var element = document.createElement('div');
+  element.dataset.coin = true;
+  element.dataset.cloudChild = true;
+  element.dataset.type = selectedCollectable.type;
+  element.dataset.locked = 'false';
+  element.dataset.isLocking = 'false';
+  element.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
+  element.dataset.isLockingDuration = randomNumberBetween(100, 300);
+  element.dataset.points = selectedCollectable.points;
+  element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom-cloud-coin');
+  element.id = Math.random().toString(16).slice(2);
+  (0, _updateCustomProperty.setCustomProperty)(element, '--left', 100);
+  (0, _updateCustomProperty.setCustomProperty)(element, '--bottom', (0, _updateCustomProperty.getCustomProperty)(parent, '--bottom'));
+  var initialKeyframe = (0, _coin.getRandomKeyframe)();
+  element.style.animationDelay = "-".concat(initialKeyframe, "%");
+  worldElem.append(element);
+  console.log('did it');
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/cloud/Cloud-1.png":"imgs/cloud/Cloud-1.png","../public/imgs/cloud/Cloud-2.png":"imgs/cloud/Cloud-2.png","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","../utility/child-items":"../utility/child-items.js","./coin":"../elements/coin.js"}],"../elements/ground-enemy.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5680,6 +6082,8 @@ function getLeafRects() {
     };
   });
 }
+},{}],"imgs/icons/Star.png":[function(require,module,exports) {
+module.exports = "/Star.3e18d544.png";
 },{}],"../elements/flag.js":[function(require,module,exports) {
 "use strict";
 
@@ -5693,6 +6097,7 @@ var _gameState = _interopRequireDefault(require("../game-state"));
 var _elementsRefs = require("../elements-refs.js");
 var _gameManager = require("../game-manager.js");
 var _playerController = require("./player-controller.js");
+var _Star = _interopRequireDefault(require("../public/imgs/icons/Star.png"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -5706,6 +6111,31 @@ var getGroundSpeed = _gameState.default.getGroundSpeed,
   setIsFlagCreated = _gameState.default.setIsFlagCreated,
   updateState = _gameState.default.updateState;
 var hasAlreadyPassedFlag;
+function generateDigitWithStars(digit) {
+  var digits = [" <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 0
+  " \n    <div class=\"flex-col items-center\"><img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n</div>"), // 1
+  " <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-end digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 2
+  " <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-end digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-end\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 3
+  " <div class=\"flex justify-between\">\n    <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div>\n<br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-end digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-end\">\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div>"), // 4
+  "<img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-start digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-end\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 5
+  "<img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-start digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 6
+  "<img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex-col items-end digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n</div>"), // 7
+  " <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 8
+  "<img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-end\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 9
+  " <div class=\"flex-row\" style=\"gap: 50px\">\n\n    <div class=\"flex-col items-center\">\n    <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n</div>\n\n    <div><img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/> \n</div>\n    \n</div>") // 10
+  // Add similar lines for other digits
+  ];
+  if (digit >= 0 && digit <= 10) {
+    return digits[digit];
+  } else {
+    return 'Invalid digit';
+  }
+}
+
+// const digitZero = generateDigitWithStars(10);
+// const digitContainer = document.getElementById('digitContainer');
+// digitContainer.innerHTML = digitZero;
+
 function updateFlag(delta, speedScale) {
   document.querySelectorAll('[data-flag]').forEach(function (flag) {
     var flagRect = flag.getBoundingClientRect();
@@ -5721,8 +6151,22 @@ function updateFlag(delta, speedScale) {
       updateState({
         isGroundLayer2Running: false
       });
-      (0, _gameManager.updateNotification)("".concat(getCurrentPhase(), "!"), 2000, 0);
+      _elementsRefs.worldElem.classList.add('whiteout-screen');
+      _elementsRefs.bonusElem.setAttribute('transition-style', 'out:circle:bottom-left');
+      _elementsRefs.scoreElem.classList.add('white-out-text');
+      _elementsRefs.currentGameTimerElem.classList.add('white-out-text');
+      // updateNotification(`${getCurrentPhase()}!`, 2000, 0);
       hasAlreadyPassedFlag = true;
+
+      // Example usage:
+      setTimeout(function () {
+        var digitZero = generateDigitWithStars(10);
+        var digitContainer = document.getElementById('digitContainer');
+        digitContainer.innerHTML = digitZero;
+      }, 300);
+      setTimeout(function () {
+        digitContainer.innerHTML = '';
+      }, 3800);
     }
     (0, _updateCustomProperty.incrementCustomProperty)(flag, '--left', delta * speedScale * getGroundSpeed() * -1);
     if ((0, _updateCustomProperty.getCustomProperty)(flag, '--left') <= -100) {
@@ -5752,7 +6196,7 @@ function createFlag() {
   (0, _updateCustomProperty.setCustomProperty)(flag, '--left', 100);
   _elementsRefs.worldElem.append(flag);
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state":"../game-state.js","../elements-refs.js":"../elements-refs.js","../game-manager.js":"../game-manager.js","./player-controller.js":"../elements/player-controller.js"}],"../elements/star.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state":"../game-state.js","../elements-refs.js":"../elements-refs.js","../game-manager.js":"../game-manager.js","./player-controller.js":"../elements/player-controller.js","../public/imgs/icons/Star.png":"imgs/icons/Star.png"}],"../elements/star.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5813,156 +6257,7 @@ function createStars() {
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"../elements/coin.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getCoinRects = getCoinRects;
-exports.setupCoin = setupCoin;
-exports.updateCoin = updateCoin;
-var _updateCustomProperty = require("../utility/updateCustomProperty");
-var _playerController = require("./player-controller");
-var _gameManager = require("../game-manager");
-var _gameState = _interopRequireDefault(require("../game-state"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-var getMagnetSpeedFactor = _gameState.default.getMagnetSpeedFactor,
-  getIsCoinsRunning = _gameState.default.getIsCoinsRunning;
-var coinPositions = [];
-var SPEED = 0.05;
-var COIN_INTERVAL_MIN = 75;
-var COIN_INTERVAL_MAX = 400;
-var worldElem = document.querySelector('[data-world]');
-var nextCoinTime;
-function setupCoin() {
-  nextCoinTime = COIN_INTERVAL_MIN;
-  document.querySelectorAll('[data-coin]').forEach(function (coin) {
-    coin.remove();
-  });
-}
-function updateCoin(delta, speedScale) {
-  document.querySelectorAll('[data-coin]').forEach(function (coin) {
-    // Get positions of the dinosaur and coin
-    var dinoRect = (0, _playerController.getDinoRect)();
-    var coinRect = coin.getBoundingClientRect();
-    // Calculate distance
-    var distance = Math.sqrt(Math.pow(dinoRect.x - coinRect.x, 2) + Math.pow(dinoRect.y - coinRect.y, 2));
-
-    // If the distance is less than 40px, move the coin towards the dinosaur
-    if (coin.dataset.locked === 'true' || distance < 225) {
-      // Enter the locking phase
-      if (coin.dataset.isLocking === 'false') {
-        var angle = Math.atan2(dinoRect.y - coinRect.y, dinoRect.x - coinRect.x);
-        var distanceFactor = 0.0025 * distance;
-        var speed = SPEED * delta * distanceFactor;
-        // Additional logic to move the coin in the opposite direction before locking
-        var oppositeDirectionX = Math.cos(angle) * speed * -1 * 2;
-        var oppositeDirectionY = Math.sin(angle) * speed * 2;
-        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', oppositeDirectionX);
-        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--bottom', oppositeDirectionY);
-        setTimeout(function () {
-          coin.dataset.locked = 'true';
-          coin.dataset.isLocking = 'true';
-        }, coin.dataset.isLockingDuration); // Adjust the timeout duration as needed
-      } else {
-        //lock the coin on the player
-        coin.dataset.locked = 'true';
-        var _angle = Math.atan2(dinoRect.y - coinRect.y, dinoRect.x - coinRect.x);
-        var magneticSpeedFactor = coin.dataset.isMagnetLocked === 'true' ? coin.dataset.isMagnetSpeedFactor : 1;
-        var _distanceFactor = 0.0025 * distance;
-        var _speed = SPEED * delta * magneticSpeedFactor + _distanceFactor;
-
-        // Calculate incremental movement based on angle and speed
-        var deltaX = Math.cos(_angle) * _speed;
-        var deltaY = Math.sin(_angle) * _speed;
-
-        // Update coin position incrementally
-        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', deltaX);
-        (0, _updateCustomProperty.incrementCustomProperty)(coin, '--bottom', deltaY * -1);
-      }
-    } else {
-      // Move the coin to the left if not close to the dinosaur
-      (0, _updateCustomProperty.incrementCustomProperty)(coin, '--left', delta * speedScale * SPEED * -1);
-    }
-
-    // Remove the coin if it goes off the screen
-    if ((0, _updateCustomProperty.getCustomProperty)(coin, '--left') <= -100) {
-      coin.remove();
-    }
-  });
-  if (nextCoinTime <= 0 && getIsCoinsRunning()) {
-    createCoins();
-    nextCoinTime = randomNumberBetween(COIN_INTERVAL_MIN, COIN_INTERVAL_MAX) / speedScale;
-  }
-  nextCoinTime -= delta;
-}
-function getCoinRects() {
-  return _toConsumableArray(document.querySelectorAll('[data-coin]')).map(function (coin) {
-    return {
-      id: coin.id,
-      rect: coin.getBoundingClientRect()
-    };
-  });
-}
-function createCoins() {
-  // Calculate the total weight
-  var totalWeight = _gameManager.collectableOptions.reduce(function (sum, item) {
-    return sum + item.weight;
-  }, 0);
-
-  // Generate a random number between 0 and totalWeight
-  var randomWeight = Math.random() * totalWeight;
-
-  // Select a random collectable based on the weighted probabilities
-  var cumulativeWeight = 0;
-  var selectedCollectable;
-  var _iterator = _createForOfIteratorHelper(_gameManager.collectableOptions),
-    _step;
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var item = _step.value;
-      cumulativeWeight += item.weight;
-      if (randomWeight <= cumulativeWeight) {
-        selectedCollectable = item;
-        break;
-      }
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-  var element = document.createElement('div');
-  element.dataset.coin = true;
-  element.dataset.type = selectedCollectable.type;
-  element.dataset.locked = 'false';
-  element.dataset.isLocking = 'false';
-  element.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
-  element.dataset.isLockingDuration = randomNumberBetween(100, 300);
-  element.dataset.points = selectedCollectable.points;
-  element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
-  element.id = Math.random().toString(16).slice(2);
-  (0, _updateCustomProperty.setCustomProperty)(element, '--left', 100);
-  var initialKeyframe = getRandomKeyframe();
-  element.style.animationDelay = "-".concat(initialKeyframe, "%");
-  worldElem.append(element);
-}
-function randomNumberBetween(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-function getRandomKeyframe() {
-  // Return a random number between 0 and 100 (percentage)
-  return Math.floor(Math.random() * 101);
-}
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js"}],"imgs/icons/Speaker-Off.png":[function(require,module,exports) {
 module.exports = "/Speaker-Off.c6acac34.png";
 },{}],"imgs/icons/Speaker-On.png":[function(require,module,exports) {
 module.exports = "/Speaker-On.4eca78fe.png";
@@ -6002,8 +6297,6 @@ module.exports = "/amulet.e627f87d.png";
 module.exports = "/book.8e749379.png";
 },{}],"imgs/buffs/coins.png":[function(require,module,exports) {
 module.exports = "/coins.7d15c922.png";
-},{}],"imgs/icons/Star.png":[function(require,module,exports) {
-module.exports = "/Star.3e18d544.png";
 },{}],"../elements/particle-systems.js":[function(require,module,exports) {
 "use strict";
 
@@ -6270,6 +6563,8 @@ function getRandomBuffWeighted(buffs) {
   return keys[keys.length - 1];
 }
 function applyBuff(buffName) {
+  var powerUpDivContainer = document.querySelector('.power-up-grid-container');
+  powerUpDivContainer.classList.remove('hide-element');
   // Get all power-up divs
   var powerUpDivs = document.querySelectorAll('.power-up');
 
@@ -6287,28 +6582,28 @@ function applyBuff(buffName) {
     console.log("Applying ".concat(buffName));
     buffs[buffName].effect();
   } else {
-    // Find the first available power-up div without a power-up
-    var lastEmptyPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
-      return !powerUpDiv.querySelector('img');
-    });
-    if (lastEmptyPowerUp) {
-      // Implement logic to apply the selected buff
-      console.log("Applying ".concat(buffName));
-      buffs[buffName].effect();
+    // <!-- <div class="power-up small-border-inset"></div> -->
 
-      // Add the icon to the power-up div
-      var icon = document.createElement('img');
-      icon.src = buffs[buffName].icon;
-      icon.alt = "".concat(buffName);
-      icon.classList.add('w-full');
-      lastEmptyPowerUp.appendChild(icon);
+    var newPowerUpDiv = document.createElement('div');
+    newPowerUpDiv;
+    newPowerUpDiv.classList.add('power-up', 'small-border-inset');
+    powerUpDivContainer.appendChild(newPowerUpDiv);
+    // Implement logic to apply the selected buff
+    console.log("Applying ".concat(buffName));
+    buffs[buffName].effect();
 
-      // Add the rank to the power-up div
-      var rank = document.createElement('div');
-      rank.classList.add('power-up-rank', 'sans');
-      rank.textContent = '1';
-      lastEmptyPowerUp.appendChild(rank);
-    }
+    // Add the icon to the power-up div
+    var icon = document.createElement('img');
+    icon.src = buffs[buffName].icon;
+    icon.alt = "".concat(buffName);
+    icon.classList.add('w-full');
+    newPowerUpDiv.appendChild(icon);
+
+    // Add the rank to the power-up div
+    var rank = document.createElement('div');
+    rank.classList.add('power-up-rank', 'sans');
+    rank.textContent = '1';
+    newPowerUpDiv.appendChild(rank);
   }
   _particleSystems.confetti.destroy();
   // Close the modal
@@ -6329,7 +6624,6 @@ function applySackOfCoins() {
 function applyStarterBuff(buffName) {
   // Get all power-up divs
   var powerUpDivs = document.querySelectorAll('.starter-power-up');
-
   // Check if the user already has the selected power-up
   var existingPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
     return powerUpDiv.querySelector('img') && powerUpDiv.querySelector('img').alt.includes(buffName);
@@ -6349,6 +6643,8 @@ function applyStarterBuff(buffName) {
       return !powerUpDiv.querySelector('img');
     });
     if (lastEmptyPowerUp) {
+      lastEmptyPowerUp.classList.remove('dim');
+
       // Implement logic to apply the selected buff
       console.log("Applying ".concat(buffName));
       starterBuffs[buffName].effect();
@@ -6972,16 +7268,18 @@ Object.defineProperty(exports, "__esModule", {
 exports.updateInterfaceText = updateInterfaceText;
 var _updateCustomProperty = require("../utility/updateCustomProperty.js");
 var _interfaceTextElemsState = _interopRequireDefault(require("../interface-text-elems-state.js"));
+var _gameState = _interopRequireDefault(require("../game-state.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getGroundSpeed = _gameState.default.getGroundSpeed;
 var getInterfaceTextElemsState = _interfaceTextElemsState.default.getInterfaceTextElemsState;
-var SPEED = 0.04;
+var SPEED = getGroundSpeed() / 1.5;
 function updateInterfaceText(delta, speedScale) {
   var interfaceTextElems = getInterfaceTextElemsState();
   interfaceTextElems.forEach(function (text) {
     (0, _updateCustomProperty.incrementCustomProperty)(text, '--left', delta * speedScale * SPEED * -1);
   });
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../interface-text-elems-state.js":"../interface-text-elems-state.js"}],"../elements/cherry.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../interface-text-elems-state.js":"../interface-text-elems-state.js","../game-state.js":"../game-state.js"}],"../elements/cherry.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7003,7 +7301,160 @@ function getCherryRects() {
     };
   });
 }
-},{}],"../game-manager.js":[function(require,module,exports) {
+},{}],"imgs/Crate/Crate-1.png":[function(require,module,exports) {
+module.exports = "/Crate-1.4d6ad77a.png";
+},{}],"imgs/Crate/Crate-2.png":[function(require,module,exports) {
+module.exports = "/Crate-2.58c2d87a.png";
+},{}],"../utility/crate-items.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createCrateItems = createCrateItems;
+exports.createCrateItemsAboveCrate = createCrateItemsAboveCrate;
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _itemDropState = _interopRequireDefault(require("../item-drop-state"));
+var _updateCustomProperty = require("./updateCustomProperty");
+var _elementsRefs = require("../elements-refs");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var getItemDropState = _itemDropState.default.getItemDropState;
+function createCrateItems(elementName, parent) {
+  var element = document.createElement('div');
+  element.dataset["".concat(elementName)] = true;
+  element.classList.add("".concat(elementName, "-item-cloud"), "".concat(elementName, "-cloud-item-asset"));
+  element.id = Math.random().toString(16).slice(2);
+  if (elementName === 'cherry') {
+    element.dataset.type = 'cherry';
+    element.dataset.points = _gameState.default.getCherryPoints();
+  }
+  parent.append(element);
+}
+function createCrateItemsAboveCrate(elementName, parent) {
+  var element = document.createElement('div');
+  element.dataset.crateItem = true;
+  element.dataset["".concat(elementName)] = true;
+  element.classList.add("".concat(elementName, "-collectable-item-translate"), 'collectable-crate-item');
+  element.style.top = 'unset';
+  element.id = Math.random().toString(16).slice(2);
+  if (elementName === 'cherry') {
+    element.dataset.type = 'cherry';
+    element.dataset.points = _gameState.default.getCherryPoints();
+  }
+
+  //removes collider for a moment so the item can track to the player without colliding instantly
+  var state = getItemDropState();
+  state[elementName].colliderSetter(false);
+  (0, _updateCustomProperty.setCustomProperty)(element, '--bottom', (0, _updateCustomProperty.getCustomProperty)(parent, '--bottom') + 3);
+  (0, _updateCustomProperty.setCustomProperty)(element, '--left', (0, _updateCustomProperty.getCustomProperty)(parent, '--left'));
+  _elementsRefs.worldElem.appendChild(element);
+  element.addEventListener('animationend', function () {
+    state[elementName].colliderSetter(true);
+    element.dataset.itemLocked = true;
+    (0, _updateCustomProperty.setCustomProperty)(element, '--bottom', (0, _updateCustomProperty.getCustomProperty)(parent, '--bottom') + 15);
+  });
+}
+},{"../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","./updateCustomProperty":"../utility/updateCustomProperty.js","../elements-refs":"../elements-refs.js"}],"../elements/crate.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getCrateRects = getCrateRects;
+exports.randomNumberBetween = randomNumberBetween;
+exports.setupCrate = setupCrate;
+exports.updateCrate = updateCrate;
+var _updateCustomProperty = require("../utility/updateCustomProperty");
+var _Crate = _interopRequireDefault(require("../public/imgs/Crate/Crate-1.png"));
+var _Crate2 = _interopRequireDefault(require("../public/imgs/Crate/Crate-2.png"));
+var _playerController = require("./player-controller");
+var _platform = require("./platform");
+var _gameManager = require("../game-manager");
+var _gameState = _interopRequireDefault(require("../game-state"));
+var _itemDropState = _interopRequireDefault(require("../item-drop-state"));
+var _crateItems = require("../utility/crate-items");
+var _elementsRefs = require("../elements-refs");
+var _coin = require("./coin");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var getIsCrateRunning = _gameState.default.getIsCrateRunning,
+  getGroundSpeed = _gameState.default.getGroundSpeed;
+var getItemDropState = _itemDropState.default.getItemDropState;
+var SPEED = getGroundSpeed();
+var crate_INTERVAL_MIN = 1000;
+var crate_INTERVAL_MAX = 1500;
+var nextCrateTime;
+function setupCrate() {
+  nextCrateTime = crate_INTERVAL_MIN;
+  document.querySelectorAll('[data-crate]').forEach(function (crate) {
+    crate.remove();
+  });
+}
+function updateCrate(delta, speedScale) {
+  var dinoRect = (0, _playerController.getDinoRect)();
+  document.querySelectorAll('[data-crate-container]').forEach(function (crateContainer) {
+    // Get positions of the dinosaur and crate
+    var crateContainerRect = crateContainer.getBoundingClientRect();
+    var collision = (0, _gameManager.isCollision)(dinoRect, crateContainerRect);
+    if (collision && !crateContainer.dataset.didCollide) {
+      var crate = crateContainer.querySelector('img');
+      crate.src = _Crate2.default;
+      crateContainer.dataset.didCollide = true;
+      (0, _crateItems.createCrateItemsAboveCrate)((0, _platform.getRandomWeighted)(normalizedCrateItemWeights), crateContainer);
+    }
+    (0, _updateCustomProperty.incrementCustomProperty)(crateContainer, '--left', delta * speedScale * SPEED * -1);
+    if ((0, _updateCustomProperty.getCustomProperty)(crateContainer, '--left') <= -100) {
+      crateContainer.remove();
+    }
+  });
+  var crateItems = document.querySelectorAll('[data-crate-item]');
+  // if any crate items exist then move them to player
+  if (crateItems.length > 0) {
+    crateItems.forEach(function (crateItem) {
+      (0, _updateCustomProperty.incrementCustomProperty)(crateItem, '--left', delta * speedScale * SPEED * -1);
+      if (crateItem.dataset.itemLocked) {
+        var crateItemRect = crateItem.getBoundingClientRect();
+        // Calculate distance
+        var distance = Math.sqrt(Math.pow(dinoRect.x - crateItemRect.x, 2) + Math.pow(dinoRect.y - crateItemRect.y, 2));
+        (0, _coin.moveItemToPlayer)(dinoRect, crateItem, crateItemRect, distance, delta, 0.02);
+      }
+    });
+  }
+  if (nextCrateTime <= 0 && getIsCrateRunning()) {
+    createCrate();
+    nextCrateTime = randomNumberBetween(crate_INTERVAL_MIN, crate_INTERVAL_MAX) / speedScale;
+  }
+  nextCrateTime -= delta;
+}
+function getCrateRects() {
+  return _toConsumableArray(document.querySelectorAll('[data-crate]')).map(function (crate) {
+    return crate.getBoundingClientRect();
+  });
+}
+var normalizedCrateItemWeights = (0, _platform.normalizeWeights)(getItemDropState());
+console.log(normalizedCrateItemWeights);
+function createCrate() {
+  var crate = document.createElement('img');
+  var parentContainer = document.createElement('div');
+  parentContainer.dataset.crateContainer = true;
+  parentContainer.classList.add('crate-parent-container');
+  crate.src = _Crate.default;
+  crate.dataset.crate = true;
+  crate.classList.add('crate', 'game-element');
+  crate.id = "crate-".concat(Math.random());
+  parentContainer.append(crate);
+  (0, _updateCustomProperty.setCustomProperty)(parentContainer, '--left', 100);
+  _elementsRefs.worldElem.append(parentContainer);
+}
+function randomNumberBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/Crate/Crate-1.png":"imgs/Crate/Crate-1.png","../public/imgs/Crate/Crate-2.png":"imgs/Crate/Crate-2.png","./player-controller":"../elements/player-controller.js","./platform":"../elements/platform.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","../utility/crate-items":"../utility/crate-items.js","../elements-refs":"../elements-refs.js","./coin":"../elements/coin.js"}],"../game-manager.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7012,6 +7463,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.SPEED_SCALE_INCREASE = void 0;
 exports.amuletEffect = amuletEffect;
 exports.booksSmartEffect = booksSmartEffect;
+exports.checkForCrateItem = checkForCrateItem;
 exports.coinsEffect = coinsEffect;
 exports.collectableOptions = void 0;
 exports.filetMignonEffect = filetMignonEffect;
@@ -7066,6 +7518,8 @@ var _bonusLayer = require("./elements/bonus-layer.js");
 var _updateInterfaceText = require("./utility/update-interface-text.js");
 var _interfaceTextElemsState = _interopRequireDefault(require("./interface-text-elems-state.js"));
 var _cherry = require("./elements/cherry");
+var _crate = require("./elements/crate.js");
+var _groundQue = require("./elements/groundQue.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
@@ -7102,7 +7556,13 @@ var setMultiplierRatio = _gameState.default.setMultiplierRatio,
   getLeafDuration = _gameState.default.getLeafDuration,
   setHasLeaf = _gameState.default.setHasLeaf,
   setCherryPoints = _gameState.default.setCherryPoints,
-  getCherryPoints = _gameState.default.getCherryPoints;
+  getCherryPoints = _gameState.default.getCherryPoints,
+  getIsCherryColliding = _gameState.default.getIsCherryColliding,
+  getIsStarColliding = _gameState.default.getIsStarColliding,
+  getIsHeartColliding = _gameState.default.getIsHeartColliding,
+  getIsMagnetColliding = _gameState.default.getIsMagnetColliding,
+  getIsLeafColliding = _gameState.default.getIsLeafColliding,
+  getIsGroundLayer2Running = _gameState.default.getIsGroundLayer2Running;
 var WORLD_WIDTH = 100;
 var WORLD_HEIGHT = 45;
 var SPEED_SCALE_INCREASE = exports.SPEED_SCALE_INCREASE = 0.00001;
@@ -7243,11 +7703,21 @@ function checkCollisions() {
   if (checkLose()) return handleLose();
   checkMultiplierCollision();
   checkCoinCollision();
-  checkStarCollision();
-  checkCherryCollision();
-  checkHeartCollision();
-  checkMagnetCollision();
-  checkLeafCollision();
+  if (getIsStarColliding()) {
+    checkStarCollision();
+  }
+  if (getIsCherryColliding()) {
+    checkCherryCollision();
+  }
+  if (getIsHeartColliding()) {
+    checkHeartCollision();
+  }
+  if (getIsMagnetColliding()) {
+    checkMagnetCollision();
+  }
+  if (getIsLeafColliding()) {
+    checkLeafCollision();
+  }
 }
 var phaseUpdateFunctions = {
   1: _phase.updatePhase1,
@@ -7282,22 +7752,24 @@ function update(time) {
     updateFunction(timer, delta, currentSpeedScale);
   }
   (0, _groundLayerTwoTwo.updateGroundLayerTwoTwo)(delta, currentSpeedScale);
-  (0, _bonusLayer.updateBonusLayer)(delta, currentSpeedScale);
+  // updateBonusLayer(delta, currentSpeedScale);
   (0, _ground.updateGround)(delta, currentSpeedScale);
   (0, _groundLayerThree.updateGroundLayerThree)(delta, currentSpeedScale);
   (0, _groundLayerTwo.updateGroundLayerTwo)(delta, currentSpeedScale);
-  // updateCactus(delta, currentSpeedScale);
+  (0, _cactus.updateCactus)(delta, currentSpeedScale);
   // updateBird(delta, currentSpeedScale);
   // updateGroundEnemy(delta, currentSpeedScale);
-  (0, _platform.updatePlatform)(delta, currentSpeedScale);
-  // updateFlag(delta, currentSpeedScale);
+  // updatePlatform(delta, currentSpeedScale);
+  (0, _flag.updateFlag)(delta, currentSpeedScale);
   (0, _updateInterfaceText.updateInterfaceText)(delta, currentSpeedScale);
   // updateMultiplier(delta, currentSpeedScale);
   // updateMagnet(delta, currentSpeedScale);
-  // updateCoin(delta, currentSpeedScale);
+  (0, _coin.updateCoin)(delta, currentSpeedScale);
+  // updateCrate(delta, currentSpeedScale);
   (0, _playerController.updateDino)(delta, currentSpeedScale, getGravityFallAdjustment(), getSelectedStarter());
   updateSpeedScale(delta);
   updateScore(delta);
+  (0, _groundQue.updateGroundQue)(delta, currentSpeedScale);
   checkCollisions();
   lastTime = time;
   window.requestAnimationFrame(update);
@@ -7342,6 +7814,9 @@ function startMultiplierTimer() {
     }
   }, 100); // Update every 100 milliseconds
   setTimerInterval(timerInterval);
+}
+function checkForCrateItem(element) {
+  if (element.dataset.crateItem && !element.dataset.itemLocked) return false;
 }
 function checkMultiplierCollision() {
   var dinoRect = (0, _playerController.getDinoRect)();
@@ -7586,7 +8061,11 @@ function updateGlassesBuffDiv(counter) {
 }
 var lastMultiplierScore = document.querySelector('[data-last-multiplier-score]');
 function addPickupText(text, pickupElement) {
-  text.classList.add('plus-points', 'sans');
+  if (!getIsGroundLayer2Running()) {
+    text.classList.add('plus-points-navy', 'sans');
+  } else {
+    text.classList.add('plus-points', 'sans');
+  }
   text.style.position = 'absolute';
   text.style.left = pickupElement.offsetLeft + 'px';
   text.style.top = pickupElement.offsetTop - 70 + 'px';
@@ -7806,6 +8285,7 @@ function setUpElements() {
   setupCharacters();
   setupPowerUps();
   (0, _platform.setupPlatform)();
+  (0, _crate.setupCrate)();
 }
 function setupGroundElements() {
   (0, _ground.setupGround)();
@@ -8462,7 +8942,7 @@ function glassesEffect() {
 function coinsEffect() {
   setSelectedStarter('Coins');
 }
-},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerTwoTwo":"../elements/groundLayerTwoTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/player-controller.js":"../elements/player-controller.js","./elements/cactus.js":"../elements/cactus.js","./elements/ground-enemy":"../elements/ground-enemy.js","./elements/bird.js":"../elements/bird.js","./elements/platform.js":"../elements/platform.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/magnet.js":"../elements/magnet.js","./elements/heart.js":"../elements/heart.js","./elements/leaf.js":"../elements/leaf.js","./elements/flag.js":"../elements/flag.js","./elements/star.js":"../elements/star.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png","./elements/buff.js":"../elements/buff.js","./game-state.js":"../game-state.js","./elements-refs":"../elements-refs.js","./utility/toggle-element.js":"../utility/toggle-element.js","./elements/particle-systems.js":"../elements/particle-systems.js","./phases/phase-properties.js":"../phases/phase-properties.js","./phases/phase1.js":"../phases/phase1.js","./phases/phase2.js":"../phases/phase2.js","./phases/bonus-phase.js":"../phases/bonus-phase.js","./elements/bonus-layer.js":"../elements/bonus-layer.js","./utility/update-interface-text.js":"../utility/update-interface-text.js","./interface-text-elems-state.js":"../interface-text-elems-state.js","./elements/cherry":"../elements/cherry.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerTwoTwo":"../elements/groundLayerTwoTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/player-controller.js":"../elements/player-controller.js","./elements/cactus.js":"../elements/cactus.js","./elements/ground-enemy":"../elements/ground-enemy.js","./elements/bird.js":"../elements/bird.js","./elements/platform.js":"../elements/platform.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/magnet.js":"../elements/magnet.js","./elements/heart.js":"../elements/heart.js","./elements/leaf.js":"../elements/leaf.js","./elements/flag.js":"../elements/flag.js","./elements/star.js":"../elements/star.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png","./elements/buff.js":"../elements/buff.js","./game-state.js":"../game-state.js","./elements-refs":"../elements-refs.js","./utility/toggle-element.js":"../utility/toggle-element.js","./elements/particle-systems.js":"../elements/particle-systems.js","./phases/phase-properties.js":"../phases/phase-properties.js","./phases/phase1.js":"../phases/phase1.js","./phases/phase2.js":"../phases/phase2.js","./phases/bonus-phase.js":"../phases/bonus-phase.js","./elements/bonus-layer.js":"../elements/bonus-layer.js","./utility/update-interface-text.js":"../utility/update-interface-text.js","./interface-text-elems-state.js":"../interface-text-elems-state.js","./elements/cherry":"../elements/cherry.js","./elements/crate.js":"../elements/crate.js","./elements/groundQue.js":"../elements/groundQue.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -8487,7 +8967,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50788" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49295" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

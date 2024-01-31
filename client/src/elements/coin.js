@@ -6,22 +6,73 @@ import {
 import { getDinoRect } from './player-controller';
 import { collectableOptions } from '../game-manager';
 import StateSingleton from '../game-state';
+import { addToSpawnQueue } from './groundQue';
+const {
+  getMagnetSpeedFactor,
+  getIsCoinsRunning,
+  getGroundSpeed,
+  getPlatformSpeed,
+  getGroundCoinMaxInterval,
+  getGroundCoinMinInterval,
+} = StateSingleton;
 
-const { getMagnetSpeedFactor, getIsCoinsRunning } = StateSingleton;
-const coinPositions = [];
-
-const SPEED = 0.05;
-const COIN_INTERVAL_MIN = 75;
-const COIN_INTERVAL_MAX = 400;
+const SPEED = getGroundSpeed();
 const worldElem = document.querySelector('[data-world]');
 
 let nextCoinTime;
+let isCoinSpawned = true;
 
 export function setupCoin() {
-  nextCoinTime = COIN_INTERVAL_MIN;
+  nextCoinTime = getGroundCoinMinInterval();
   document.querySelectorAll('[data-coin]').forEach((coin) => {
     coin.remove();
   });
+}
+
+export function moveItemToPlayer(
+  dinoRect,
+  item,
+  itemRect,
+  distance,
+  delta,
+  extraFactor = 0
+) {
+  // Enter the locking phase
+  if (item.dataset.isLocking === 'false') {
+    const angle = Math.atan2(dinoRect.y - itemRect.y, dinoRect.x - itemRect.x);
+    let distanceFactor = 0.0005 * distance;
+
+    const speed = SPEED * delta * distanceFactor;
+    // Additional logic to move the coin in the opposite direction before locking
+    const oppositeDirectionX = Math.cos(angle) * speed * -1 * 2;
+    const oppositeDirectionY = Math.sin(angle) * speed * 2;
+
+    incrementCustomProperty(item, '--left', oppositeDirectionX);
+    incrementCustomProperty(item, '--bottom', oppositeDirectionY);
+
+    setTimeout(() => {
+      item.dataset.locked = 'true';
+      item.dataset.isLocking = 'true';
+    }, item.dataset.isLockingDuration); // Adjust the timeout duration as needed
+  } else {
+    //lock the coin on the player
+    item.dataset.locked = 'true';
+    const angle = Math.atan2(dinoRect.y - itemRect.y, dinoRect.x - itemRect.x);
+    let magneticSpeedFactor =
+      item.dataset.isMagnetLocked === 'true'
+        ? item.dataset.isMagnetSpeedFactor
+        : 1;
+    let distanceFactor = extraFactor + 0.0025 * distance;
+    const speed = SPEED * delta * magneticSpeedFactor + distanceFactor;
+
+    // Calculate incremental movement based on angle and speed
+    const deltaX = Math.cos(angle) * speed;
+    const deltaY = Math.sin(angle) * speed;
+
+    // Update coin position incrementally
+    incrementCustomProperty(item, '--left', deltaX);
+    incrementCustomProperty(item, '--bottom', deltaY * -1);
+  }
 }
 
 export function updateCoin(delta, speedScale) {
@@ -37,51 +88,22 @@ export function updateCoin(delta, speedScale) {
 
     // If the distance is less than 40px, move the coin towards the dinosaur
     if (coin.dataset.locked === 'true' || distance < 225) {
-      // Enter the locking phase
-      if (coin.dataset.isLocking === 'false') {
-        const angle = Math.atan2(
-          dinoRect.y - coinRect.y,
-          dinoRect.x - coinRect.x
-        );
-        let distanceFactor = 0.0025 * distance;
-
-        const speed = SPEED * delta * distanceFactor;
-        // Additional logic to move the coin in the opposite direction before locking
-        const oppositeDirectionX = Math.cos(angle) * speed * -1 * 2;
-        const oppositeDirectionY = Math.sin(angle) * speed * 2;
-
-        incrementCustomProperty(coin, '--left', oppositeDirectionX);
-        incrementCustomProperty(coin, '--bottom', oppositeDirectionY);
-
-        setTimeout(() => {
-          coin.dataset.locked = 'true';
-          coin.dataset.isLocking = 'true';
-        }, coin.dataset.isLockingDuration); // Adjust the timeout duration as needed
-      } else {
-        //lock the coin on the player
-        coin.dataset.locked = 'true';
-        const angle = Math.atan2(
-          dinoRect.y - coinRect.y,
-          dinoRect.x - coinRect.x
-        );
-        let magneticSpeedFactor =
-          coin.dataset.isMagnetLocked === 'true'
-            ? coin.dataset.isMagnetSpeedFactor
-            : 1;
-        let distanceFactor = 0.0025 * distance;
-        const speed = SPEED * delta * magneticSpeedFactor + distanceFactor;
-
-        // Calculate incremental movement based on angle and speed
-        const deltaX = Math.cos(angle) * speed;
-        const deltaY = Math.sin(angle) * speed;
-
-        // Update coin position incrementally
-        incrementCustomProperty(coin, '--left', deltaX);
-        incrementCustomProperty(coin, '--bottom', deltaY * -1);
-      }
+      moveItemToPlayer(dinoRect, coin, coinRect, distance, delta);
     } else {
       // Move the coin to the left if not close to the dinosaur
-      incrementCustomProperty(coin, '--left', delta * speedScale * SPEED * -1);
+      if (coin.dataset.cloudChild) {
+        incrementCustomProperty(
+          coin,
+          '--left',
+          delta * speedScale * getPlatformSpeed() * -1
+        );
+      } else {
+        incrementCustomProperty(
+          coin,
+          '--left',
+          delta * speedScale * SPEED * -1
+        );
+      }
     }
 
     // Remove the coin if it goes off the screen
@@ -91,10 +113,15 @@ export function updateCoin(delta, speedScale) {
   });
 
   if (nextCoinTime <= 0 && getIsCoinsRunning()) {
-    createCoins();
+    addToSpawnQueue('coin');
+    isCoinSpawned = false;
     nextCoinTime =
-      randomNumberBetween(COIN_INTERVAL_MIN, COIN_INTERVAL_MAX) / speedScale;
+      randomNumberBetween(
+        getGroundCoinMinInterval(),
+        getGroundCoinMaxInterval()
+      ) / speedScale;
   }
+
   nextCoinTime -= delta;
 }
 
@@ -107,7 +134,8 @@ export function getCoinRects() {
   });
 }
 
-function createCoins() {
+export function createCoins() {
+  isCoinSpawned = true;
   // Calculate the total weight
   const totalWeight = collectableOptions.reduce(
     (sum, item) => sum + item.weight,
@@ -147,7 +175,7 @@ function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function getRandomKeyframe() {
+export function getRandomKeyframe() {
   // Return a random number between 0 and 100 (percentage)
   return Math.floor(Math.random() * 101);
 }

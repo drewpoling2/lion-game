@@ -3,8 +3,9 @@ import {
   incrementCustomProperty,
   setCustomProperty,
 } from '../utility/updateCustomProperty.js';
-
-const SPEED = 0.04;
+import StateSingleton from '../game-state.js';
+const { getGroundSpeed } = StateSingleton;
+const SPEED = getGroundSpeed();
 const groundElems = document.querySelectorAll('[data-ground]');
 
 export function setupGround() {

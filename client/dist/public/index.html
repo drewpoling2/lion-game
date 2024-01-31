@@ -401,6 +401,28 @@
 }</script>
 
       <div class="world sans" data-world="">
+        <!-- testing pixelated filter  -->
+        <!-- <svg
+          xmlns="http://www.w3.org/2000/svg"
+          version="1.1"
+          width="0"
+          height="0"
+        >
+          <defs>
+            <filter id="pixelate" x="0" y="0">
+              <feFlood x="3" y="3" height="1" width="1"></feFlood>
+              <feComposite width="5" height="5"></feComposite>
+              <feTile result="a"></feTile>
+              <feComposite
+                in="SourceGraphic"
+                in2="a"
+                operator="in"
+              ></feComposite>
+              <feMorphology operator="dilate" radius="2.5"></feMorphology>
+            </filter>
+          </defs>
+        </svg>
+         -->
         <!-- <div
           data-game-loading-screen
           class="game-loading-screen justify-center items-center flex"
@@ -466,15 +488,10 @@
               </div>
               <div class="hud-container-middle">
                 <div class="starter-power-up-container">
-                  <div class="starter-power-up small-border-inset"></div>
+                  <div class="starter-power-up small-border-inset dim"></div>
                 </div>
-                <div class="power-up-grid-container">
-                  <div class="power-up small-border-inset"></div>
-                  <div class="power-up small-border-inset"></div>
-                  <div class="power-up small-border-inset"></div>
-                  <div class="power-up small-border-inset"></div>
-                  <div class="power-up small-border-inset"></div>
-                  <div class="power-up small-border-inset"></div>
+                <div class="power-up-grid-container hide-element">
+                  <!-- <div class="power-up small-border-inset"></div> -->
                 </div>
               </div>
             </div>
@@ -517,17 +534,20 @@
         <div class="start-screen blink" data-start-screen="">
           Press Any Key To Start
         </div>
+        <div class="w-fit digit-container" id="digitContainer"></div>
         <div class="pause-overlay" style="display: none" data-paused-screen="">
           <div class="paused-screen">Game Paused</div>
         </div>
         <div class="notification-screen" data-notification-screen=""></div>
-        <img alt="" src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
-        <img alt="" src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
-        <img alt="" src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
-        <img alt="" src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
-        <img alt="" src="/Bonus.17a540d4.png" class="bonus-layer" data-bonus-layer="">
-        <img alt="" src="/Bonus.17a540d4.png" class="bonus-layer" data-bonus-layer="">
-
+        <div class="whiteout-screen"></div>
+        <div class="flashing-screen" data-bonus="">
+          <img alt="" src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
+          <img alt="" src="/Mountain.5a5dcb5e.png" class="mountains" data-ground-layer-three="">
+          <img alt="" src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
+          <img alt="" src="/Foreground-Trees.1c0db94f.png" class="foreground-trees" data-ground-layer-two="">
+          <img alt="" src="/Bonus.17a540d4.png" class="bonus-layer" data-bonus-layer="">
+          <img alt="" src="/Bonus.17a540d4.png" class="bonus-layer" data-bonus-layer="">
+        </div>
         <img alt="" src="/ground.efe81358.png" class="ground" data-ground="">
         <img alt="" src="/ground.efe81358.png" class="ground" data-ground="">
         <div class="dino w-fit" data-dino="">

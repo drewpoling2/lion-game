@@ -61,6 +61,10 @@ function getRandomBuffWeighted(buffs) {
 }
 
 function applyBuff(buffName) {
+  const powerUpDivContainer = document.querySelector(
+    '.power-up-grid-container'
+  );
+  powerUpDivContainer.classList.remove('hide-element');
   // Get all power-up divs
   const powerUpDivs = document.querySelectorAll('.power-up');
 
@@ -81,29 +85,28 @@ function applyBuff(buffName) {
     console.log(`Applying ${buffName}`);
     buffs[buffName].effect();
   } else {
-    // Find the first available power-up div without a power-up
-    const lastEmptyPowerUp = Array.from(powerUpDivs).find(
-      (powerUpDiv) => !powerUpDiv.querySelector('img')
-    );
+    // <!-- <div class="power-up small-border-inset"></div> -->
 
-    if (lastEmptyPowerUp) {
-      // Implement logic to apply the selected buff
-      console.log(`Applying ${buffName}`);
-      buffs[buffName].effect();
+    const newPowerUpDiv = document.createElement('div');
+    newPowerUpDiv;
+    newPowerUpDiv.classList.add('power-up', 'small-border-inset');
+    powerUpDivContainer.appendChild(newPowerUpDiv);
+    // Implement logic to apply the selected buff
+    console.log(`Applying ${buffName}`);
+    buffs[buffName].effect();
 
-      // Add the icon to the power-up div
-      const icon = document.createElement('img');
-      icon.src = buffs[buffName].icon;
-      icon.alt = `${buffName}`;
-      icon.classList.add('w-full');
-      lastEmptyPowerUp.appendChild(icon);
+    // Add the icon to the power-up div
+    const icon = document.createElement('img');
+    icon.src = buffs[buffName].icon;
+    icon.alt = `${buffName}`;
+    icon.classList.add('w-full');
+    newPowerUpDiv.appendChild(icon);
 
-      // Add the rank to the power-up div
-      const rank = document.createElement('div');
-      rank.classList.add('power-up-rank', 'sans');
-      rank.textContent = '1';
-      lastEmptyPowerUp.appendChild(rank);
-    }
+    // Add the rank to the power-up div
+    const rank = document.createElement('div');
+    rank.classList.add('power-up-rank', 'sans');
+    rank.textContent = '1';
+    newPowerUpDiv.appendChild(rank);
   }
   confetti.destroy();
   // Close the modal
@@ -126,7 +129,6 @@ function applySackOfCoins() {
 function applyStarterBuff(buffName) {
   // Get all power-up divs
   const powerUpDivs = document.querySelectorAll('.starter-power-up');
-
   // Check if the user already has the selected power-up
   const existingPowerUp = Array.from(powerUpDivs).find(
     (powerUpDiv) =>
@@ -150,6 +152,8 @@ function applyStarterBuff(buffName) {
     );
 
     if (lastEmptyPowerUp) {
+      lastEmptyPowerUp.classList.remove('dim');
+
       // Implement logic to apply the selected buff
       console.log(`Applying ${buffName}`);
       starterBuffs[buffName].effect();

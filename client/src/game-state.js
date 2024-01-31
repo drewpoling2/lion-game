@@ -23,6 +23,7 @@ const StateSingleton = (function () {
     isCactusRunning: false,
     isBirdRunning: true,
     isGroundEnemyRunning: true,
+    isCrateRunning: true,
 
     //world
     isGroundRunning: true,
@@ -31,9 +32,15 @@ const StateSingleton = (function () {
     groundSpeed: 0.04,
     groundEnemySpeedFactor: 0.05,
     isFlagCreated: true,
-    platformSpeed: 0.05,
+    platformSpeed: 0.035,
 
     //items
+    platformCoinIntervalMax: 2000,
+    platformCoinIntervalMin: 1000,
+    groundCoinIntervalMin: 50,
+    groundCoinIntervalMax: 1000,
+    cactusIntervalMin: 900,
+    cactusIntervalMax: 1400,
     isMultiplierRunning: false,
     isMagnetRunning: false,
     isStarRunning: false,
@@ -43,9 +50,94 @@ const StateSingleton = (function () {
     hasLeaf: false,
     leafDuration: 10000,
     isMagnetItem: false,
+    isStarColliding: true,
+    isMagnetColliding: true,
+    isCherryColliding: true,
+    isLeafColliding: true,
+    isHeartColliding: true,
+    groundSpawnReady: true,
+    nextGroundSpawnType: '',
   };
 
   return {
+    getGroundSpawnReady: function () {
+      return state.groundSpawnReady;
+    },
+    setGroundSpawnReady: function (newGroundSpawnReady) {
+      state.groundSpawnReady = newGroundSpawnReady;
+    },
+    getCactusIntervalMin: function () {
+      return state.cactusIntervalMin;
+    },
+    setCactusIntervalMin: function (newCactusIntervalMin) {
+      state.cactusIntervalMin = newCactusIntervalMin;
+    },
+    getCactusIntervalMax: function () {
+      return state.cactusIntervalMax;
+    },
+    setCactusIntervalMax: function (newCactusIntervalMax) {
+      state.cactusIntervalMax = newCactusIntervalMax;
+    },
+    getNextGroundSpawnType: function () {
+      return state.nextGroundSpawnType;
+    },
+    setNextGroundSpawnType: function (newNextGroundSpawnType) {
+      state.nextGroundSpawnType = newNextGroundSpawnType;
+    },
+    getPlatformCoinIntervalMin: function () {
+      return state.platformCoinIntervalMin;
+    },
+    setPlatformCoinIntervalMax: function (newPlatformCoinIntervalMax) {
+      state.platformCoinIntervalMax = newPlatformCoinIntervalMax;
+    },
+    getGroundCoinMinInterval: function () {
+      return state.groundCoinIntervalMin;
+    },
+    setGroundCoinMinInterval: function (newGroundCoinMinInterval) {
+      state.groundCoinIntervalMin = newGroundCoinMinInterval;
+    },
+    getGroundCoinMaxInterval: function () {
+      return state.groundCoinIntervalMax;
+    },
+    setGroundCoinMaxInterval: function (newGroundCoinMaxInterval) {
+      state.groundCoinIntervalMax = newGroundCoinMaxInterval;
+    },
+    getIsHeartColliding: function () {
+      return state.isHeartColliding;
+    },
+    setIsHeartColliding: function (newIsHeartColliding) {
+      state.isHeartColliding = newIsHeartColliding;
+    },
+    getIsLeafColliding: function () {
+      return state.isLeafColliding;
+    },
+    setIsLeafColliding: function (newIsLeafColliding) {
+      state.isLeafColliding = newIsLeafColliding;
+    },
+    getIsStarColliding: function () {
+      return state.isStarColliding;
+    },
+    setIsStarColliding: function (newIsStarColliding) {
+      state.isStarColliding = newIsStarColliding;
+    },
+    getIsMagnetColliding: function () {
+      return state.isMagnetColliding;
+    },
+    setIsMagnetColliding: function (newIsMagnetColliding) {
+      state.isMagnetColliding = newIsMagnetColliding;
+    },
+    getIsCherryColliding: function () {
+      return state.isCherryColliding;
+    },
+    setIsCherryColliding: function (newIsCherryColliding) {
+      state.isCherryColliding = newIsCherryColliding;
+    },
+    getIsCrateRunning: function () {
+      return state.isCrateRunning;
+    },
+    setIsCrateRunning: function (newIsCrateRunning) {
+      state.isCrateRunning = newIsCrateRunning;
+    },
     getIsGroundEnemyRunning: function () {
       return state.isGroundEnemyRunning;
     },

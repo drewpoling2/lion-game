@@ -16,6 +16,7 @@ import {
 } from '../elements-refs';
 import { toggleElemOn } from '../utility/toggle-element';
 import { updateScoreWithPoints } from '../game-manager';
+import { addToSpawnQueue } from './groundQue';
 const {
   setMultiplierRatio,
   getMultiplierRatio,
@@ -23,17 +24,17 @@ const {
   getHasStar,
   getObstaclePoints,
   getIsCactusRunning,
+  getCactusIntervalMax,
+  getCactusIntervalMin,
+  getGroundSpeed,
 } = StateSingleton;
 const cactiPositions = [];
 
-const SPEED = 0.04;
-const CACTUS_INTERVAL_MIN = 500;
-const CACTUS_INTERVAL_MAX = 2000;
 const worldElem = document.querySelector('[data-world]');
 
 let nextCactusTime;
 export function setupCactus() {
-  nextCactusTime = CACTUS_INTERVAL_MIN;
+  nextCactusTime = getCactusIntervalMin();
   document.querySelectorAll('[data-cactus]').forEach((cactus) => {
     cactus.remove();
   });
@@ -44,8 +45,11 @@ function isPositionOccupied(position) {
 }
 
 let groupIdCounter = 0; // Counter to generate unique groupIds
+let isCactusSpawned = true;
 
-function generateRandomCacti() {
+export function generateRandomCacti() {
+  isCactusSpawned = true;
+  console.log('cactus spawned');
   const minCacti = 1;
   const maxCacti = 2; // Adjust the range as needed
   let groupId; // Declare groupId outside the loop
@@ -200,16 +204,21 @@ export function updateCactus(delta, speedScale) {
       }
     }
 
-    incrementCustomProperty(cactus, '--left', delta * speedScale * SPEED * -1);
+    incrementCustomProperty(
+      cactus,
+      '--left',
+      delta * speedScale * getGroundSpeed() * -1
+    );
     if (getCustomProperty(cactus, '--left') <= -100) {
       cactus.remove();
     }
   });
 
   if (nextCactusTime <= 0 && getIsCactusRunning()) {
-    generateRandomCacti();
+    addToSpawnQueue('cactus');
+    isCactusSpawned = false;
     nextCactusTime =
-      randomNumberBetween(CACTUS_INTERVAL_MIN, CACTUS_INTERVAL_MAX) /
+      randomNumberBetween(getCactusIntervalMin(), getCactusIntervalMax()) /
       speedScale;
   }
   nextCactusTime -= delta;

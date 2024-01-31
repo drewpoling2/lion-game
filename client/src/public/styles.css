@@ -12,6 +12,13 @@
   font-style: normal;
 }
 
+/* html {
+  filter: url('#pixelated');
+}
+svg {
+  display: block;
+} */
+
 :root {
   --beaver-blue: #1e407c;
   --beaver-70: rgba(30, 64, 124, 0.7);
@@ -216,6 +223,10 @@ body.pause-animation * {
   opacity: 0;
   height: 0px;
   pointer-events: none;
+}
+
+.dim {
+  opacity: 0.35;
 }
 
 .hide-element {
@@ -563,9 +574,7 @@ body.pause-animation * {
 }
 
 .starter-power-up-container {
-  margin-right: 12px;
   padding-right: 12px;
-  border-right: 2px solid #1e407c;
 }
 
 .starter-power-up {
@@ -578,6 +587,8 @@ body.pause-animation * {
 }
 
 .power-up-grid-container {
+  padding-left: 12px;
+  border-left: 2px solid #1e407c;
   display: grid;
   grid-template-columns: repeat(6, 1fr); /* Three columns */
   gap: 6px; /* Gap between items */
@@ -1455,7 +1466,7 @@ progress[value]::-moz-progress-bar {
 
 @keyframes fadeUpNoArc {
   0% {
-    opacity: 0;
+    opacity: 0.8;
     transform: translateY(-20px) scale(1);
   }
   50% {
@@ -1463,7 +1474,7 @@ progress[value]::-moz-progress-bar {
     transform: translateY(-70px) scale(1);
   }
   100% {
-    opacity: 0;
+    opacity: 1;
     transform: translateY(-120px) scale(1);
   }
 }
@@ -1485,14 +1496,83 @@ progress[value]::-moz-progress-bar {
   }
 }
 
+br {
+  height: 0px;
+  margin: -20px;
+}
+
 .test-text {
   width: fit-content;
   color: white;
 }
 
+.digit-container {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+}
+
+.digit-container-top {
+  margin-top: 12px;
+}
+
+@keyframes showDigit {
+  0% {
+    transform: scale(0);
+  }
+  15% {
+    transform: scale(1);
+  }
+  80% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+.digit-star {
+  width: 20px;
+  animation: flashStar infinite step-start 0.5s, showDigit ease 4s;
+}
+
+@keyframes flashStar {
+  0% {
+    filter: invert(11%) sepia(16%) saturate(6312%) hue-rotate(183deg)
+      brightness(97%) contrast(105%);
+  }
+  50% {
+    filter: invert(17%) sepia(50%) saturate(8200%) hue-rotate(190deg)
+      brightness(65%) contrast(101%);
+  }
+  100% {
+    filter: invert(11%) sepia(16%) saturate(6312%) hue-rotate(183deg)
+      brightness(97%) contrast(105%);
+  }
+}
+
 .outline-text {
   text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
     2px 2px 0 #000;
+}
+
+[transition-style='out:circle:bottom-left'] {
+  --transition__duration: 2s !important;
+}
+
+.white-out-text {
+  color: var(--potential-midnight) !important;
+}
+
+.plus-points-navy {
+  width: fit-content;
+  text-shadow: 1px 2px 0 #fff;
+  -webkit-text-stroke: 0.5px var(--potential-midnight); /* width and color */
+  color: var(--potential-midnight);
+  animation: fadeInUp 0.6s forwards; /* Animation for fade in with upward translate */
+  transition: opacity 0.6s; /* Add a transition for the opacity property over 1 second */
 }
 
 .plus-points {
@@ -1511,7 +1591,7 @@ progress[value]::-moz-progress-bar {
   color: #bc204b;
   font-size: 22px;
   width: fit-content;
-  animation: fadeUpNoArc 0.9s linear; /* Animation for fade in with upward translate */
+  animation: fadeUpNoArc 0.6s linear; /* Animation for fade in with upward translate */
 }
 
 .pixel-art-input {
@@ -1655,6 +1735,65 @@ progress[value]::-moz-progress-bar {
     itemFloatingCloudItem 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
 }
 
+.heart-collectable-item-translate {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 28px;
+  z-index: 20;
+  position: absolute;
+  left: 37%;
+  height: 28px;
+  animation: itemFloatingCloudItem 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
+  background-image: url('./imgs/items/heart/Heart-1.png');
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  animation: translateCollectable ease-in-out 0.65s, invert ease 0.8s infinite;
+}
+
+.star-collectable-item-translate {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 28px;
+  z-index: 20;
+  position: absolute;
+  left: 37%;
+  height: 28px;
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  animation: starSpin 0.35s infinite ease-in-out,
+    translateCollectable ease-in-out 0.65s, invert ease 0.8s infinite;
+}
+
+@keyframes invert {
+  0% {
+    filter: brightness(100%) saturate(100%);
+  }
+  50% {
+    filter: brightness(170%);
+  }
+  100% {
+    filter: brightness(100%) saturate(100%);
+  }
+}
+
+@keyframes starSpin {
+  0% {
+    background-image: url('./imgs/items/star/Star-Spin-1.png');
+  }
+  35% {
+    background-image: url('./imgs/items/star/Star-Spin-2.png');
+  }
+  50% {
+    background-image: url('./imgs/items/star/Star-Spin-3.png');
+  }
+  65% {
+    background-image: url('./imgs/items/star/Star-Spin-4.png');
+  }
+  100% {
+    background-image: url('./imgs/items/star/Star-Spin-1.png');
+  }
+}
+
 @keyframes starShine {
   0% {
     background-image: url('./imgs/items/star/Star-5.png');
@@ -1713,7 +1852,6 @@ progress[value]::-moz-progress-bar {
   width: 28px;
   height: 28px;
   image-rendering: pixelated; /* Prevent blurriness between images */
-  transition: none !important;
   animation: shineSilverCoin 1.5s ease-in-out infinite,
     floating 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
 }
@@ -1780,6 +1918,10 @@ progress[value]::-moz-progress-bar {
 
 .move-bottom {
   --bottom: 23.5;
+  bottom: calc(var(--bottom) * 1%);
+}
+
+.move-bottom-cloud-coin {
   bottom: calc(var(--bottom) * 1%);
 }
 
@@ -2169,11 +2311,33 @@ progress[value]::-moz-progress-bar {
   left: calc(var(--left) * 1%);
 }
 
+.flashing-screen {
+  width: 1364px;
+  height: 613.8px;
+}
+
+.whiteout-screen {
+  background-color: var(--limestone-light) !important;
+}
+
+@keyframes flashingScreen {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .dino {
   --bottom: 19.5;
   position: absolute;
   height: 9.8%;
   left: 25%;
+  z-index: 2;
   bottom: calc(var(--bottom) * 1%);
 }
 
@@ -2577,6 +2741,48 @@ progress[value]::-moz-progress-bar {
   position: absolute;
   left: calc(var(--left) * 1%);
   bottom: calc(var(--bottom) * 1%);
+}
+
+.collectable-crate-item {
+  --left: 25;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+}
+
+@keyframes translateCollectable {
+  0% {
+    opacity: 0.9;
+    transform: translateY(0px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-80px) scale(1);
+  }
+}
+
+@keyframes invertCollectable {
+  0% {
+    filter: grayscale(0%) brightness(100%) saturate(100%) invert(0);
+  }
+  100% {
+    filter: grayscale(0%) brightness(150%) saturate(120%) invert(0);
+  }
+}
+
+.crate {
+  height: 53px;
+  --bottom: 15.5;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+}
+
+.crate-parent-container {
+  --bottom: 20.5;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  z-index: 1;
 }
 
 .cactus-img {

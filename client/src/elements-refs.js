@@ -49,11 +49,13 @@ const gameLoadingScreenElem = document.querySelector(
 );
 
 const gameLoadingTextElem = document.querySelector('[data-game-loading-text]');
+const bonusElem = document.querySelector('[data-bonus]');
 const gameNotificationElem = document.querySelector(
   '[data-notification-screen]'
 );
 const pausedScreenElem = document.querySelector('[data-paused-screen]');
 export {
+  bonusElem,
   pausedScreenElem,
   gameNotificationElem,
   gameLoadingTextElem,

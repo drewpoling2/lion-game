@@ -10,11 +10,13 @@ import { isCollision, updateMultiplierInterface } from '../game-manager';
 import StateSingleton from '../game-state';
 import ItemDropStateSingleton from '../item-drop-state';
 import { createChildItems } from '../utility/child-items';
+import { collectableOptions } from '../game-manager';
+import { getRandomKeyframe } from './coin';
 const { getIsPlatformRunning, getPlatformSpeed } = StateSingleton;
 const { getItemDropState } = ItemDropStateSingleton;
 const platformPositions = [];
 
-const SPEED = 0.035;
+const SPEED = getPlatformSpeed();
 const platform_INTERVAL_MIN = 1000;
 const platform_INTERVAL_MAX = 1500;
 const worldElem = document.querySelector('[data-world]');
@@ -199,6 +201,7 @@ function createPlatform(newPosition) {
     `${randomNumberBetween(45, 45)}`
   );
   worldElem.append(parentContainer);
+  createCoinsOnPlatform(parentContainer);
 }
 
 export function randomNumberBetween(min, max) {
@@ -236,4 +239,47 @@ export function getRandomWeighted(item) {
 
   // Default case (fallback)
   return keys[keys.length - 1];
+}
+
+function createCoinsOnPlatform(parent) {
+  // Calculate the total weight
+  const totalWeight = collectableOptions.reduce(
+    (sum, item) => sum + item.weight,
+    0
+  );
+
+  // Generate a random number between 0 and totalWeight
+  const randomWeight = Math.random() * totalWeight;
+
+  // Select a random collectable based on the weighted probabilities
+  let cumulativeWeight = 0;
+  let selectedCollectable;
+  for (const item of collectableOptions) {
+    cumulativeWeight += item.weight;
+    if (randomWeight <= cumulativeWeight) {
+      selectedCollectable = item;
+      break;
+    }
+  }
+  const element = document.createElement('div');
+  element.dataset.coin = true;
+  element.dataset.cloudChild = true;
+  element.dataset.type = selectedCollectable.type;
+  element.dataset.locked = 'false';
+  element.dataset.isLocking = 'false';
+  element.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
+  element.dataset.isLockingDuration = randomNumberBetween(100, 300);
+  element.dataset.points = selectedCollectable.points;
+  element.classList.add(
+    selectedCollectable.type,
+    'collectable',
+    'move-bottom-cloud-coin'
+  );
+  element.id = Math.random().toString(16).slice(2);
+  setCustomProperty(element, '--left', 100);
+  setCustomProperty(element, '--bottom', getCustomProperty(parent, '--bottom'));
+  const initialKeyframe = getRandomKeyframe();
+  element.style.animationDelay = `-${initialKeyframe}%`;
+  worldElem.append(element);
+  console.log('did it');
 }
