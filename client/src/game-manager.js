@@ -162,7 +162,7 @@ let lastTime;
 let score;
 let idleIntervalId;
 let collisionOccurred = false; // Flag to track collision
-let milestone = 100000;
+let milestone = 25;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
@@ -336,7 +336,7 @@ function update(time) {
     return;
   }
 
-  let baseDelta = 15;
+  let baseDelta = 5;
   // let delta = time - lastTime;
   let delta = baseDelta;
   if (collisionOccurred && !getPlayerImmunity()) {
@@ -1347,11 +1347,11 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 }
 
 export let collectableOptions = [
-  { type: 'gold-coin', weight: 0, points: 31 },
-  { type: 'silver-coin', weight: 0, points: 16 },
-  { type: 'green-gem', weight: 0.01, points: 250 },
-  { type: 'red-gem', weight: 0.01, points: 500 },
-  { type: 'blue-gem', weight: 0.01, points: 1000 },
+  { type: 'gold-coin', weight: 20, points: 31 },
+  { type: 'silver-coin', weight: 60, points: 16 },
+  { type: 'green-gem', weight: 0.3, points: 250 },
+  { type: 'red-gem', weight: 0.2, points: 500 },
+  { type: 'blue-gem', weight: 0.1, points: 1000 },
 ];
 
 //buff-effects
@@ -1421,10 +1421,6 @@ function sackOfCoinsEffect() {
   console.log(`Collected ${totalPoints} points from 25 random coins.`);
 }
 
-function momsCookiesEffect() {
-  updateScoreWithPoints(milestone);
-}
-
 function reduceByPercentage(value, percentage) {
   return value * (1 - percentage);
 }
@@ -1436,110 +1432,11 @@ function slowFallEffect() {
   );
 }
 
-function reverseAndReIncrement(finalValue, incrementFactor, reIncrementFactor) {
-  // Reverse the increment by incrementFactor
-  const decreasedValue = finalValue / incrementFactor;
-  // Re-increment the reversed value by reIncrementFactor
-  const reIncrementedValue = decreasedValue * reIncrementFactor;
-  return reIncrementedValue;
-}
-
-let incrementAdjustment = 1.016;
-
-function applyIncrementEffect(
-  collectable,
-  incrementAdjustment,
-  newIncrementAdjustment,
-  effectMultiplier
-) {
-  if (incrementAdjustment) {
-    const lastCollectable = currentPassives.find(
-      (item) => item.type === collectable.type
-    );
-    // Increment the points by passive increase
-    collectable.points = reverseAndReIncrement(
-      lastCollectable.lastValue,
-      effectMultiplier,
-      newIncrementAdjustment
-    );
-  } else {
-    collectable.points *= effectMultiplier;
-  }
-
-  collectable.points = Math.round(collectable.points);
-}
-
-function silverFeatherEffect(incrementAdjustment) {
-  let newIncrementAdjustment;
-  const silverFeatherIncrement = 1.2;
-  const silverCoin = collectableOptions.find(
-    (item) => item.type === 'silver-coin'
-  );
-  const hasSilverFeatherEffect = currentPassives.some(
-    (passive) => passive.effect === silverFeatherEffect
-  );
-  if (!hasSilverFeatherEffect) {
-    handleAddToCurrentPassives(
-      silverFeatherEffect,
-      'silver-coin',
-      silverCoin.points
-    );
-  } else {
-    newIncrementAdjustment = silverFeatherIncrement * incrementAdjustment;
-  }
-  applyIncrementEffect(
-    silverCoin,
-    incrementAdjustment,
-    newIncrementAdjustment,
-    silverFeatherIncrement
-  );
-}
-
-function amuletEffect(incrementAdjustment) {
-  let newIncrementAdjustment;
-  const amuletIncrement = 1.2;
-  const goldCoin = collectableOptions.find((item) => item.type === 'gold-coin');
-  // Check if amuletEffect is already in currentPassives
-  const hasAmuletEffect = currentPassives.some(
-    (passive) => passive.effect === amuletEffect
-  );
-  // If not, add it
-  if (!hasAmuletEffect) {
-    handleAddToCurrentPassives(amuletEffect, 'gold-coin', goldCoin.points);
-  } else {
-    newIncrementAdjustment = amuletIncrement * incrementAdjustment;
-  }
-  applyIncrementEffect(
-    goldCoin,
-    incrementAdjustment,
-    newIncrementAdjustment,
-    amuletIncrement
-  );
-}
-
-export {
-  amuletEffect,
-  silverFeatherEffect,
-  momsCookiesEffect,
-  filetMignonEffect,
-  trustyPocketWatchEffect,
-  sackOfCoinsEffect,
-  slowFallEffect,
-};
+export { filetMignonEffect, trustyPocketWatchEffect, sackOfCoinsEffect };
 
 //starters
 let selectedStarter;
 let currentPassives = [];
-
-function handleAddToCurrentPassives(effect, type, lastValue) {
-  if (getSelectedStarter() === 'Text book') {
-    currentPassives.push({
-      effect: effect,
-      lastValue: lastValue,
-      type: type,
-    });
-  }
-}
 
 function booksSmartEffect() {
   if (currentPassives !== []) {
@@ -1552,8 +1449,4 @@ function booksSmartEffect() {
   setSelectedStarter('Text book');
 }
 
-function coinsEffect() {
-  setSelectedStarter('Coins');
-}
-
-export { booksSmartEffect, coinsEffect };
+export { booksSmartEffect };
