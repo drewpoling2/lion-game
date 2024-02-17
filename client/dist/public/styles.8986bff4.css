@@ -1626,21 +1626,6 @@ br {
   width: 70px;
 }
 
-.cherry-cloud-item-asset {
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 34px;
-  height: 30px;
-  z-index: 20;
-  position: absolute;
-  top: 22%;
-  left: 37%;
-  background-image: url('/Cherry-1.7ab7dd95.png');
-  image-rendering: pixelated; /* Prevent blurriness between images */
-  animation: itemFloatingCloudItem 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
-}
-
 .heart-cloud-item-asset {
   background-size: contain;
   background-position: center;
@@ -1888,31 +1873,46 @@ br {
 
 @keyframes shineRedGem {
   0% {
-    background-image: url('/Red-Gem-1.17c0dba0.png');
-  }
-  30% {
-    background-image: url('/Red-Gem-1.17c0dba0.png');
-  }
-  45% {
-    background-image: url('/Red-Gem-1.17c0dba0.png');
-  }
-  60% {
-    background-image: url('/Red-Gem-2.287ee36b.png');
-  }
-  67% {
-    background-image: url('/Red-Gem-3.c4623f2f.png');
-  }
-  73% {
-    background-image: url('/Red-Gem-4.4aacaaca.png');
-  }
-  80% {
-    background-image: url('/Red-Gem-5.858ad1cf.png');
-  }
-  90% {
-    background-image: url('/Red-Gem-6.599bb707.png');
+    background-image: url('/red-gem.00802886.png');
   }
   100% {
-    background-image: url('/Red-Gem-1.17c0dba0.png');
+    background-image: url('/red-gem.00802886.png');
+  }
+}
+
+.blue-gem {
+  width: 34px;
+  height: 34px;
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  transition: none !important;
+  animation: shineBlueGem 2.25s ease-in-out infinite,
+    floating 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
+}
+
+@keyframes shineBlueGem {
+  0% {
+    background-image: url('/blue-gem.ac346ac3.png');
+  }
+  100% {
+    background-image: url('/blue-gem.ac346ac3.png');
+  }
+}
+
+.green-gem {
+  width: 34px;
+  height: 34px;
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  transition: none !important;
+  animation: shineGreenGem 2.25s ease-in-out infinite,
+    floating 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
+}
+
+@keyframes shineGreenGem {
+  0% {
+    background-image: url('/green-gem.be153e86.png');
+  }
+  100% {
+    background-image: url('/green-gem.be153e86.png');
   }
 }
 

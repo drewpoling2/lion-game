@@ -8,9 +8,6 @@ export function createChildItems(elementName, parent) {
     `${elementName}-cloud-item-asset`
   );
   element.id = Math.random().toString(16).slice(2);
-  if (elementName === 'cherry') {
-    element.dataset.type = 'cherry';
-    element.dataset.points = StateSingleton.getCherryPoints();
-  }
+
   parent.append(element);
 }

@@ -281,5 +281,4 @@ function createCoinsOnPlatform(parent) {
   const initialKeyframe = getRandomKeyframe();
   element.style.animationDelay = `-${initialKeyframe}%`;
   worldElem.append(element);
-  console.log('did it');
 }

@@ -98,7 +98,6 @@ export function getCrateRects() {
 }
 
 const normalizedCrateItemWeights = normalizeWeights(getItemDropState());
-console.log(normalizedCrateItemWeights);
 function createCrate() {
   const crate = document.createElement('img');
   const parentContainer = document.createElement('div');

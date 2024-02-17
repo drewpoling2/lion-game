@@ -158,7 +158,6 @@ var StateSingleton = function (_ref) {
     speedScale: 0.9,
     speedScaleIncrease: 0.000015,
     jumpCountLimit: 1,
-    cherryPoints: 1000,
     obstaclePoints: 5,
     lastPhase: 0,
     gravityFallAdjustment: 0.021,
@@ -196,7 +195,6 @@ var StateSingleton = function (_ref) {
     isMagnetItem: false,
     isStarColliding: true,
     isMagnetColliding: true,
-    isCherryColliding: true,
     isLeafColliding: true,
     isHeartColliding: true,
     groundSpawnReady: true,
@@ -269,12 +267,6 @@ var StateSingleton = function (_ref) {
     setIsMagnetColliding: function setIsMagnetColliding(newIsMagnetColliding) {
       state.isMagnetColliding = newIsMagnetColliding;
     },
-    getIsCherryColliding: function getIsCherryColliding() {
-      return state.isCherryColliding;
-    },
-    setIsCherryColliding: function setIsCherryColliding(newIsCherryColliding) {
-      state.isCherryColliding = newIsCherryColliding;
-    },
     getIsCrateRunning: function getIsCrateRunning() {
       return state.isCrateRunning;
     },
@@ -286,12 +278,6 @@ var StateSingleton = function (_ref) {
     },
     setIsGroundEnemyRunning: function setIsGroundEnemyRunning(newIsGroundEnemyRunning) {
       state.isGroundEnemyRunning = newIsGroundEnemyRunning;
-    },
-    getCherryPoints: function getCherryPoints() {
-      return state.cherryPoints;
-    },
-    setCherryPoints: function setCherryPoints(newCherryPoints) {
-      state.cherryPoints = newCherryPoints;
     },
     getLeafDuration: function getLeafDuration() {
       return state.leafDuration;
@@ -4424,6 +4410,9 @@ function createCoins() {
   element.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
   element.dataset.isLockingDuration = randomNumberBetween(100, 300);
   element.dataset.points = selectedCollectable.points;
+  if (selectedCollectable.type === 'red-gem' || selectedCollectable.type === 'blue-gem' || selectedCollectable.type === 'green-gem') {
+    element.dataset.gem = true;
+  }
   element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
   element.id = Math.random().toString(16).slice(2);
   (0, _updateCustomProperty.setCustomProperty)(element, '--left', 100);
@@ -4478,8 +4467,6 @@ function spawnNextItem(delta, speedScale) {
 
     // Call the appropriate function based on the spawnType
     if (spawnFunctions[nextSpawnType]) {
-      console.log(lastTypeSpawned, nextSpawnType);
-
       // Adjust the spawn delay based on the types of items in the queue
       if (nextSpawnType === 'cactus' && lastTypeSpawned === 'coin' || nextSpawnType === 'coin' && lastTypeSpawned === 'cactus' || nextSpawnType === 'cactus' && lastTypeSpawned === 'cactus') {
         // If a cactus is followed by a coin or cactus followed by cactus, add a delay
@@ -4508,7 +4495,6 @@ function spawnNextItem(delta, speedScale) {
 // addToSpawnQueue('coin');
 
 function updateGroundQue(delta, speedScale) {
-  console.log(spawnQueue);
   if (getGroundSpawnReady()) {
     spawnNextItem(delta, speedScale);
   }
@@ -4792,8 +4778,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var setIsStarColliding = _gameState.default.setIsStarColliding,
   setIsMagnetColliding = _gameState.default.setIsMagnetColliding,
   setIsHeartColliding = _gameState.default.setIsHeartColliding,
-  setIsLeafColliding = _gameState.default.setIsLeafColliding,
-  setIsCherryColliding = _gameState.default.setIsCherryColliding;
+  setIsLeafColliding = _gameState.default.setIsLeafColliding;
 
 // state.js
 var ItemDropStateSingleton = function () {
@@ -4809,7 +4794,6 @@ var ItemDropStateSingleton = function () {
       colliderSetter: setIsHeartColliding
     }
     // leaf: { weight: 12, colliderSetter: setIsLeafColliding },
-    // cherry: { weight: 12, colliderSetter: setIsCherryColliding },
     // empty: { weight: 2 },
   };
 
@@ -4837,10 +4821,6 @@ function createChildItems(elementName, parent) {
   element.dataset["".concat(elementName)] = true;
   element.classList.add("".concat(elementName, "-item-cloud"), "".concat(elementName, "-cloud-item-asset"));
   element.id = Math.random().toString(16).slice(2);
-  if (elementName === 'cherry') {
-    element.dataset.type = 'cherry';
-    element.dataset.points = _gameState.default.getCherryPoints();
-  }
   parent.append(element);
 }
 },{"../game-state":"../game-state.js"}],"../elements/platform.js":[function(require,module,exports) {
@@ -5112,7 +5092,6 @@ function createCoinsOnPlatform(parent) {
   var initialKeyframe = (0, _coin.getRandomKeyframe)();
   element.style.animationDelay = "-".concat(initialKeyframe, "%");
   worldElem.append(element);
-  console.log('did it');
 }
 },{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/cloud/Cloud-1.png":"imgs/cloud/Cloud-1.png","../public/imgs/cloud/Cloud-2.png":"imgs/cloud/Cloud-2.png","./player-controller":"../elements/player-controller.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","../utility/child-items":"../utility/child-items.js","./coin":"../elements/coin.js"}],"../elements/ground-enemy.js":[function(require,module,exports) {
 "use strict";
@@ -5331,7 +5310,6 @@ var groundEnemyObj = {
 var normalizedGroundEnemyWeights = (0, _platform.normalizeWeights)(groundEnemyObj);
 function createGroundEnemy(newPosition, groupId) {
   var randomBuffKey = (0, _platform.getRandomWeighted)(normalizedGroundEnemyWeights);
-  console.log(randomBuffKey);
   var groundEnemy = document.createElement('div');
   groundEnemy.dataset.groundEnemy = true;
   groundEnemy.dataset.groundEnemyType = randomBuffKey;
@@ -6082,121 +6060,7 @@ function getLeafRects() {
     };
   });
 }
-},{}],"imgs/icons/Star.png":[function(require,module,exports) {
-module.exports = "/Star.3e18d544.png";
-},{}],"../elements/flag.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getFlagRects = getFlagRects;
-exports.updateFlag = updateFlag;
-var _updateCustomProperty = require("../utility/updateCustomProperty.js");
-var _gameState = _interopRequireDefault(require("../game-state"));
-var _elementsRefs = require("../elements-refs.js");
-var _gameManager = require("../game-manager.js");
-var _playerController = require("./player-controller.js");
-var _Star = _interopRequireDefault(require("../public/imgs/icons/Star.png"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-var getGroundSpeed = _gameState.default.getGroundSpeed,
-  getCurrentPhase = _gameState.default.getCurrentPhase,
-  getIsFlagCreated = _gameState.default.getIsFlagCreated,
-  setIsFlagCreated = _gameState.default.setIsFlagCreated,
-  updateState = _gameState.default.updateState;
-var hasAlreadyPassedFlag;
-function generateDigitWithStars(digit) {
-  var digits = [" <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 0
-  " \n    <div class=\"flex-col items-center\"><img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n</div>"), // 1
-  " <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-end digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 2
-  " <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-end digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-end\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 3
-  " <div class=\"flex justify-between\">\n    <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div>\n<br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-end digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-end\">\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div>"), // 4
-  "<img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-start digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-end\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 5
-  "<img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-start digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 6
-  "<img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex-col items-end digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n</div>"), // 7
-  " <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 8
-  "<img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-end\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>"), // 9
-  " <div class=\"flex-row\" style=\"gap: 50px\">\n\n    <div class=\"flex-col items-center\">\n    <img class=\"digit-star\" src=\"".concat(_Star.default, "\"/>\n<br>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n</div>\n\n    <div><img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<br>\n<div class=\"flex justify-between digit-container-top\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<div class=\"flex justify-between\">\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n  <img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n</div><br>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/>\n<img class=\"digit-star\" src=\"").concat(_Star.default, "\"/> \n</div>\n    \n</div>") // 10
-  // Add similar lines for other digits
-  ];
-  if (digit >= 0 && digit <= 10) {
-    return digits[digit];
-  } else {
-    return 'Invalid digit';
-  }
-}
-
-// const digitZero = generateDigitWithStars(10);
-// const digitContainer = document.getElementById('digitContainer');
-// digitContainer.innerHTML = digitZero;
-
-function updateFlag(delta, speedScale) {
-  document.querySelectorAll('[data-flag]').forEach(function (flag) {
-    var flagRect = flag.getBoundingClientRect();
-    var collision = (0, _gameManager.isCollision)((0, _playerController.getDinoRect)(), flagRect);
-    var flagLeft = parseFloat(getComputedStyle(flag).left);
-    var dinoLeft = parseFloat(getComputedStyle(_elementsRefs.dinoElem).left);
-    var passedFlag = dinoLeft > flagLeft;
-    if (collision) {
-      flag.classList.remove('flag-animation');
-      flag.classList.add('flag-empty');
-    }
-    if (passedFlag && !hasAlreadyPassedFlag) {
-      updateState({
-        isGroundLayer2Running: false
-      });
-      _elementsRefs.worldElem.classList.add('whiteout-screen');
-      _elementsRefs.bonusElem.setAttribute('transition-style', 'out:circle:bottom-left');
-      _elementsRefs.scoreElem.classList.add('white-out-text');
-      _elementsRefs.currentGameTimerElem.classList.add('white-out-text');
-      // updateNotification(`${getCurrentPhase()}!`, 2000, 0);
-      hasAlreadyPassedFlag = true;
-
-      // Example usage:
-      setTimeout(function () {
-        var digitZero = generateDigitWithStars(10);
-        var digitContainer = document.getElementById('digitContainer');
-        digitContainer.innerHTML = digitZero;
-      }, 300);
-      setTimeout(function () {
-        digitContainer.innerHTML = '';
-      }, 3800);
-    }
-    (0, _updateCustomProperty.incrementCustomProperty)(flag, '--left', delta * speedScale * getGroundSpeed() * -1);
-    if ((0, _updateCustomProperty.getCustomProperty)(flag, '--left') <= -100) {
-      flag.remove();
-    }
-  });
-  if (getCurrentPhase() === 'bonus' && getIsFlagCreated() === false) {
-    createFlag();
-    setIsFlagCreated(true);
-  }
-}
-function getFlagRects() {
-  return _toConsumableArray(document.querySelectorAll('[data-flag]')).map(function (flag) {
-    return {
-      id: flag.id,
-      rect: flag.getBoundingClientRect(),
-      flag: flag.dataset.flag
-    };
-  });
-}
-function createFlag() {
-  hasAlreadyPassedFlag = false;
-  var flag = document.createElement('div');
-  flag.dataset.flag = true;
-  flag.classList.add('flag', 'flag-animation');
-  flag.id = Math.random().toString(16).slice(2);
-  (0, _updateCustomProperty.setCustomProperty)(flag, '--left', 100);
-  _elementsRefs.worldElem.append(flag);
-}
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../game-state":"../game-state.js","../elements-refs.js":"../elements-refs.js","../game-manager.js":"../game-manager.js","./player-controller.js":"../elements/player-controller.js","../public/imgs/icons/Star.png":"imgs/icons/Star.png"}],"../elements/star.js":[function(require,module,exports) {
+},{}],"../elements/star.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6265,8 +6129,6 @@ module.exports = "/Speaker-On.4eca78fe.png";
 module.exports = "/Pause.af4380de.png";
 },{}],"imgs/icons/Play.png":[function(require,module,exports) {
 module.exports = "/Play.59a6ba15.png";
-},{}],"imgs/buffs/glasses.png":[function(require,module,exports) {
-module.exports = "/glasses.73339926.png";
 },{}],"imgs/icons/Redo.png":[function(require,module,exports) {
 module.exports = "/Redo.35a20d07.png";
 },{}],"imgs/backgrounds/Foreground-Trees.png":[function(require,module,exports) {
@@ -6295,8 +6157,12 @@ module.exports = "/cape.922da988.png";
 module.exports = "/amulet.e627f87d.png";
 },{}],"imgs/buffs/book.png":[function(require,module,exports) {
 module.exports = "/book.8e749379.png";
+},{}],"imgs/buffs/glasses.png":[function(require,module,exports) {
+module.exports = "/glasses.73339926.png";
 },{}],"imgs/buffs/coins.png":[function(require,module,exports) {
 module.exports = "/coins.7d15c922.png";
+},{}],"imgs/icons/Star.png":[function(require,module,exports) {
+module.exports = "/Star.3e18d544.png";
 },{}],"../elements/particle-systems.js":[function(require,module,exports) {
 "use strict";
 
@@ -7279,29 +7145,7 @@ function updateInterfaceText(delta, speedScale) {
     (0, _updateCustomProperty.incrementCustomProperty)(text, '--left', delta * speedScale * SPEED * -1);
   });
 }
-},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../interface-text-elems-state.js":"../interface-text-elems-state.js","../game-state.js":"../game-state.js"}],"../elements/cherry.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getCherryRects = getCherryRects;
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function getCherryRects() {
-  return _toConsumableArray(document.querySelectorAll('[data-cherry]')).map(function (cherry) {
-    return {
-      id: cherry.id,
-      rect: cherry.getBoundingClientRect(),
-      cherry: cherry.dataset['cherry']
-    };
-  });
-}
-},{}],"imgs/Crate/Crate-1.png":[function(require,module,exports) {
+},{"../utility/updateCustomProperty.js":"../utility/updateCustomProperty.js","../interface-text-elems-state.js":"../interface-text-elems-state.js","../game-state.js":"../game-state.js"}],"imgs/Crate/Crate-1.png":[function(require,module,exports) {
 module.exports = "/Crate-1.4d6ad77a.png";
 },{}],"imgs/Crate/Crate-2.png":[function(require,module,exports) {
 module.exports = "/Crate-2.58c2d87a.png";
@@ -7324,10 +7168,6 @@ function createCrateItems(elementName, parent) {
   element.dataset["".concat(elementName)] = true;
   element.classList.add("".concat(elementName, "-item-cloud"), "".concat(elementName, "-cloud-item-asset"));
   element.id = Math.random().toString(16).slice(2);
-  if (elementName === 'cherry') {
-    element.dataset.type = 'cherry';
-    element.dataset.points = _gameState.default.getCherryPoints();
-  }
   parent.append(element);
 }
 function createCrateItemsAboveCrate(elementName, parent) {
@@ -7337,10 +7177,6 @@ function createCrateItemsAboveCrate(elementName, parent) {
   element.classList.add("".concat(elementName, "-collectable-item-translate"), 'collectable-crate-item');
   element.style.top = 'unset';
   element.id = Math.random().toString(16).slice(2);
-  if (elementName === 'cherry') {
-    element.dataset.type = 'cherry';
-    element.dataset.points = _gameState.default.getCherryPoints();
-  }
 
   //removes collider for a moment so the item can track to the player without colliding instantly
   var state = getItemDropState();
@@ -7437,7 +7273,6 @@ function getCrateRects() {
   });
 }
 var normalizedCrateItemWeights = (0, _platform.normalizeWeights)(getItemDropState());
-console.log(normalizedCrateItemWeights);
 function createCrate() {
   var crate = document.createElement('img');
   var parentContainer = document.createElement('div');
@@ -7454,7 +7289,69 @@ function createCrate() {
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/Crate/Crate-1.png":"imgs/Crate/Crate-1.png","../public/imgs/Crate/Crate-2.png":"imgs/Crate/Crate-2.png","./player-controller":"../elements/player-controller.js","./platform":"../elements/platform.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","../utility/crate-items":"../utility/crate-items.js","../elements-refs":"../elements-refs.js","./coin":"../elements/coin.js"}],"../game-manager.js":[function(require,module,exports) {
+},{"../utility/updateCustomProperty":"../utility/updateCustomProperty.js","../public/imgs/Crate/Crate-1.png":"imgs/Crate/Crate-1.png","../public/imgs/Crate/Crate-2.png":"imgs/Crate/Crate-2.png","./player-controller":"../elements/player-controller.js","./platform":"../elements/platform.js","../game-manager":"../game-manager.js","../game-state":"../game-state.js","../item-drop-state":"../item-drop-state.js","../utility/crate-items":"../utility/crate-items.js","../elements-refs":"../elements-refs.js","./coin":"../elements/coin.js"}],"imgs/red-gem/red-gem.png":[function(require,module,exports) {
+module.exports = "/red-gem.00802886.png";
+},{}],"imgs/blue-gem/blue-gem.png":[function(require,module,exports) {
+module.exports = "/blue-gem.ac346ac3.png";
+},{}],"imgs/green-gem/green-gem.png":[function(require,module,exports) {
+module.exports = "/green-gem.be153e86.png";
+},{}],"../elements/gem-collection.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.applyGem = applyGem;
+var _redGem = _interopRequireDefault(require("../public/imgs/red-gem/red-gem.png"));
+var _blueGem = _interopRequireDefault(require("../public/imgs/blue-gem/blue-gem.png"));
+var _greenGem = _interopRequireDefault(require("../public/imgs/green-gem/green-gem.png"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function applyGem(gemName) {
+  // Get all power-up divs
+  var powerUpDivs = document.querySelectorAll('.power-up');
+
+  // Check if the user already has the selected power-up
+  var existingPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
+    return powerUpDiv.querySelector('img') && powerUpDiv.querySelector('img').alt.includes(gemName);
+  });
+  if (existingPowerUp) {
+    // User already has the power-up, increment the rank
+    var existingRank = existingPowerUp.querySelector('.power-up-rank');
+    var existingRankValue = parseInt(existingRank.textContent);
+    existingRank.textContent = "".concat(existingRankValue + 1);
+  } else {
+    // Find the first available power-up div without a power-up
+    var lastEmptyPowerUp = Array.from(powerUpDivs).find(function (powerUpDiv) {
+      return !powerUpDiv.querySelector('img');
+    });
+    if (lastEmptyPowerUp) {
+      // Add the icon to the power-up div
+      var icon = document.createElement('img');
+      icon.src = collectableGems[gemName].icon;
+      icon.alt = "".concat(gemName);
+      icon.classList.add('w-full');
+      lastEmptyPowerUp.appendChild(icon);
+
+      // Add the rank to the power-up div
+      var rank = document.createElement('div');
+      rank.classList.add('power-up-rank', 'sans');
+      rank.textContent = '1';
+      lastEmptyPowerUp.appendChild(rank);
+    }
+  }
+}
+var collectableGems = {
+  'red-gem': {
+    icon: _redGem.default
+  },
+  'blue-gem': {
+    icon: _blueGem.default
+  },
+  'green-gem': {
+    icon: _greenGem.default
+  }
+};
+},{"../public/imgs/red-gem/red-gem.png":"imgs/red-gem/red-gem.png","../public/imgs/blue-gem/blue-gem.png":"imgs/blue-gem/blue-gem.png","../public/imgs/green-gem/green-gem.png":"imgs/green-gem/green-gem.png"}],"../game-manager.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7467,7 +7364,6 @@ exports.checkForCrateItem = checkForCrateItem;
 exports.coinsEffect = coinsEffect;
 exports.collectableOptions = void 0;
 exports.filetMignonEffect = filetMignonEffect;
-exports.glassesEffect = glassesEffect;
 exports.isCollision = isCollision;
 exports.momsCookiesEffect = momsCookiesEffect;
 exports.sackOfCoinsEffect = sackOfCoinsEffect;
@@ -7495,14 +7391,12 @@ var _scoreMultiplier = require("./elements/score-multiplier.js");
 var _magnet = require("./elements/magnet.js");
 var _heart = require("./elements/heart.js");
 var _leaf = require("./elements/leaf.js");
-var _flag = require("./elements/flag.js");
 var _star = require("./elements/star.js");
 var _coin = require("./elements/coin.js");
 var _SpeakerOff = _interopRequireDefault(require("./public/imgs/icons/Speaker-Off.png"));
 var _SpeakerOn = _interopRequireDefault(require("./public/imgs/icons/Speaker-On.png"));
 var _Pause = _interopRequireDefault(require("./public/imgs/icons/Pause.png"));
 var _Play = _interopRequireDefault(require("./public/imgs/icons/Play.png"));
-var _glasses = _interopRequireDefault(require("./public/imgs/buffs/glasses.png"));
 var _Redo = _interopRequireDefault(require("./public/imgs/icons/Redo.png"));
 var _ForegroundTrees = _interopRequireDefault(require("./public/imgs/backgrounds/Foreground-Trees.png"));
 var _buff = require("./elements/buff.js");
@@ -7517,9 +7411,9 @@ var _bonusPhase = require("./phases/bonus-phase.js");
 var _bonusLayer = require("./elements/bonus-layer.js");
 var _updateInterfaceText = require("./utility/update-interface-text.js");
 var _interfaceTextElemsState = _interopRequireDefault(require("./interface-text-elems-state.js"));
-var _cherry = require("./elements/cherry");
 var _crate = require("./elements/crate.js");
 var _groundQue = require("./elements/groundQue.js");
+var _gemCollection = require("./elements/gem-collection.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
@@ -7555,9 +7449,6 @@ var setMultiplierRatio = _gameState.default.setMultiplierRatio,
   setJumpCountLimit = _gameState.default.setJumpCountLimit,
   getLeafDuration = _gameState.default.getLeafDuration,
   setHasLeaf = _gameState.default.setHasLeaf,
-  setCherryPoints = _gameState.default.setCherryPoints,
-  getCherryPoints = _gameState.default.getCherryPoints,
-  getIsCherryColliding = _gameState.default.getIsCherryColliding,
   getIsStarColliding = _gameState.default.getIsStarColliding,
   getIsHeartColliding = _gameState.default.getIsHeartColliding,
   getIsMagnetColliding = _gameState.default.getIsMagnetColliding,
@@ -7706,9 +7597,6 @@ function checkCollisions() {
   if (getIsStarColliding()) {
     checkStarCollision();
   }
-  if (getIsCherryColliding()) {
-    checkCherryCollision();
-  }
   if (getIsHeartColliding()) {
     checkHeartCollision();
   }
@@ -7760,7 +7648,7 @@ function update(time) {
   // updateBird(delta, currentSpeedScale);
   // updateGroundEnemy(delta, currentSpeedScale);
   // updatePlatform(delta, currentSpeedScale);
-  (0, _flag.updateFlag)(delta, currentSpeedScale);
+  // updateFlag(delta, currentSpeedScale);
   (0, _updateInterfaceText.updateInterfaceText)(delta, currentSpeedScale);
   // updateMultiplier(delta, currentSpeedScale);
   // updateMagnet(delta, currentSpeedScale);
@@ -7862,23 +7750,14 @@ function checkCoinCollision() {
   (0, _coin.getCoinRects)().some(function (element) {
     if (isCollision(element.rect, dinoRect)) {
       var coinElement = document.getElementById(element.id);
-      if (coinElement.dataset.type === 'gold-coin' && goldCoinCounter < 14 && getSelectedStarter() === 'Glasses') {
-        // Increment the counter and update the value of the next red gem
-        goldCoinCounter++;
-        redGemMultiplier = goldCoinCounter;
 
-        // Check if glasses buff div exists, otherwise create it
-        var glassesBuffDiv = document.querySelector('.top-hud-right .glasses-buff');
-        if (!glassesBuffDiv) {
-          createGlassesBuffDiv(_glasses.default);
-        }
-
-        // Update the glasses buff div with the current counter
-        updateGlassesBuffDiv(goldCoinCounter);
-      }
       // Create a pickup text element
       var newElement = document.createElement('div');
-      addPickupText(newElement, coinElement);
+      if (coinElement.dataset.gem === 'true') {
+        (0, _gemCollection.applyGem)(coinElement.dataset.type);
+      } else {
+        addPickupText(newElement, coinElement);
+      }
       coinElement.remove();
       setTimeout(function () {
         newElement.remove();
@@ -7953,25 +7832,6 @@ function checkLeafCollision() {
     }
   });
 }
-function checkCherryCollision() {
-  var dinoRect = (0, _playerController.getDinoRect)();
-  (0, _cherry.getCherryRects)().some(function (element) {
-    if (isCollision(element.rect, dinoRect)) {
-      var cherryElement = document.getElementById(element.id);
-      // Create a pickup text element
-      var newElement = document.createElement('div');
-      if (!(getCherryPoints() >= 8000)) {
-        if (cherryElement.dataset.points != getCherryPoints()) {
-          cherryElement.dataset.points = getCherryPoints();
-        }
-        setCherryPoints(getCherryPoints() * 2);
-      }
-      addPickupText(newElement, cherryElement);
-      cherryElement.remove();
-      return true;
-    }
-  });
-}
 function checkStarCollision() {
   var dinoRect = (0, _playerController.getDinoRect)();
   (0, _star.getStarRects)().some(function (element) {
@@ -8020,47 +7880,9 @@ function checkMagnetCollision() {
 //   dinoElem.classList.remove('flash-light-animation');
 // }, 1600);
 
-// Function to create glasses buff div
-function createGlassesBuffDiv(imgSrc) {
-  var topHudRightDiv = document.querySelector('.top-hud-right');
-  var glassesBuffDiv = document.createElement('div');
-  glassesBuffDiv.id = 'glasses-buff-container';
-  glassesBuffDiv.classList.add('glasses-buff', 'hide-element');
-  topHudRightDiv.appendChild(glassesBuffDiv);
-  // Create an img element with the specified src
-  var imgElement = document.createElement('img');
-  imgElement.classList.add('buff-icon', 'w-full');
-  imgElement.src = imgSrc; // Set the src attribute with the provided imgSrc
-
-  var buffStackDiv = document.createElement('div');
-  buffStackDiv.classList.add('glasses-buff-stacks', 'buff-stacks', 'power-up-rank');
-  buffStackDiv.id = "glasses-buff";
-  buffStackDiv.textContent = '0';
-  // Append the img element to the bordered div
-  var borderedDiv = document.createElement('div');
-  borderedDiv.classList.add('bordered-buff-div', 'relative', 'small-border-inset');
-  borderedDiv.appendChild(imgElement);
-  borderedDiv.appendChild(buffStackDiv);
-  // Append the bordered div to the glasses buff div
-  glassesBuffDiv.appendChild(borderedDiv);
-
-  // Append the glasses buff div to the top hud
-}
-
-// Function to update glasses buff div with the current counter
-function updateGlassesBuffDiv(counter) {
-  var glassesBuffStackDiv = document.getElementById('glasses-buff');
-  if (glassesBuffStackDiv) {
-    if (glassesBuffStackDiv.textContent === '0') {
-      var glassesBuffDiv = document.getElementById('glasses-buff-container');
-      glassesBuffDiv.classList.remove('hide-element');
-      glassesBuffDiv.classList.add('show-element');
-    }
-    glassesBuffStackDiv.textContent = counter;
-  }
-}
 var lastMultiplierScore = document.querySelector('[data-last-multiplier-score]');
 function addPickupText(text, pickupElement) {
+  var _pickupElement$datase;
   if (!getIsGroundLayer2Running()) {
     text.classList.add('plus-points-navy', 'sans');
   } else {
@@ -8073,33 +7895,8 @@ function addPickupText(text, pickupElement) {
   pickupElement.parentNode.insertBefore(text, pickupElement);
   var pickupPoints, points;
   var currentMultiplierRatio = getMultiplierRatio();
-  //case when glasses are starter
-  if (pickupElement.dataset.type === 'red-gem' && redGemMultiplier !== 1) {
-    var _pickupElement$datase;
-    pickupPoints = (pickupElement === null || pickupElement === void 0 || (_pickupElement$datase = pickupElement.dataset) === null || _pickupElement$datase === void 0 ? void 0 : _pickupElement$datase.points) * redGemMultiplier;
-    points = pickupPoints * currentMultiplierRatio;
-    redGemMultiplier = 1;
-    goldCoinCounter = 0;
-    var glassesBuffStackDiv = document.getElementById('glasses-buff');
-    glassesBuffStackDiv.textContent = goldCoinCounter;
-    if (glassesBuffStackDiv) {
-      var glassesBuffDiv = document.getElementById('glasses-buff-container');
-      if (glassesBuffDiv.classList.contains('show-element')) {
-        glassesBuffDiv.classList.remove('show-element');
-        glassesBuffDiv.classList.add('hide-element');
-      } // Set the number of stacks
-    }
-  }
-  //case when coins are starter
-  else if (getSelectedStarter() === 'Coins' && pickupElement.dataset.type === 'gold-coin') {
-    var _pickupElement$datase2;
-    pickupPoints = Math.round((pickupElement === null || pickupElement === void 0 || (_pickupElement$datase2 = pickupElement.dataset) === null || _pickupElement$datase2 === void 0 ? void 0 : _pickupElement$datase2.points) / 2);
-    points = pickupPoints * currentMultiplierRatio;
-  } else {
-    var _pickupElement$datase3;
-    pickupPoints = pickupElement === null || pickupElement === void 0 || (_pickupElement$datase3 = pickupElement.dataset) === null || _pickupElement$datase3 === void 0 ? void 0 : _pickupElement$datase3.points;
-    points = pickupPoints * currentMultiplierRatio;
-  }
+  pickupPoints = pickupElement === null || pickupElement === void 0 || (_pickupElement$datase = pickupElement.dataset) === null || _pickupElement$datase === void 0 ? void 0 : _pickupElement$datase.points;
+  points = pickupPoints * currentMultiplierRatio;
   updateScoreWithPoints(points);
   var fontSize = calculateFontSize(points);
   text.style.fontSize = fontSize + 'px';
@@ -8765,19 +8562,23 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 }
 var collectableOptions = exports.collectableOptions = [{
   type: 'gold-coin',
-  weight: 0.3,
+  weight: 0,
   points: 31
 }, {
-  type: 'red-gem',
-  weight: 0.1,
-  points: 85
-}, {
   type: 'silver-coin',
-  weight: 0.6,
+  weight: 0,
   points: 16
 }, {
-  type: 'cherry',
-  weight: 0,
+  type: 'green-gem',
+  weight: 0.01,
+  points: 250
+}, {
+  type: 'red-gem',
+  weight: 0.01,
+  points: 500
+}, {
+  type: 'blue-gem',
+  weight: 0.01,
   points: 1000
 }];
 
@@ -8858,10 +8659,6 @@ function slowFallEffect() {
   var reductionPercentage = 0.3; // Adjust the percentage as needed
   setGravityFallAdjustment(reduceByPercentage(getGravityFallAdjustment(), reductionPercentage));
 }
-function increaseByPercentage(value, percentage) {
-  var multiplier = 1 + percentage / 100;
-  return value * multiplier;
-}
 function reverseAndReIncrement(finalValue, incrementFactor, reIncrementFactor) {
   // Reverse the increment by incrementFactor
   var decreasedValue = finalValue / incrementFactor;
@@ -8936,13 +8733,10 @@ function booksSmartEffect() {
   }
   setSelectedStarter('Text book');
 }
-function glassesEffect() {
-  setSelectedStarter('Glasses');
-}
 function coinsEffect() {
   setSelectedStarter('Coins');
 }
-},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerTwoTwo":"../elements/groundLayerTwoTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/player-controller.js":"../elements/player-controller.js","./elements/cactus.js":"../elements/cactus.js","./elements/ground-enemy":"../elements/ground-enemy.js","./elements/bird.js":"../elements/bird.js","./elements/platform.js":"../elements/platform.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/magnet.js":"../elements/magnet.js","./elements/heart.js":"../elements/heart.js","./elements/leaf.js":"../elements/leaf.js","./elements/flag.js":"../elements/flag.js","./elements/star.js":"../elements/star.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/buffs/glasses.png":"imgs/buffs/glasses.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png","./elements/buff.js":"../elements/buff.js","./game-state.js":"../game-state.js","./elements-refs":"../elements-refs.js","./utility/toggle-element.js":"../utility/toggle-element.js","./elements/particle-systems.js":"../elements/particle-systems.js","./phases/phase-properties.js":"../phases/phase-properties.js","./phases/phase1.js":"../phases/phase1.js","./phases/phase2.js":"../phases/phase2.js","./phases/bonus-phase.js":"../phases/bonus-phase.js","./elements/bonus-layer.js":"../elements/bonus-layer.js","./utility/update-interface-text.js":"../utility/update-interface-text.js","./interface-text-elems-state.js":"../interface-text-elems-state.js","./elements/cherry":"../elements/cherry.js","./elements/crate.js":"../elements/crate.js","./elements/groundQue.js":"../elements/groundQue.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./elements/ground.js":"../elements/ground.js","./elements/groundLayerTwo":"../elements/groundLayerTwo.js","./elements/groundLayerTwoTwo":"../elements/groundLayerTwoTwo.js","./elements/groundLayerThree":"../elements/groundLayerThree.js","./elements/player-controller.js":"../elements/player-controller.js","./elements/cactus.js":"../elements/cactus.js","./elements/ground-enemy":"../elements/ground-enemy.js","./elements/bird.js":"../elements/bird.js","./elements/platform.js":"../elements/platform.js","./elements/leaderboard.js":"../elements/leaderboard.js","./utility/sound-controller.js":"../utility/sound-controller.js","./apis.js":"../apis.js","./utility/validate-input.js":"../utility/validate-input.js","./elements/score-multiplier.js":"../elements/score-multiplier.js","./elements/magnet.js":"../elements/magnet.js","./elements/heart.js":"../elements/heart.js","./elements/leaf.js":"../elements/leaf.js","./elements/star.js":"../elements/star.js","./elements/coin.js":"../elements/coin.js","./public/imgs/icons/Speaker-Off.png":"imgs/icons/Speaker-Off.png","./public/imgs/icons/Speaker-On.png":"imgs/icons/Speaker-On.png","./public/imgs/icons/Pause.png":"imgs/icons/Pause.png","./public/imgs/icons/Play.png":"imgs/icons/Play.png","./public/imgs/icons/Redo.png":"imgs/icons/Redo.png","./public/imgs/backgrounds/Foreground-Trees.png":"imgs/backgrounds/Foreground-Trees.png","./elements/buff.js":"../elements/buff.js","./game-state.js":"../game-state.js","./elements-refs":"../elements-refs.js","./utility/toggle-element.js":"../utility/toggle-element.js","./elements/particle-systems.js":"../elements/particle-systems.js","./phases/phase-properties.js":"../phases/phase-properties.js","./phases/phase1.js":"../phases/phase1.js","./phases/phase2.js":"../phases/phase2.js","./phases/bonus-phase.js":"../phases/bonus-phase.js","./elements/bonus-layer.js":"../elements/bonus-layer.js","./utility/update-interface-text.js":"../utility/update-interface-text.js","./interface-text-elems-state.js":"../interface-text-elems-state.js","./elements/crate.js":"../elements/crate.js","./elements/groundQue.js":"../elements/groundQue.js","./elements/gem-collection.js":"../elements/gem-collection.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -8967,7 +8761,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49295" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53085" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -32,8 +32,6 @@ export function spawnNextItem(delta, speedScale) {
 
     // Call the appropriate function based on the spawnType
     if (spawnFunctions[nextSpawnType]) {
-      console.log(lastTypeSpawned, nextSpawnType);
-
       // Adjust the spawn delay based on the types of items in the queue
       if (
         (nextSpawnType === 'cactus' && lastTypeSpawned === 'coin') ||
@@ -67,7 +65,6 @@ export function spawnNextItem(delta, speedScale) {
 // addToSpawnQueue('coin');
 
 export function updateGroundQue(delta, speedScale) {
-  console.log(spawnQueue);
   if (getGroundSpawnReady()) {
     spawnNextItem(delta, speedScale);
   }

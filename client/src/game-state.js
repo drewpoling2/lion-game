@@ -10,7 +10,6 @@ const StateSingleton = (function () {
     speedScale: 0.9,
     speedScaleIncrease: 0.000015,
     jumpCountLimit: 1,
-    cherryPoints: 1000,
 
     obstaclePoints: 5,
     lastPhase: 0,
@@ -52,7 +51,6 @@ const StateSingleton = (function () {
     isMagnetItem: false,
     isStarColliding: true,
     isMagnetColliding: true,
-    isCherryColliding: true,
     isLeafColliding: true,
     isHeartColliding: true,
     groundSpawnReady: true,
@@ -126,12 +124,6 @@ const StateSingleton = (function () {
     setIsMagnetColliding: function (newIsMagnetColliding) {
       state.isMagnetColliding = newIsMagnetColliding;
     },
-    getIsCherryColliding: function () {
-      return state.isCherryColliding;
-    },
-    setIsCherryColliding: function (newIsCherryColliding) {
-      state.isCherryColliding = newIsCherryColliding;
-    },
     getIsCrateRunning: function () {
       return state.isCrateRunning;
     },
@@ -143,12 +135,6 @@ const StateSingleton = (function () {
     },
     setIsGroundEnemyRunning: function (newIsGroundEnemyRunning) {
       state.isGroundEnemyRunning = newIsGroundEnemyRunning;
-    },
-    getCherryPoints: function () {
-      return state.cherryPoints;
-    },
-    setCherryPoints: function (newCherryPoints) {
-      state.cherryPoints = newCherryPoints;
     },
     getLeafDuration: function () {
       return state.leafDuration;

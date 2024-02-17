@@ -163,6 +163,13 @@ export function createCoins() {
   element.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
   element.dataset.isLockingDuration = randomNumberBetween(100, 300);
   element.dataset.points = selectedCollectable.points;
+  if (
+    selectedCollectable.type === 'red-gem' ||
+    selectedCollectable.type === 'blue-gem' ||
+    selectedCollectable.type === 'green-gem'
+  ) {
+    element.dataset.gem = true;
+  }
   element.classList.add(selectedCollectable.type, 'collectable', 'move-bottom');
   element.id = Math.random().toString(16).slice(2);
   setCustomProperty(element, '--left', 100);

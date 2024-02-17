@@ -54,14 +54,12 @@ import {
 } from './elements/magnet.js';
 import { getHeartRects } from './elements/heart.js';
 import { getLeafRects } from './elements/leaf.js';
-import { getFlagRects, updateFlag } from './elements/flag.js';
 import { setupStar, updateStar, getStarRects } from './elements/star.js';
 import { setupCoin, updateCoin, getCoinRects } from './elements/coin.js';
 import muteImg from './public/imgs/icons/Speaker-Off.png';
 import unmuteImg from './public/imgs/icons/Speaker-On.png';
 import pauseImg from './public/imgs/icons/Pause.png';
 import playImg from './public/imgs/icons/Play.png';
-import glasses from './public/imgs/buffs/glasses.png';
 import redoImg from './public/imgs/icons/Redo.png';
 import foregroundImg from './public/imgs/backgrounds/Foreground-Trees.png';
 import { createBuffs, createStarterBuffs } from './elements/buff.js';
@@ -110,9 +108,9 @@ import { updateBonusPhase } from './phases/bonus-phase.js';
 import { setupBonusLayer, updateBonusLayer } from './elements/bonus-layer.js';
 import { updateInterfaceText } from './utility/update-interface-text.js';
 import InterfaceTextElemsSingleton from './interface-text-elems-state.js';
-import { getCherryRects } from './elements/cherry';
 import { setupCrate, updateCrate } from './elements/crate.js';
 import { updateGroundQue } from './elements/groundQue.js';
+import { applyGem } from './elements/gem-collection.js';
 const { removeInterfaceTextElem, addInterfaceTextElem } =
   InterfaceTextElemsSingleton;
 const {
@@ -137,9 +135,6 @@ const {
   setJumpCountLimit,
   getLeafDuration,
   setHasLeaf,
-  setCherryPoints,
-  getCherryPoints,
-  getIsCherryColliding,
   getIsStarColliding,
   getIsHeartColliding,
   getIsMagnetColliding,
@@ -311,9 +306,7 @@ function checkCollisions() {
   if (getIsStarColliding()) {
     checkStarCollision();
   }
-  if (getIsCherryColliding()) {
-    checkCherryCollision();
-  }
+
   if (getIsHeartColliding()) {
     checkHeartCollision();
   }
@@ -369,7 +362,7 @@ function update(time) {
   // updateBird(delta, currentSpeedScale);
   // updateGroundEnemy(delta, currentSpeedScale);
   // updatePlatform(delta, currentSpeedScale);
-  updateFlag(delta, currentSpeedScale);
+  // updateFlag(delta, currentSpeedScale);
   updateInterfaceText(delta, currentSpeedScale);
   // updateMultiplier(delta, currentSpeedScale);
   // updateMagnet(delta, currentSpeedScale);
@@ -490,30 +483,14 @@ function checkCoinCollision() {
   getCoinRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
       const coinElement = document.getElementById(element.id);
-      if (
-        coinElement.dataset.type === 'gold-coin' &&
-        goldCoinCounter < 14 &&
-        getSelectedStarter() === 'Glasses'
-      ) {
-        // Increment the counter and update the value of the next red gem
-        goldCoinCounter++;
-        redGemMultiplier = goldCoinCounter;
 
-        // Check if glasses buff div exists, otherwise create it
-        const glassesBuffDiv = document.querySelector(
-          '.top-hud-right .glasses-buff'
-        );
-
-        if (!glassesBuffDiv) {
-          createGlassesBuffDiv(glasses);
-        }
-
-        // Update the glasses buff div with the current counter
-        updateGlassesBuffDiv(goldCoinCounter);
-      }
       // Create a pickup text element
       const newElement = document.createElement('div');
-      addPickupText(newElement, coinElement);
+      if (coinElement.dataset.gem === 'true') {
+        applyGem(coinElement.dataset.type);
+      } else {
+        addPickupText(newElement, coinElement);
+      }
       coinElement.remove();
       setTimeout(() => {
         newElement.remove();
@@ -591,26 +568,6 @@ function checkLeafCollision() {
   });
 }
 
-function checkCherryCollision() {
-  const dinoRect = getDinoRect();
-  getCherryRects().some((element) => {
-    if (isCollision(element.rect, dinoRect)) {
-      const cherryElement = document.getElementById(element.id);
-      // Create a pickup text element
-      const newElement = document.createElement('div');
-      if (!(getCherryPoints() >= 8000)) {
-        if (cherryElement.dataset.points != getCherryPoints()) {
-          cherryElement.dataset.points = getCherryPoints();
-        }
-        setCherryPoints(getCherryPoints() * 2);
-      }
-      addPickupText(newElement, cherryElement);
-      cherryElement.remove();
-      return true;
-    }
-  });
-}
-
 function checkStarCollision() {
   const dinoRect = getDinoRect();
   getStarRects().some((element) => {
@@ -661,54 +618,6 @@ function checkMagnetCollision() {
 //   dinoElem.classList.remove('flash-light-animation');
 // }, 1600);
 
-// Function to create glasses buff div
-function createGlassesBuffDiv(imgSrc) {
-  const topHudRightDiv = document.querySelector('.top-hud-right');
-  const glassesBuffDiv = document.createElement('div');
-  glassesBuffDiv.id = 'glasses-buff-container';
-  glassesBuffDiv.classList.add('glasses-buff', 'hide-element');
-  topHudRightDiv.appendChild(glassesBuffDiv);
-  // Create an img element with the specified src
-  const imgElement = document.createElement('img');
-  imgElement.classList.add('buff-icon', 'w-full');
-  imgElement.src = imgSrc; // Set the src attribute with the provided imgSrc
-
-  const buffStackDiv = document.createElement('div');
-  buffStackDiv.classList.add(
-    'glasses-buff-stacks',
-    'buff-stacks',
-    'power-up-rank'
-  );
-  buffStackDiv.id = `glasses-buff`;
-  buffStackDiv.textContent = '0';
-  // Append the img element to the bordered div
-  const borderedDiv = document.createElement('div');
-  borderedDiv.classList.add(
-    'bordered-buff-div',
-    'relative',
-    'small-border-inset'
-  );
-  borderedDiv.appendChild(imgElement);
-  borderedDiv.appendChild(buffStackDiv);
-  // Append the bordered div to the glasses buff div
-  glassesBuffDiv.appendChild(borderedDiv);
-
-  // Append the glasses buff div to the top hud
-}
-
-// Function to update glasses buff div with the current counter
-function updateGlassesBuffDiv(counter) {
-  const glassesBuffStackDiv = document.getElementById('glasses-buff');
-  if (glassesBuffStackDiv) {
-    if (glassesBuffStackDiv.textContent === '0') {
-      const glassesBuffDiv = document.getElementById('glasses-buff-container');
-      glassesBuffDiv.classList.remove('hide-element');
-      glassesBuffDiv.classList.add('show-element');
-    }
-    glassesBuffStackDiv.textContent = counter;
-  }
-}
-
 const lastMultiplierScore = document.querySelector(
   '[data-last-multiplier-score]'
 );
@@ -726,34 +635,10 @@ function addPickupText(text, pickupElement) {
   pickupElement.parentNode.insertBefore(text, pickupElement);
   let pickupPoints, points;
   let currentMultiplierRatio = getMultiplierRatio();
-  //case when glasses are starter
-  if (pickupElement.dataset.type === 'red-gem' && redGemMultiplier !== 1) {
-    pickupPoints = pickupElement?.dataset?.points * redGemMultiplier;
-    points = pickupPoints * currentMultiplierRatio;
-    redGemMultiplier = 1;
-    goldCoinCounter = 0;
-    const glassesBuffStackDiv = document.getElementById('glasses-buff');
-    glassesBuffStackDiv.textContent = goldCoinCounter;
 
-    if (glassesBuffStackDiv) {
-      const glassesBuffDiv = document.getElementById('glasses-buff-container');
-      if (glassesBuffDiv.classList.contains('show-element')) {
-        glassesBuffDiv.classList.remove('show-element');
-        glassesBuffDiv.classList.add('hide-element');
-      } // Set the number of stacks
-    }
-  }
-  //case when coins are starter
-  else if (
-    getSelectedStarter() === 'Coins' &&
-    pickupElement.dataset.type === 'gold-coin'
-  ) {
-    pickupPoints = Math.round(pickupElement?.dataset?.points / 2);
-    points = pickupPoints * currentMultiplierRatio;
-  } else {
-    pickupPoints = pickupElement?.dataset?.points;
-    points = pickupPoints * currentMultiplierRatio;
-  }
+  pickupPoints = pickupElement?.dataset?.points;
+  points = pickupPoints * currentMultiplierRatio;
+
   updateScoreWithPoints(points);
   const fontSize = calculateFontSize(points);
   text.style.fontSize = fontSize + 'px';
@@ -1462,10 +1347,11 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 }
 
 export let collectableOptions = [
-  { type: 'gold-coin', weight: 0.3, points: 31 },
-  { type: 'red-gem', weight: 0.1, points: 85 },
-  { type: 'silver-coin', weight: 0.6, points: 16 },
-  { type: 'cherry', weight: 0, points: 1000 },
+  { type: 'gold-coin', weight: 0, points: 31 },
+  { type: 'silver-coin', weight: 0, points: 16 },
+  { type: 'green-gem', weight: 0.01, points: 250 },
+  { type: 'red-gem', weight: 0.01, points: 500 },
+  { type: 'blue-gem', weight: 0.01, points: 1000 },
 ];
 
 //buff-effects
@@ -1548,11 +1434,6 @@ function slowFallEffect() {
   setGravityFallAdjustment(
     reduceByPercentage(getGravityFallAdjustment(), reductionPercentage)
   );
-}
-
-function increaseByPercentage(value, percentage) {
-  const multiplier = 1 + percentage / 100;
-  return value * multiplier;
 }
 
 function reverseAndReIncrement(finalValue, incrementFactor, reIncrementFactor) {
@@ -1671,12 +1552,8 @@ function booksSmartEffect() {
   setSelectedStarter('Text book');
 }
 
-function glassesEffect() {
-  setSelectedStarter('Glasses');
-}
-
 function coinsEffect() {
   setSelectedStarter('Coins');
 }
 
-export { booksSmartEffect, glassesEffect, coinsEffect };
+export { booksSmartEffect, coinsEffect };

@@ -11,10 +11,7 @@ export function createCrateItems(elementName, parent) {
     `${elementName}-cloud-item-asset`
   );
   element.id = Math.random().toString(16).slice(2);
-  if (elementName === 'cherry') {
-    element.dataset.type = 'cherry';
-    element.dataset.points = StateSingleton.getCherryPoints();
-  }
+
   parent.append(element);
 }
 
@@ -28,10 +25,6 @@ export function createCrateItemsAboveCrate(elementName, parent) {
   );
   element.style.top = 'unset';
   element.id = Math.random().toString(16).slice(2);
-  if (elementName === 'cherry') {
-    element.dataset.type = 'cherry';
-    element.dataset.points = StateSingleton.getCherryPoints();
-  }
 
   //removes collider for a moment so the item can track to the player without colliding instantly
   const state = getItemDropState();

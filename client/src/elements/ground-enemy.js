@@ -241,7 +241,6 @@ const normalizedGroundEnemyWeights = normalizeWeights(groundEnemyObj);
 
 function createGroundEnemy(newPosition, groupId) {
   const randomBuffKey = getRandomWeighted(normalizedGroundEnemyWeights);
-  console.log(randomBuffKey);
   const groundEnemy = document.createElement('div');
   groundEnemy.dataset.groundEnemy = true;
   groundEnemy.dataset.groundEnemyType = randomBuffKey;

@@ -5,7 +5,6 @@ const {
   setIsMagnetColliding,
   setIsHeartColliding,
   setIsLeafColliding,
-  setIsCherryColliding,
 } = StateSingleton;
 
 // state.js
@@ -16,7 +15,6 @@ const ItemDropStateSingleton = (function () {
     // magnet: { weight: 4, colliderSetter: setIsMagnetColliding },
     heart: { weight: 12, colliderSetter: setIsHeartColliding },
     // leaf: { weight: 12, colliderSetter: setIsLeafColliding },
-    // cherry: { weight: 12, colliderSetter: setIsCherryColliding },
     // empty: { weight: 2 },
   };
 
