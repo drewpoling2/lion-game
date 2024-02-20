@@ -9,10 +9,14 @@ import cowbell from '../public/imgs/buffs/cowbell.png';
 
 import {
   filetMignonEffect,
-  trustyPocketWatchEffect,
+  coffeeEffect,
+  stopWatchEffect,
   booksSmartEffect,
   sackOfCoinsEffect,
   togglePause,
+  sneakersEffect,
+  cowbellEffect,
+  mittensEffect,
 } from '../game-manager';
 import { confetti } from './particle-systems';
 const buffOptionsContainer = document.querySelector('.buff-options');
@@ -184,13 +188,13 @@ const buffs = {
     description: 'Speed up game speed.',
     weight: 1,
     icon: stopwatch,
-    effect: filetMignonEffect,
+    effect: stopWatchEffect,
   },
   'Magic Coffee': {
     description: 'Gain 1 random item.',
     weight: 1,
     icon: coffee,
-    effect: filetMignonEffect,
+    effect: coffeeEffect,
   },
   Backpack: {
     description: 'Open your backpack. Gain 25 random coins.',
@@ -209,16 +213,16 @@ const buffs = {
 const starterBuffs = {
   Cowbell: {
     description:
-      'Items with duration last twice as long, items that are instant occur twice.',
+      'Items with duration last 50% longer, items that are instant have a 50% chance to be twice as strong.',
     weight: 1,
     icon: cowbell,
-    effect: filetMignonEffect,
+    effect: cowbellEffect,
   },
   'New Sneakers': {
     description: 'Gain the ability to jump twice',
     weight: 1,
     icon: sneakers,
-    effect: filetMignonEffect,
+    effect: sneakersEffect,
   },
   'Text book': {
     description: 'Every level up increases value of coins by 1.',
@@ -226,11 +230,11 @@ const starterBuffs = {
     icon: book,
     effect: booksSmartEffect,
   },
-  'Luck Mittens': {
+  'Lucky Mittens': {
     description:
       'Your pick up range & item drop frequency is increased by 15%.',
     weight: 1,
     icon: mittens,
-    effect: filetMignonEffect,
+    effect: mittensEffect,
   },
 };

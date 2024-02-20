@@ -55,9 +55,16 @@ const StateSingleton = (function () {
     isHeartColliding: true,
     groundSpawnReady: true,
     nextGroundSpawnType: '',
+    coinPickupRadius: 70,
   };
 
   return {
+    getCoinPickupRadius: function () {
+      return state.coinPickupRadius;
+    },
+    setCoinPickupRadius: function (newCoinPickupRadius) {
+      state.coinPickupRadius = newCoinPickupRadius;
+    },
     getGroundSpawnReady: function () {
       return state.groundSpawnReady;
     },

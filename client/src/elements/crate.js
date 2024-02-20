@@ -14,7 +14,11 @@ import { createCrateItemsAboveCrate } from '../utility/crate-items';
 import { worldElem } from '../elements-refs';
 import { moveItemToPlayer } from './coin';
 const { getIsCrateRunning, getGroundSpeed } = StateSingleton;
-const { getItemDropState } = ItemDropStateSingleton;
+const {
+  getItemDropState,
+  setNormalizedItemDropState,
+  getNormalizedItemDropState,
+} = ItemDropStateSingleton;
 
 const SPEED = getGroundSpeed();
 const crate_INTERVAL_MIN = 1000;
@@ -42,7 +46,7 @@ export function updateCrate(delta, speedScale) {
         crate.src = crate2Img;
         crateContainer.dataset.didCollide = true;
         createCrateItemsAboveCrate(
-          getRandomWeighted(normalizedCrateItemWeights),
+          getRandomWeighted(getNormalizedItemDropState()),
           crateContainer
         );
       }
@@ -97,7 +101,7 @@ export function getCrateRects() {
   });
 }
 
-const normalizedCrateItemWeights = normalizeWeights(getItemDropState());
+setNormalizedItemDropState(normalizeWeights(getItemDropState()));
 function createCrate() {
   const crate = document.createElement('img');
   const parentContainer = document.createElement('div');

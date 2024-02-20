@@ -48,7 +48,7 @@ function createMagnet() {
   const magnet = document.createElement('div');
   magnet.dataset.magnet = true;
   magnet.textContent = 'magnet';
-  magnet.classList.add('magnet', 'bouncing-item');
+  magnet.classList.add('magnet');
   magnet.id = Math.random().toString(16).slice(2);
   setCustomProperty(magnet, '--left', 100);
   worldElem.append(magnet);

@@ -12,8 +12,13 @@ import ItemDropStateSingleton from '../item-drop-state';
 import { createChildItems } from '../utility/child-items';
 import { collectableOptions } from '../game-manager';
 import { getRandomKeyframe } from './coin';
-const { getIsPlatformRunning, getPlatformSpeed } = StateSingleton;
-const { getItemDropState } = ItemDropStateSingleton;
+const { getIsPlatformRunning, getPlatformSpeed, getSelectedStarter } =
+  StateSingleton;
+const {
+  getItemDropState,
+  getNormalizedItemDropState,
+  setNormalizedItemDropState,
+} = ItemDropStateSingleton;
 const platformPositions = [];
 
 const SPEED = getPlatformSpeed();
@@ -155,19 +160,16 @@ function createCloud(platformElem, isFirstChild, zIndex, i) {
   platformElem.append(cloud);
 }
 
-const normalizedPlatformItemWeights = normalizeWeights(getItemDropState());
-
+setNormalizedItemDropState(normalizeWeights(getItemDropState()));
 function createItemCloud(platformElem) {
   const cloud = document.createElement('img');
   cloud.src = cloud2Img;
-
   cloud.classList.add('item-cloud');
 
   // Randomly flip the cloud horizontally
   if (Math.random() < 0.5) {
     cloud.style.transform = 'scaleX(-1)';
   }
-
   // Shift each cloud to the left by 30% of its width if it's not the first cloud
   platformElem.append(cloud);
 }
@@ -186,7 +188,7 @@ function createPlatform(newPosition) {
   } else {
     createItemCloud(platform);
     createChildItems(
-      getRandomWeighted(normalizedPlatformItemWeights),
+      getRandomWeighted(getNormalizedItemDropState()),
       parentContainer
     );
   }

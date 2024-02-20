@@ -14,6 +14,7 @@ const {
   getPlatformSpeed,
   getGroundCoinMaxInterval,
   getGroundCoinMinInterval,
+  getCoinPickupRadius,
 } = StateSingleton;
 
 const SPEED = getGroundSpeed();
@@ -87,7 +88,7 @@ export function updateCoin(delta, speedScale) {
     );
 
     // If the distance is less than 40px, move the coin towards the dinosaur
-    if (coin.dataset.locked === 'true' || distance < 225) {
+    if (coin.dataset.locked === 'true' || distance < getCoinPickupRadius()) {
       moveItemToPlayer(dinoRect, coin, coinRect, distance, delta);
     } else {
       // Move the coin to the left if not close to the dinosaur

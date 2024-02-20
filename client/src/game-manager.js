@@ -55,7 +55,12 @@ import {
 import { getHeartRects } from './elements/heart.js';
 import { getLeafRects } from './elements/leaf.js';
 import { setupStar, updateStar, getStarRects } from './elements/star.js';
-import { setupCoin, updateCoin, getCoinRects } from './elements/coin.js';
+import {
+  setupCoin,
+  updateCoin,
+  getCoinRects,
+  createCoins,
+} from './elements/coin.js';
 import muteImg from './public/imgs/icons/Speaker-Off.png';
 import unmuteImg from './public/imgs/icons/Speaker-On.png';
 import pauseImg from './public/imgs/icons/Pause.png';
@@ -111,6 +116,8 @@ import InterfaceTextElemsSingleton from './interface-text-elems-state.js';
 import { setupCrate, updateCrate } from './elements/crate.js';
 import { updateGroundQue } from './elements/groundQue.js';
 import { applyGem } from './elements/gem-collection.js';
+import ItemDropStateSingleton from './item-drop-state.js';
+import { normalizeWeights, getRandomWeighted } from './elements/platform.js';
 const { removeInterfaceTextElem, addInterfaceTextElem } =
   InterfaceTextElemsSingleton;
 const {
@@ -122,7 +129,9 @@ const {
   getMultiplierTimer,
   getSpeedScale,
   getSpeedScaleIncrease,
+  setSpeedScaleIncrease,
   getStarDuration,
+  setStarDuration,
   getPlayerImmunity,
   setPlayerImmunity,
   getHasStar,
@@ -134,12 +143,15 @@ const {
   getCurrentPhase,
   setJumpCountLimit,
   getLeafDuration,
+  setLeafDuration,
   setHasLeaf,
   getIsStarColliding,
   getIsHeartColliding,
   getIsMagnetColliding,
   getIsLeafColliding,
   getIsGroundLayer2Running,
+  getCoinPickupRadius,
+  setCoinPickupRadius,
 } = StateSingleton;
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 45;
@@ -162,7 +174,7 @@ let lastTime;
 let score;
 let idleIntervalId;
 let collisionOccurred = false; // Flag to track collision
-let milestone = 25;
+let milestone = 125;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
@@ -361,7 +373,7 @@ function update(time) {
   updateCactus(delta, currentSpeedScale);
   // updateBird(delta, currentSpeedScale);
   // updateGroundEnemy(delta, currentSpeedScale);
-  // updatePlatform(delta, currentSpeedScale);
+  updatePlatform(delta, currentSpeedScale);
   // updateFlag(delta, currentSpeedScale);
   updateInterfaceText(delta, currentSpeedScale);
   // updateMultiplier(delta, currentSpeedScale);
@@ -503,7 +515,7 @@ function checkCoinCollision() {
   });
 }
 
-function createOneUpTextAtPosition(position) {
+function createOneUpTextAtPosition(number = 1, position) {
   soundController.beatScore.play();
   const newElement = document.createElement('div');
   newElement.classList.add('one-up', 'moving-interface-text');
@@ -512,7 +524,7 @@ function createOneUpTextAtPosition(position) {
   // Set the position based on the provided coordinates
   newElement.style.top = `${position.y - 100}px`;
   worldElem.appendChild(newElement);
-  newElement.textContent = '1UP';
+  newElement.textContent = `${number + 'UP'}`;
 
   // Store the created element in the array
   addInterfaceTextElem(newElement);
@@ -531,20 +543,24 @@ function checkHeartCollision() {
   getHeartRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
       const collisionPosition = { x: dinoRect.x, y: dinoRect.y };
-
       let currentLives = parseInt(livesElem.textContent, 10);
-      currentLives += 1;
+      if (getSelectedStarter() === 'cowbell') {
+        const randomValue = Math.random();
+        if (randomValue > 0.5) {
+          currentLives += 2;
+          createOneUpTextAtPosition(2, collisionPosition);
+          console.log('did it');
+        } else {
+          currentLives += 1;
+          createOneUpTextAtPosition(1, collisionPosition);
+        }
+      } else {
+        currentLives += 1;
+        createOneUpTextAtPosition(1, collisionPosition);
+      }
       livesElem.textContent = currentLives;
       const heartElement = document.getElementById(element.id);
-      createOneUpTextAtPosition(collisionPosition);
       heartElement.remove();
-      // // Add a class to dinoElem
-
-      // // Set a timeout to remove the class after the star duration
-      // setTimeout(() => {
-
-      //   // Remove the class from dinoElem after the star duration
-      // }, 100);
 
       return true;
     }
@@ -561,7 +577,7 @@ function checkLeafCollision() {
       leaf.remove();
       setTimeout(() => {
         setHasLeaf(false);
-        setJumpCountLimit(1);
+        setJumpCountLimit(getSelectedStarter === 'sneakers' ? 2 : 1);
       }, getLeafDuration());
       return true;
     }
@@ -577,7 +593,7 @@ function checkStarCollision() {
       setHasStar(true);
       // Add a class to dinoElem
       dinoElem.classList.add('star-invincible');
-
+      console.log(getStarDuration());
       // Set a timeout to remove the class after the star duration
       setTimeout(() => {
         setHasStar(false);
@@ -596,8 +612,22 @@ function checkMagnetCollision() {
   const dinoRect = getDinoRect();
   getMagnetRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
+      let numberOfCoins;
+      numberOfCoins = Math.floor(Math.random() * 5) + 3;
+
+      if (getSelectedStarter() === 'cowbell') {
+        const randomValue = Math.random();
+        if (randomValue > 0.5) {
+          numberOfCoins += numberOfCoins + 5;
+        }
+      }
+      // Run createCoins the generated number of times
+      for (let i = 0; i < numberOfCoins; i++) {
+        createCoins();
+      }
       const magnetElement = document.getElementById(element.id);
       magnetElement.remove();
+      // Run createCoins 20 times
       document.querySelectorAll('[data-coin]').forEach((coin) => {
         coin.dataset.locked = 'true';
         coin.dataset.isMagnetLocked = 'true';
@@ -795,14 +825,7 @@ function handleLevelUp() {
   const currentLevel = parseInt(levelDisplayElem.textContent, 10);
   levelDisplayElem.textContent = currentLevel + 1;
   if (getSelectedStarter() === 'Text book') {
-    currentPassives.forEach((item) => {
-      const currentItem = collectableOptions.find(
-        (curItem) => curItem.type === item.type
-      );
-
-      item.lastValue = currentItem.points;
-      item.effect(incrementAdjustment);
-    });
+    applyBookSmartEffect();
   }
   if (currentLevel === 1) {
     createStarterBuffs();
@@ -897,73 +920,6 @@ function handleStart() {
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
   gameOverIconElem.classList.add('hide-element');
-  // Get the container element where the ticker items will be appended
-  const tickerData = [
-    {
-      username: 'bap1',
-      score: 'start',
-    },
-    { username: 'b4p2', score: '323451' },
-    { username: 'fgp3', score: '331451' },
-    { username: 'agf4', score: '131451' },
-    {
-      username: 'bap5',
-      score: '353451',
-    },
-    { username: 'b4p6', score: '323451' },
-    { username: 'fgp', score: '331451' },
-    {
-      username: 'bap7',
-      score: '353451',
-    },
-    { username: 'b4p8', score: '323451' },
-    { username: 'fgp9', score: '331451' },
-    { username: 'agf10', score: '131451' },
-    {
-      username: 'bap11',
-      score: '353451',
-    },
-    { username: 'b4p12', score: '323451' },
-    { username: 'fgp13', score: 'end' },
-  ];
-  tickerData.forEach((item, index) => {
-    const tickerItem = document.createElement('div');
-    tickerItem.classList.add('ticker__item');
-    tickerItem.innerHTML = `${item.username} - ${item.score}`;
-    const tickerDivider = document.createElement('div');
-    tickerDivider.classList.add('ticker-divider');
-    tickerElem.appendChild(tickerItem);
-    // Add a divider after each item, except for the last one
-    if (index < tickerData.length - 1) {
-      tickerElem.appendChild(tickerDivider);
-    }
-  });
-  tickerData.forEach((item, index) => {
-    const tickerItem = document.createElement('div');
-    tickerItem.classList.add('ticker__item');
-    tickerItem.innerHTML = `${item.username} - ${item.score}`;
-    const tickerDivider = document.createElement('div');
-    tickerDivider.classList.add('ticker-divider');
-    tickerElem2.appendChild(tickerItem);
-    // Add a divider after each item, except for the last one
-    if (index < tickerData.length - 1) {
-      tickerElem2.appendChild(tickerDivider);
-    }
-  });
-  tickerData.forEach((item, index) => {
-    const tickerItem = document.createElement('div');
-    tickerItem.classList.add('ticker__item');
-    tickerItem.innerHTML = `${item.username} - ${item.score}`;
-    const tickerDivider = document.createElement('div');
-    tickerDivider.classList.add('ticker-divider');
-    tickerElem3.appendChild(tickerItem);
-    // Add a divider after each item, except for the last one
-    if (index < tickerData.length - 1) {
-      tickerElem3.appendChild(tickerDivider);
-    }
-  });
-  // tickerContainerElem.classList.add('hide-element');
-  // tickerContainerElem.classList.remove('show-element');
 
   window.requestAnimationFrame(update);
 }
@@ -1354,40 +1310,45 @@ export let collectableOptions = [
   { type: 'blue-gem', weight: 0.1, points: 1000 },
 ];
 
+function createItemAboveDino(itemName) {
+  const itemElement = document.createElement('div');
+
+  itemElement.classList.add('pop-up-item', `${itemName}-item`);
+  itemElement.id = Math.random().toString(16).slice(2);
+  itemElement.dataset[`${itemName}`] = true;
+
+  // Set the initial position of the coin above the dino
+  itemElement.style.position = 'absolute';
+  itemElement.style.top = dinoElem.offsetTop - 50 + 'px'; // Adjust the vertical position as needed
+  itemElement.style.left = dinoElem.offsetLeft + 50 + 'px'; // Center above the dino
+  // Append the coin element to the document body or another container
+  const worldElem = document.querySelector('[data-world]');
+  worldElem.appendChild(itemElement);
+}
+
 //buff-effects
-
 function filetMignonEffect() {
-  const rank = 1;
-
   let currentLives = parseInt(livesElem.textContent, 10);
-  currentLives += rank;
+  currentLives += 1;
   livesElem.textContent = currentLives;
   const playerContainer = document.querySelector('.player-container');
   createOneUpText(playerContainer);
 }
 
-function trustyPocketWatchEffect() {
-  const startRank = 0.4;
-  const endRank = 0.95;
-  const updateInterval = 1000; // Update every second
+function stopWatchEffect() {
+  setSpeedScaleIncrease(getSpeedScaleIncrease() + 0.000015);
+}
 
-  let currentRank = startRank;
-  const intervalId = setInterval(() => {
-    // Increment the current rank
-    currentRank += 0.1; // Adjust the increment as needed
+function coffeeEffect() {
+  let result;
+  //run this til you don't get empty as a result
+  do {
+    result = getRandomWeighted(
+      ItemDropStateSingleton.getNormalizedItemDropState()
+    );
+  } while (result === 'empty');
 
-    // Ensure the current rank does not exceed the end rank
-    currentRank = Math.min(currentRank, endRank);
-
-    // Update the deltaAdjustment based on the current rank
-    deltaAdjustment = currentRank;
-
-    if (currentRank >= endRank) {
-      // Stop the interval when the end rank is reached
-      clearInterval(intervalId);
-      deltaAdjustment = endRank;
-    }
-  }, updateInterval);
+  createItemAboveDino(result);
 }
 
 function getRandomCollectable() {
@@ -1432,21 +1393,45 @@ function slowFallEffect() {
   );
 }
 
-export { filetMignonEffect, trustyPocketWatchEffect, sackOfCoinsEffect };
+export { filetMignonEffect, stopWatchEffect, sackOfCoinsEffect, coffeeEffect };
 
 //starters
-let selectedStarter;
 let currentPassives = [];
 
 function booksSmartEffect() {
-  if (currentPassives !== []) {
-    currentPassives.forEach((ability) => {
-      console.log(
-        `${ability.name} - Level ${ability.level}, Value ${ability.value}`
-      );
-    });
-  }
+  applyBookSmartEffect();
   setSelectedStarter('Text book');
 }
 
-export { booksSmartEffect };
+function applyBookSmartEffect() {
+  collectableOptions.forEach((option) => {
+    option.points += 1;
+  });
+}
+
+function sneakersEffect() {
+  setSelectedStarter('sneakers');
+  setJumpCountLimit(2);
+}
+
+function cowbellEffect() {
+  setSelectedStarter('cowbell');
+  setLeafDuration(getLeafDuration() * 1.5);
+  setStarDuration(getStarDuration() * 1.5);
+}
+
+function mittensEffect() {
+  ItemDropStateSingleton.updateState({
+    empty: {
+      weight: 0,
+    },
+  });
+  const newRadius = getCoinPickupRadius() * 1.85;
+  setCoinPickupRadius(newRadius);
+  setSelectedStarter('mittens');
+  ItemDropStateSingleton.setNormalizedItemDropState(
+    normalizeWeights(ItemDropStateSingleton.getItemDropState())
+  );
+}
+
+export { booksSmartEffect, sneakersEffect, cowbellEffect, mittensEffect };
