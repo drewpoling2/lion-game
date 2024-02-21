@@ -8,7 +8,7 @@ const StateSingleton = (function () {
     multiplierTimer: 5000,
     currentPhase: 1,
     speedScale: 0.9,
-    speedScaleIncrease: 0.000015,
+    speedScaleIncrease: 0.000017,
     jumpCountLimit: 1,
 
     obstaclePoints: 5,

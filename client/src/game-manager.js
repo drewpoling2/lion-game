@@ -103,6 +103,7 @@ import {
   gameNotificationElem,
   pausedScreenElem,
   bonusElem,
+  speedElem,
 } from './elements-refs';
 import { toggleElemOff, toggleElemOn } from './utility/toggle-element.js';
 import { snow } from './elements/particle-systems.js';
@@ -178,7 +179,7 @@ let milestone = 125;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
-  : Math.floor('0').toString().padStart(6, 0);
+  : Math.floor('0').toString().padStart(7, 0);
 let hasBeatenScore = false;
 let isPaused = false;
 let immunityDuration = 2000; // Example: 2000 milliseconds (2 seconds)
@@ -348,7 +349,7 @@ function update(time) {
     return;
   }
 
-  let baseDelta = 5;
+  let baseDelta = 4;
   // let delta = time - lastTime;
   let delta = baseDelta;
   if (collisionOccurred && !getPlayerImmunity()) {
@@ -388,6 +389,7 @@ function update(time) {
   );
   updateSpeedScale(delta);
   updateScore(delta);
+  updateSpeedUI(delta);
   updateGroundQue(delta, currentSpeedScale);
   checkCollisions();
   lastTime = time;
@@ -706,7 +708,7 @@ export function updateScoreWithPoints(delta) {
   const intervalId = setInterval(() => {
     score += incrementAmount;
     scoreSinceMilestone += incrementAmount;
-    scoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
+    scoreElem.textContent = Math.floor(score).toString().padStart(7, 0);
 
     if (currentMultiplierRatio > 1) {
       currentComboScore += incrementAmount;
@@ -838,10 +840,33 @@ function handleLevelUp() {
   milestone = calculateNextMilestone(milestone);
 }
 
+let baselineSpeed = getSpeedScale();
+let lastUISpeed = null;
+const conversionSpeedFactor = 50;
+
+function convertSpeedToNormalNumber() {
+  // Convert speed scale to mph relative to the baseline
+  const mph = (currentSpeedScale - baselineSpeed) * conversionSpeedFactor;
+
+  // Round mph to the nearest whole number
+  const roundedMPH = Math.round(mph);
+  console.log(roundedMPH);
+  return roundedMPH;
+}
+
+function updateSpeedUI() {
+  const speed = convertSpeedToNormalNumber();
+  // Only update the UI if the speed has changed since the last frame
+  if (speed !== lastUISpeed) {
+    speedElem.textContent = speed.toString().padStart(3, '0');
+    lastUISpeed = speed;
+  }
+}
+
 function updateScore(delta) {
   score += delta * 0.01;
   scoreSinceMilestone += delta * 0.01;
-  scoreElem.textContent = Math.floor(score).toString().padStart(6, '0');
+  scoreElem.textContent = Math.floor(score).toString().padStart(7, '0');
 
   // Update the level bar
   let progress = (scoreSinceMilestone / milestone) * 100;
@@ -1305,9 +1330,9 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 export let collectableOptions = [
   { type: 'gold-coin', weight: 20, points: 31 },
   { type: 'silver-coin', weight: 60, points: 16 },
-  { type: 'green-gem', weight: 0.3, points: 250 },
-  { type: 'red-gem', weight: 0.2, points: 500 },
-  { type: 'blue-gem', weight: 0.1, points: 1000 },
+  { type: 'green-gem', weight: 0.7, points: 250 },
+  { type: 'red-gem', weight: 0.4, points: 500 },
+  { type: 'blue-gem', weight: 0.25, points: 1000 },
 ];
 
 function createItemAboveDino(itemName) {
@@ -1352,18 +1377,24 @@ function coffeeEffect() {
 }
 
 function getRandomCollectable() {
-  const randomValue = Math.random();
-  let cumulativeProbability = 0;
+  // Calculate the total weight of all collectable options
+  const totalWeight = collectableOptions.reduce(
+    (acc, option) => acc + option.weight,
+    0
+  );
+  // Generate a random number between 0 and the total weight
+  const randomWeight = Math.random() * totalWeight;
 
+  let cumulativeWeight = 0;
+  // Iterate through the collectable options
   for (const option of collectableOptions) {
-    cumulativeProbability += option.weight;
-    if (randomValue <= cumulativeProbability) {
+    // Add the current option's weight to the cumulative weight
+    cumulativeWeight += option.weight;
+    // If the randomWeight falls within the range of the current option's weight, return this option
+    if (randomWeight <= cumulativeWeight) {
       return option;
     }
   }
-
-  // Default case (fallback)
-  return collectableOptions[collectableOptions.length - 1];
 }
 
 function sackOfCoinsEffect() {
@@ -1373,12 +1404,11 @@ function sackOfCoinsEffect() {
   for (let i = 0; i < 25; i++) {
     const randomCollectable = getRandomCollectable();
     totalPoints += randomCollectable.points * currentMultiplierRatio;
+    console.log('coin', randomCollectable);
   }
 
   updateScoreWithPoints(totalPoints);
 
-  // Add totalPoints to the score (adjust as needed)
-  // Example: score += totalPoints;
   console.log(`Collected ${totalPoints} points from 25 random coins.`);
 }
 

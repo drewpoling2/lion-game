@@ -597,11 +597,17 @@
         <div class="top-hud-container flex-row justify-between">
           <div class="top-hud-left">
             <div class="flex-col">
-              <div class="score hud-font" data-score>000000</div>
+              <div class="high-score-label hud-font">BEST</div>
+              <div class="score hud-font" data-high-score>000000</div>
             </div>
           </div>
           <div class="top-hud-middle" data-current-game-timer>0:00</div>
-          <div class="top-hud-right"></div>
+          <div class="top-hud-right">
+            <div class="flex-col">
+              <div class="high-score-label hud-font">SPEED</div>
+              <div class="high-score hud-font" data-speed>000</div>
+            </div>
+          </div>
         </div>
         <div id="level-up-modal" class="modal">
           <canvas id="confetti" class="confetti"></canvas>
@@ -651,9 +657,12 @@
             <div class="hud-container-left flex-row items-center">
               <div class="flex-row items-start inner-pixel-border-container">
                 <div class="flex-col">
-                  <div class="high-score-label hud-font">YOUR BEST</div>
-                  <div class="high-score hud-font" data-high-score>000000</div>
+                  <div class="high-score-label hud-font">SCORE</div>
+                  <div class="important-ui-text high-score hud-font" data-score>
+                    0000000
+                  </div>
                 </div>
+
                 <div class="flex-col lives-container">
                   <div class="lives-label uppercase hud-font">lives</div>
                   <div class="flex-row items-center lion-head-container">
@@ -663,7 +672,9 @@
                       src="imgs/icons/Health-1.png"
                     />
                     <div class="lives-x hud-font">x</div>
-                    <div class="lives hud-font" data-lives>1</div>
+                    <div class="important-ui-text lives hud-font" data-lives>
+                      1
+                    </div>
                   </div>
                 </div>
               </div>
@@ -672,9 +683,9 @@
                   <div class="starter-power-up small-border-inset dim"></div>
                 </div>
                 <div class="power-up-grid-container">
-                  <div class="power-up small-border-inset"></div>
-                  <div class="power-up small-border-inset"></div>
-                  <div class="power-up small-border-inset"></div>
+                  <div class="power-up small-border-inset dim"></div>
+                  <div class="power-up small-border-inset dim"></div>
+                  <div class="power-up small-border-inset dim"></div>
                 </div>
               </div>
             </div>

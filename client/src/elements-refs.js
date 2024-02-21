@@ -54,7 +54,9 @@ const gameNotificationElem = document.querySelector(
   '[data-notification-screen]'
 );
 const pausedScreenElem = document.querySelector('[data-paused-screen]');
+const speedElem = document.querySelector('[data-speed]');
 export {
+  speedElem,
   bonusElem,
   pausedScreenElem,
   gameNotificationElem,

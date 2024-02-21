@@ -267,6 +267,13 @@ function createCoinsOnPlatform(parent) {
   element.dataset.coin = true;
   element.dataset.cloudChild = true;
   element.dataset.type = selectedCollectable.type;
+  if (
+    selectedCollectable.type === 'red-gem' ||
+    selectedCollectable.type === 'blue-gem' ||
+    selectedCollectable.type === 'green-gem'
+  ) {
+    element.dataset.gem = true;
+  }
   element.dataset.locked = 'false';
   element.dataset.isLocking = 'false';
   element.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);

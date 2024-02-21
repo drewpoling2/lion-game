@@ -27,6 +27,7 @@ export function applyGem(gemName) {
     if (lastEmptyPowerUp) {
       // Add the icon to the power-up div
       const icon = document.createElement('img');
+      lastEmptyPowerUp.classList.remove('dim');
       icon.src = collectableGems[gemName].icon;
       icon.alt = `${gemName}`;
       icon.classList.add('w-full');

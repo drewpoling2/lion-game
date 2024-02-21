@@ -225,6 +225,10 @@ body.pause-animation * {
   pointer-events: none;
 }
 
+.current-multiplier-small {
+  height: 10px;
+}
+
 .dim {
   opacity: 0.35;
 }
@@ -463,7 +467,7 @@ body.pause-animation * {
 }
 
 .hud-container-left {
-  gap: 4rem;
+  gap: 3rem;
   color: white;
 }
 
@@ -619,7 +623,7 @@ body.pause-animation * {
 .inner-pixel-border-container {
   display: flex;
   flex-direction: row;
-  gap: 4rem;
+  gap: 3rem;
 }
 
 .pixel-borders-inset {
@@ -658,10 +662,14 @@ body.pause-animation * {
 .high-score {
 }
 
+.important-ui-text {
+  font-size: 18px;
+}
+
 .high-score-label {
-  padding-bottom: 5px;
-  margin-bottom: 5px;
-  border-bottom: 2px solid #005fa9;
+  opacity: 0.75;
+  padding-bottom: 10px;
+  font-size: 9.5px;
 }
 
 .transition-medium {
@@ -1103,7 +1111,7 @@ td {
 
 .lion-head {
   height: fit-content;
-  width: 20px;
+  width: 24px;
 }
 
 .lives {
@@ -1353,6 +1361,8 @@ progress[value]::-moz-progress-bar {
 }
 
 .lives-label {
+  font-size: 9.5px;
+  opacity: 0.75;
 }
 
 .stop-time {
