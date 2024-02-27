@@ -760,7 +760,16 @@
           <div class="paused-screen">Game Paused</div>
         </div>
         <div class="notification-screen" data-notification-screen></div>
-        <div class="whiteout-screen"></div>
+        <div class="snackbar-container hide-element" data-snackbar>
+          <div class="snackbar-icon" data-snackbar-icon></div>
+          <div class="flex">
+            <div
+              class="snackbar-text"
+              style="display: none"
+              data-snackbar-text
+            ></div>
+          </div>
+        </div>
         <div class="flashing-screen" data-bonus>
           <img
             alt=""
@@ -801,13 +810,15 @@
         </div>
         <img alt="" src="imgs/ground.png" class="ground" data-ground />
         <img alt="" src="imgs/ground.png" class="ground" data-ground />
-        <div class="dino w-fit" data-dino>
-          <div class="player-container relative w-fit h-full">
-            <img
-              alt=""
-              src="imgs/nittany-lion/rest-animation/Rest-1.png"
-              class="dino-img h-full"
-            />
+        <div data-dino-top>
+          <div class="dino w-fit" data-dino>
+            <div class="player-container relative w-fit h-full">
+              <img
+                alt=""
+                src="imgs/nittany-lion/rest-animation/Rest-1.png"
+                class="dino-img h-full"
+              />
+            </div>
           </div>
         </div>
         <div

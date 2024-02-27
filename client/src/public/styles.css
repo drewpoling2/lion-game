@@ -1775,6 +1775,24 @@ br {
     itemFloatingCloudItem 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
 }
 
+@keyframes starShine {
+  0% {
+    background-image: url('./imgs/items/star/Star-1.png');
+  }
+  25% {
+    background-image: url('./imgs/items/star/Star-2.png');
+  }
+  50% {
+    background-image: url('./imgs/items/star/Star-3.png');
+  }
+  75% {
+    background-image: url('./imgs/items/star/Star-4.png');
+  }
+  100% {
+    background-image: url('./imgs/items/star/Star-5.png');
+  }
+}
+
 .heart-collectable-item-translate {
   background-size: contain;
   background-position: center;
@@ -1784,10 +1802,47 @@ br {
   position: absolute;
   left: 37%;
   height: 28px;
-  animation: itemFloatingCloudItem 2.75s ease-in-out infinite; /* You can adjust the duration and timing function */
   background-image: url('./imgs/items/heart/Heart-1.png');
   image-rendering: pixelated; /* Prevent blurriness between images */
-  animation: translateCollectable ease-in-out 0.65s, invert ease 0.8s infinite;
+}
+
+.magnet-collectable-item-translate {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 28px;
+  z-index: 20;
+  position: absolute;
+  left: 37%;
+  height: 28px;
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  background-image: url('./imgs/items/cherry/Cherry-1.png');
+}
+
+.cherry-collectable-item-translate {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 28px;
+  z-index: 20;
+  position: absolute;
+  left: 37%;
+  height: 28px;
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  background-image: url('./imgs/items/cherry/Cherry-1.png');
+}
+
+.leaf-collectable-item-translate {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 28px;
+  z-index: 20;
+  position: absolute;
+  left: 37%;
+  height: 28px;
+  image-rendering: pixelated; /* Prevent blurriness between images */
+  background-image: url('./imgs/items/leaf/Leaf-1.png');
 }
 
 .star-collectable-item-translate {
@@ -1800,8 +1855,7 @@ br {
   left: 37%;
   height: 28px;
   image-rendering: pixelated; /* Prevent blurriness between images */
-  animation: starSpin 0.35s infinite ease-in-out,
-    translateCollectable ease-in-out 0.65s, invert ease 0.8s infinite;
+  background-image: url('./imgs/items/star/Star-1.png');
 }
 
 @keyframes invert {
@@ -1813,45 +1867,6 @@ br {
   }
   100% {
     filter: brightness(100%) saturate(100%);
-  }
-}
-
-@keyframes starSpin {
-  0% {
-    background-image: url('./imgs/items/star/Star-Spin-1.png');
-  }
-  35% {
-    background-image: url('./imgs/items/star/Star-Spin-2.png');
-  }
-  50% {
-    background-image: url('./imgs/items/star/Star-Spin-3.png');
-  }
-  65% {
-    background-image: url('./imgs/items/star/Star-Spin-4.png');
-  }
-  100% {
-    background-image: url('./imgs/items/star/Star-Spin-1.png');
-  }
-}
-
-@keyframes starShine {
-  0% {
-    background-image: url('./imgs/items/star/Star-5.png');
-  }
-  80% {
-    background-image: url('./imgs/items/star/Star-1.png');
-  }
-  85% {
-    background-image: url('./imgs/items/star/Star-2.png');
-  }
-  90% {
-    background-image: url('./imgs/items/star/Star-3.png');
-  }
-  95% {
-    background-image: url('./imgs/items/star/Star-4.png');
-  }
-  100% {
-    background-image: url('./imgs/items/star/Star-5.png');
   }
 }
 
@@ -2387,10 +2402,64 @@ br {
   }
 }
 
+.snackbar-icon {
+  border: 1px solid darkgray;
+  padding: 4px;
+  width: 38px;
+  height: 38px;
+}
+
+.snackbar-img {
+  width: 24px;
+}
+
+@keyframes colorCycle {
+  0% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.25;
+  }
+}
+
+.flash-color {
+  animation: colorCycle 0.65s infinite; /* Change '4s' to adjust the duration of each cycle */
+}
+
+.snackbar-container {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #232d3ea3;
+  color: #ceff40;
+  width: fit-content;
+  --bottom: 77.5;
+  --left: 1;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+}
+
+.snackbar-text {
+  font-size: 16px;
+  margin-left: 16px;
+}
+
 .dino {
   --bottom: 19.5;
   position: absolute;
   height: 9.8%;
+  left: 25%;
+  z-index: 2;
+  bottom: calc(var(--bottom) * 1%);
+}
+
+.dino-top {
+  --bottom: 19.5;
+  position: absolute;
   left: 25%;
   z-index: 2;
   bottom: calc(var(--bottom) * 1%);
@@ -2789,6 +2858,147 @@ br {
   position: absolute;
   left: calc(var(--left) * 1%);
   bottom: calc(var(--bottom) * 1%);
+}
+
+.poof-particles {
+  z-index: 10000;
+  width: 85px;
+  height: 85px;
+  --bottom: 77.5;
+  --left: 25;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: poofParticles 0.4s step-start;
+}
+
+@keyframes poofParticles {
+  0% {
+    background-image: url('./imgs/poof-particles/poof-particles-1.png');
+  }
+  20% {
+    background-image: url('./imgs/poof-particles/poof-particles-1.png');
+  }
+  40% {
+    background-image: url('./imgs/poof-particles/poof-particles-2.png');
+  }
+  60% {
+    background-image: url('./imgs/poof-particles/poof-particles-3.png');
+  }
+  80% {
+    background-image: url('./imgs/poof-particles/poof-particles-4.png');
+  }
+  100% {
+    background-image: url('./imgs/poof-particles/poof-particles-5.png');
+  }
+}
+
+.jump-particles {
+  z-index: 10000;
+  width: 85px;
+  height: 85px;
+  --bottom: 77.5;
+  --left: 25;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: jumpParticles 0.4s step-start;
+}
+
+@keyframes jumpParticles {
+  0% {
+    background-image: url('./imgs/jump-particles/jump-particles-1.png');
+  }
+  25% {
+    background-image: url('./imgs/jump-particles/jump-particles-1.png');
+  }
+  50% {
+    background-image: url('./imgs/jump-particles/jump-particles-2.png');
+  }
+  75% {
+    background-image: url('./imgs/jump-particles/jump-particles-3.png');
+  }
+  100% {
+    background-image: url('./imgs/jump-particles/jump-particles-4.png');
+  }
+}
+
+.silver-coin-particles {
+  z-index: 10000;
+  width: 85px;
+  height: 85px;
+  --bottom: 77.5;
+  --left: 1;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: silverCoinParticles 0.4s step-start;
+}
+
+@keyframes silverCoinParticles {
+  0% {
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles1.png');
+  }
+  20% {
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles2.png');
+  }
+  40% {
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles3.png');
+  }
+  60% {
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles4.png');
+  }
+  80% {
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles5.png');
+  }
+  100% {
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles1.png');
+  }
+}
+
+.gold-coin-particles {
+  z-index: 10000;
+  width: 85px;
+  height: 85px;
+  --bottom: 77.5;
+  --left: 1;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: goldCoinParticles 0.4s step-start;
+}
+
+@keyframes goldCoinParticles {
+  0% {
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles1.png');
+  }
+  20% {
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles2.png');
+  }
+  40% {
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles3.png');
+  }
+  60% {
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles4.png');
+  }
+  80% {
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles5.png');
+  }
+  100% {
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles1.png');
+  }
 }
 
 .cactus {

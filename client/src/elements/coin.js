@@ -7,6 +7,7 @@ import { getDinoRect } from './player-controller';
 import { collectableOptions } from '../game-manager';
 import StateSingleton from '../game-state';
 import { addToSpawnQueue } from './groundQue';
+import { snackBarElem } from '../elements-refs';
 const {
   getMagnetSpeedFactor,
   getIsCoinsRunning,
@@ -186,4 +187,30 @@ function randomNumberBetween(min, max) {
 export function getRandomKeyframe() {
   // Return a random number between 0 and 100 (percentage)
   return Math.floor(Math.random() * 101);
+}
+
+export function createSpecificCoin(coin, parentElem) {
+  const coinElement = document.createElement('div');
+
+  coinElement.dataset.coin = true;
+  coinElement.dataset.type = coin.type;
+  coinElement.dataset.locked = 'true';
+  coinElement.dataset.points = coin.points;
+  if (
+    coin.type === 'red-gem' ||
+    coin.type === 'blue-gem' ||
+    coin.type === 'green-gem'
+  ) {
+    coinElement.dataset.gem = true;
+  }
+  coinElement.classList.add(coin.type, 'collectable', 'move-bottom');
+  coinElement.id = Math.random().toString(16).slice(2);
+
+  // Set the initial position of the coin above the dino
+  coinElement.style.position = 'absolute';
+  setCustomProperty(coinElement, '--left', 7);
+  setCustomProperty(coinElement, '--bottom', 73.5);
+  // Append the coin element to the document body or another container
+  const worldElem = document.querySelector('[data-world]');
+  worldElem.appendChild(coinElement);
 }

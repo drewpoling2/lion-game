@@ -16,6 +16,7 @@ import lionIdleImg3 from '../public/imgs/nittany-lion/rest-animation/Rest-3.png'
 import { soundController } from '../utility/sound-controller.js';
 import { collectableOptions } from '../game-manager.js';
 import StateSingleton from '../game-state.js';
+import { createJumpParticles } from './jump-particles.js';
 const { getHasLeaf, getJumpCountLimit, getGravityFallAdjustment } =
   StateSingleton;
 const dinoElem = document.querySelector('[data-dino]');
@@ -240,7 +241,7 @@ function handleJump(delta, gravityFallAdjustment = 0.01) {
     isFalling = true;
     // Set interval to adjust fall speed every 5 seconds (adjust the interval as needed)
     yVelocity -= getHasLeaf()
-      ? GRAVITY * delta - gravityFallAdjustment / 4
+      ? GRAVITY * delta - gravityFallAdjustment / 14
       : GRAVITY * delta + gravityFallAdjustment; // Increase or decrease gravityAdjustment as needed
   } else {
     yVelocity -= GRAVITY * delta;
@@ -285,6 +286,9 @@ function onJump(e) {
   isJumping = true;
   yVelocity = JUMP_SPEED;
   jumpCount++;
+  if (getHasLeaf()) {
+    createJumpParticles(dinoElem);
+  }
 }
 
 //handles jump key release event

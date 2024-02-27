@@ -1,4 +1,11 @@
+import {
+  startSlotMachine,
+  updateNotificationItem,
+} from './elements/slot-machine-item.js';
+import { createPoofParticles } from './elements/poof-particles.js';
+import { createPickUpParticles } from './elements/pickup-particles.js';
 import { updateGround, setupGround } from './elements/ground.js';
+import backpack from './public/imgs/buffs/backpack.png';
 import {
   updateGroundLayerTwo,
   setupGroundLayerTwo,
@@ -60,6 +67,7 @@ import {
   updateCoin,
   getCoinRects,
   createCoins,
+  createSpecificCoin,
 } from './elements/coin.js';
 import muteImg from './public/imgs/icons/Speaker-Off.png';
 import unmuteImg from './public/imgs/icons/Speaker-On.png';
@@ -82,11 +90,9 @@ import {
   scoreNewHighScoreElem,
   scoreErrorMessageElem,
   multiplierTimerElem,
-  tickerElem,
-  tickerElem2,
-  tickerElem3,
   livesElem,
   dinoElem,
+  dinoTopElem,
   scrollableTableElem,
   currentMultiplierElem,
   plusPointsElem,
@@ -104,6 +110,9 @@ import {
   pausedScreenElem,
   bonusElem,
   speedElem,
+  snackBarTextElem,
+  snackBarElem,
+  snackBarIconElem,
 } from './elements-refs';
 import { toggleElemOff, toggleElemOn } from './utility/toggle-element.js';
 import { snow } from './elements/particle-systems.js';
@@ -119,6 +128,9 @@ import { updateGroundQue } from './elements/groundQue.js';
 import { applyGem } from './elements/gem-collection.js';
 import ItemDropStateSingleton from './item-drop-state.js';
 import { normalizeWeights, getRandomWeighted } from './elements/platform.js';
+import { getCustomProperty } from './utility/updateCustomProperty.js';
+import { notifySnackBar } from './elements/snackbar.js';
+
 const { removeInterfaceTextElem, addInterfaceTextElem } =
   InterfaceTextElemsSingleton;
 const {
@@ -175,7 +187,7 @@ let lastTime;
 let score;
 let idleIntervalId;
 let collisionOccurred = false; // Flag to track collision
-let milestone = 125;
+let milestone = 225;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
@@ -246,6 +258,10 @@ pauseButton.addEventListener('click', function () {
     pausedScreenElem.style.display = 'none';
   } else {
     pausedScreenElem.style.display = 'flex';
+  }
+  if (isPaused) pauseIconButton.src = playImg;
+  else {
+    pauseIconButton.src = pauseImg;
   }
   pauseButton.blur();
 });
@@ -371,9 +387,9 @@ function update(time) {
   updateGround(delta, currentSpeedScale);
   updateGroundLayerThree(delta, currentSpeedScale);
   updateGroundLayerTwo(delta, currentSpeedScale);
-  updateCactus(delta, currentSpeedScale);
+  // updateCactus(delta, currentSpeedScale);
   // updateBird(delta, currentSpeedScale);
-  // updateGroundEnemy(delta, currentSpeedScale);
+  updateGroundEnemy(delta, currentSpeedScale);
   updatePlatform(delta, currentSpeedScale);
   // updateFlag(delta, currentSpeedScale);
   updateInterfaceText(delta, currentSpeedScale);
@@ -381,6 +397,7 @@ function update(time) {
   // updateMagnet(delta, currentSpeedScale);
   updateCoin(delta, currentSpeedScale);
   // updateCrate(delta, currentSpeedScale);
+  updateNotificationItem(delta, currentSpeedScale);
   updateDino(
     delta,
     currentSpeedScale,
@@ -505,6 +522,13 @@ function checkCoinCollision() {
       } else {
         addPickupText(newElement, coinElement);
       }
+      if (coinElement.dataset.type === 'gold-coin') {
+        createPickUpParticles('gold-coin', coinElement);
+      } else if (coinElement.dataset.type === 'silver-coin') {
+        createPickUpParticles('silver-coin', coinElement);
+      } else {
+        createPickUpParticles('gold-coin', coinElement);
+      }
       coinElement.remove();
       setTimeout(() => {
         newElement.remove();
@@ -551,7 +575,6 @@ function checkHeartCollision() {
         if (randomValue > 0.5) {
           currentLives += 2;
           createOneUpTextAtPosition(2, collisionPosition);
-          console.log('did it');
         } else {
           currentLives += 1;
           createOneUpTextAtPosition(1, collisionPosition);
@@ -574,6 +597,13 @@ function checkLeafCollision() {
   getLeafRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
       const leaf = document.getElementById(element.id);
+      dinoElem.style.display = 'none';
+      createPoofParticles(dinoElem);
+      togglePause();
+      setTimeout(() => {
+        togglePause();
+        dinoElem.style.display = 'block';
+      }, 300);
       setHasLeaf(true);
       setJumpCountLimit(4);
       leaf.remove();
@@ -604,7 +634,6 @@ function checkStarCollision() {
         dinoElem.classList.remove('star-invincible');
       }, getStarDuration());
       setTimedPlayerImmunity(getStarDuration());
-
       return true;
     }
   });
@@ -719,6 +748,66 @@ export function updateScoreWithPoints(delta) {
     if (score >= initialScore + delta) {
       // Stop the interval when the target score is reached
       clearInterval(intervalId);
+    }
+  }, updateInterval);
+}
+
+let snackBarTextScore = 0;
+
+export function updateSnackbarText(delta, randomCollectables) {
+  snackBarTextElem.style.display = 'block';
+
+  const increments = Math.ceil(duration / updateInterval);
+  const incrementAmount = delta / increments;
+  const intervalId = setInterval(() => {
+    snackBarTextScore += incrementAmount;
+    snackBarTextElem.textContent = `+${Math.floor(snackBarTextScore)
+      .toString()
+      .padStart(1, 0)}`;
+    const incrementDuration = 125;
+    if (snackBarTextScore >= delta) {
+      // Stop the interval when the target score is reached
+      clearInterval(intervalId);
+      setTimeout(() => {
+        randomCollectables.forEach((collectable, index) => {
+          setTimeout(() => {
+            createSpecificCoin(collectable);
+          }, index * incrementDuration);
+        });
+        updateSnackbarTextDown(
+          delta,
+          randomCollectables.length * incrementDuration
+        );
+      }, 2000);
+    }
+  }, updateInterval);
+}
+
+export function updateSnackbarTextDown(initialScore, incrementDuration) {
+  snackBarTextElem.classList.add('flash-color');
+  const targetScore = 0;
+  const increments = Math.ceil(incrementDuration / updateInterval);
+  const incrementAmount = (initialScore - targetScore) / increments;
+  let currentScore = initialScore;
+
+  const intervalId = setInterval(() => {
+    currentScore -= incrementAmount;
+
+    // Update the snackbar text
+    if (currentScore <= targetScore) {
+      // Stop the interval when the target score is reached
+      clearInterval(intervalId);
+      snackBarTextElem.textContent = '0';
+      snackBarTextElem.classList.remove('flash-color');
+      snackBarElem.classList.add('hide-element');
+      snackBarTextElem.style.display = 'none';
+      snackBarIconElem.innerHTML = ''; // Remove all children
+      snackBarTextScore = 0;
+    } else {
+      // Update the snackbar text with the current score
+      snackBarTextElem.textContent = `+${Math.floor(currentScore)
+        .toString()
+        .padStart(1, '0')}`;
     }
   }, updateInterval);
 }
@@ -850,7 +939,6 @@ function convertSpeedToNormalNumber() {
 
   // Round mph to the nearest whole number
   const roundedMPH = Math.round(mph);
-  console.log(roundedMPH);
   return roundedMPH;
 }
 
@@ -977,12 +1065,10 @@ export function togglePause() {
   // const body = document.body;
   if (isPaused) {
     // body.classList.add('pause-animation');
-    pauseIconButton.src = playImg;
     stopTimer(); // Pause the timer
     snow.togglePause();
   } else {
     // body.classList.remove('pause-animation');
-    pauseIconButton.src = pauseImg;
     snow.togglePause();
     startTimer(); // Start the timer or resume from where it left off
     window.requestAnimationFrame(update);
@@ -1373,7 +1459,8 @@ function coffeeEffect() {
     );
   } while (result === 'empty');
 
-  createItemAboveDino(result);
+  notifySnackBar();
+  startSlotMachine(result);
 }
 
 function getRandomCollectable() {
@@ -1400,16 +1487,14 @@ function getRandomCollectable() {
 function sackOfCoinsEffect() {
   let totalPoints = 0;
   let currentMultiplierRatio = getMultiplierRatio();
-
-  for (let i = 0; i < 25; i++) {
+  let randomCollectables = [];
+  for (let i = 0; i < 13; i++) {
     const randomCollectable = getRandomCollectable();
+    randomCollectables.push(randomCollectable);
     totalPoints += randomCollectable.points * currentMultiplierRatio;
-    console.log('coin', randomCollectable);
   }
-
-  updateScoreWithPoints(totalPoints);
-
-  console.log(`Collected ${totalPoints} points from 25 random coins.`);
+  notifySnackBar(backpack);
+  updateSnackbarText(totalPoints, randomCollectables);
 }
 
 function reduceByPercentage(value, percentage) {

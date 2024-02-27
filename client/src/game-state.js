@@ -20,9 +20,9 @@ const StateSingleton = (function () {
     isCoinsRunning: true,
     isPlatformRunning: false,
     isCactusRunning: false,
-    isBirdRunning: true,
-    isGroundEnemyRunning: true,
-    isCrateRunning: true,
+    isBirdRunning: false,
+    isGroundEnemyRunning: false,
+    isCrateRunning: false,
 
     //world
     isGroundRunning: true,

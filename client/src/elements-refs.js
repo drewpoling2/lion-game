@@ -20,10 +20,14 @@ const tickerElem2 = document.querySelector('[data-ticker2]');
 const tickerElem3 = document.querySelector('[data-ticker3]');
 const livesElem = document.querySelector('[data-lives]');
 const dinoElem = document.querySelector('[data-dino]');
+const dinoTopElem = document.querySelector('[data-dino-top]');
 const scrollableTableElem = document.querySelector('[data-scrollable-table]');
 const currentMultiplierElem = document.querySelector(
   '[data-current-multiplier]'
 );
+const snackBarElem = document.querySelector('[data-snackbar]');
+const snackBarIconElem = document.querySelector('[data-snackbar-icon]');
+const snackBarTextElem = document.querySelector('[data-snackbar-text]');
 const plusPointsElem = document.querySelector('[data-plus-points]');
 const tickerContainerElem = document.querySelector('[data-ticker-container]');
 const loadingTextElem = document.querySelector('[data-loading-text]');
@@ -56,6 +60,7 @@ const gameNotificationElem = document.querySelector(
 const pausedScreenElem = document.querySelector('[data-paused-screen]');
 const speedElem = document.querySelector('[data-speed]');
 export {
+  dinoTopElem,
   speedElem,
   bonusElem,
   pausedScreenElem,
@@ -90,4 +95,7 @@ export {
   interfaceComboContainer,
   currentMultiplierScoreElem,
   currentComboScoreContainer,
+  snackBarElem,
+  snackBarIconElem,
+  snackBarTextElem,
 };

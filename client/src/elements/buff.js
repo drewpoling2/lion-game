@@ -197,7 +197,7 @@ const buffs = {
     effect: coffeeEffect,
   },
   Backpack: {
-    description: 'Open your backpack. Gain 25 random coins.',
+    description: 'Open your backpack. Gain 15 random coins.',
     weight: 1,
     icon: backpack,
     effect: sackOfCoinsEffect,
