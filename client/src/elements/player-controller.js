@@ -3,6 +3,7 @@ import {
   setCustomProperty,
   getCustomProperty,
 } from '../utility/updateCustomProperty.js';
+import { createStarParticles } from './star-particles';
 import lionJumpImg1 from '../public/imgs/nittany-lion/jump-animation/Jump-1.png';
 import lionJumpImg2 from '../public/imgs/nittany-lion/jump-animation/Jump-2.png';
 import lionLoseImg from '../public/imgs/nittany-lion/jump-animation/Jump-1.png';
@@ -17,7 +18,7 @@ import { soundController } from '../utility/sound-controller.js';
 import { collectableOptions } from '../game-manager.js';
 import StateSingleton from '../game-state.js';
 import { createJumpParticles } from './jump-particles.js';
-const { getHasLeaf, getJumpCountLimit, getGravityFallAdjustment } =
+const { getHasLeaf, getJumpCountLimit, getGravityFallAdjustment, getHasStar } =
   StateSingleton;
 const dinoElem = document.querySelector('[data-dino]');
 const dinoImg = document.querySelector('.dino-img');
@@ -134,7 +135,17 @@ export function handleIdle() {
   // Call the updateImage function at a specific interval (e.g., every 200 milliseconds)
 }
 
+let starParticlesCreated = false;
+
 function handleRun(delta, speedScale, selectedStarter) {
+  if (getHasStar() && !starParticlesCreated) {
+    // Schedule the creation of star particles after a delay
+    starParticlesCreated = true; // Update the flag to indicate that star particles have been created
+    setTimeout(() => {
+      createStarParticles();
+      starParticlesCreated = false; // Update the flag to indicate that star particles have been created
+    }, 200); // Adjust the delay as needed (in milliseconds)
+  }
   if (isJumping) {
     startJump(selectedStarter);
     return;

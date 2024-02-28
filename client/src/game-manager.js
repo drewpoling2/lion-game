@@ -2,8 +2,14 @@ import {
   startSlotMachine,
   updateNotificationItem,
 } from './elements/slot-machine-item.js';
+import {
+  createColumnOfCoins,
+  createArrowOfCoins,
+  createDiagonalOfCoins,
+} from './elements/coin-group.js';
 import { createPoofParticles } from './elements/poof-particles.js';
 import { createPickUpParticles } from './elements/pickup-particles.js';
+import { createGemParticles } from './elements/gem-particles.js';
 import { updateGround, setupGround } from './elements/ground.js';
 import backpack from './public/imgs/buffs/backpack.png';
 import {
@@ -187,7 +193,7 @@ let lastTime;
 let score;
 let idleIntervalId;
 let collisionOccurred = false; // Flag to track collision
-let milestone = 225;
+let milestone = 1025;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
@@ -353,6 +359,8 @@ const phaseUpdateFunctions = {
   2: updatePhase2,
 };
 
+let batchSpawned = false;
+let wholeBatchSpawned = false;
 function update(time) {
   if (isPaused) {
     // Do nothing if the game is paused
@@ -411,6 +419,31 @@ function update(time) {
   checkCollisions();
   lastTime = time;
   window.requestAnimationFrame(update);
+  if (!wholeBatchSpawned) {
+    createDiagonalOfCoins();
+    wholeBatchSpawned = true;
+  }
+  // if (!wholeBatchSpawned) {
+  //   let baseBatchDelay = 0; // Initial delay
+  //   const numBatches = 3; // Number of columns to create
+  //   const batchDelay = 2000; // Delay between each column creation
+  //   for (let i = 0; i < numBatches; i++) {
+  //     setTimeout(() => {
+  //       let delay = 0; // Initial delay
+  //       const numColumns = 5; // Number of columns to create
+  //       const columnDelay = 300; // Delay between each column creation
+
+  //       for (let j = 0; j < numColumns; j++) {
+  //         setTimeout(() => {
+  //           createColumnOfCoins(5);
+  //         }, delay);
+  //         delay += columnDelay; // Increment the delay for the next column
+  //       }
+  //     }, baseBatchDelay);
+  //     baseBatchDelay += batchDelay; // Increment the delay for the next column
+  //   }
+  //   wholeBatchSpawned = true;
+  // }
 }
 
 function createOneUpText(element) {
@@ -522,13 +555,10 @@ function checkCoinCollision() {
       } else {
         addPickupText(newElement, coinElement);
       }
-      if (coinElement.dataset.type === 'gold-coin') {
-        createPickUpParticles('gold-coin', coinElement);
-      } else if (coinElement.dataset.type === 'silver-coin') {
-        createPickUpParticles('silver-coin', coinElement);
-      } else {
-        createPickUpParticles('gold-coin', coinElement);
+      if (coinElement.dataset.type) {
+        createPickUpParticles(coinElement.dataset.type, coinElement);
       }
+
       coinElement.remove();
       setTimeout(() => {
         newElement.remove();
@@ -1416,9 +1446,9 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 export let collectableOptions = [
   { type: 'gold-coin', weight: 20, points: 31 },
   { type: 'silver-coin', weight: 60, points: 16 },
-  { type: 'green-gem', weight: 0.7, points: 250 },
-  { type: 'red-gem', weight: 0.4, points: 500 },
-  { type: 'blue-gem', weight: 0.25, points: 1000 },
+  { type: 'green-gem', weight: 1, points: 250 },
+  { type: 'red-gem', weight: 0.75, points: 500 },
+  { type: 'blue-gem', weight: 0.5, points: 1000 },
 ];
 
 function createItemAboveDino(itemName) {
@@ -1548,5 +1578,7 @@ function mittensEffect() {
     normalizeWeights(ItemDropStateSingleton.getItemDropState())
   );
 }
+
+createColumnOfCoins('gold-coin', 5);
 
 export { booksSmartEffect, sneakersEffect, cowbellEffect, mittensEffect };

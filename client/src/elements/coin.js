@@ -7,7 +7,7 @@ import { getDinoRect } from './player-controller';
 import { collectableOptions } from '../game-manager';
 import StateSingleton from '../game-state';
 import { addToSpawnQueue } from './groundQue';
-import { snackBarElem } from '../elements-refs';
+import { snackBarElem, worldElem } from '../elements-refs';
 const {
   getMagnetSpeedFactor,
   getIsCoinsRunning,
@@ -19,7 +19,6 @@ const {
 } = StateSingleton;
 
 const SPEED = getGroundSpeed();
-const worldElem = document.querySelector('[data-world]');
 
 let nextCoinTime;
 let isCoinSpawned = true;
@@ -180,7 +179,7 @@ export function createCoins() {
   worldElem.append(element);
 }
 
-function randomNumberBetween(min, max) {
+export function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
@@ -211,6 +210,5 @@ export function createSpecificCoin(coin, parentElem) {
   setCustomProperty(coinElement, '--left', 7);
   setCustomProperty(coinElement, '--bottom', 73.5);
   // Append the coin element to the document body or another container
-  const worldElem = document.querySelector('[data-world]');
   worldElem.appendChild(coinElement);
 }

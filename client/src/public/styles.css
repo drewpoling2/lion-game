@@ -1986,6 +1986,10 @@ br {
   }
 }
 
+.column-coin {
+  bottom: calc(var(--bottom) * 1%);
+}
+
 .move-bottom {
   --bottom: 23.5;
   bottom: calc(var(--bottom) * 1%);
@@ -2079,7 +2083,7 @@ br {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-19px);
+    transform: translateY(-15px);
   }
   100% {
     transform: translateY(0);
@@ -2858,6 +2862,150 @@ br {
   position: absolute;
   left: calc(var(--left) * 1%);
   bottom: calc(var(--bottom) * 1%);
+}
+
+.blue-gem-particles {
+  z-index: 10000;
+  width: 95px;
+  height: 95px;
+  --left: 22.5;
+  --bottom: -58;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: blueGemParticles 0.4s step-start;
+}
+
+@keyframes blueGemParticles {
+  0% {
+    background-image: url('./imgs/pickup-particles/blue-gem-particles/blue-gem-particles1.png');
+  }
+  20% {
+    background-image: url('./imgs/pickup-particles/blue-gem-particles/blue-gem-particles1.png');
+  }
+  40% {
+    background-image: url('./imgs/pickup-particles/blue-gem-particles/blue-gem-particles2.png');
+  }
+  60% {
+    background-image: url('./imgs/pickup-particles/blue-gem-particles/blue-gem-particles3.png');
+  }
+  80% {
+    background-image: url('./imgs/pickup-particles/blue-gem-particles/blue-gem-particles4.png');
+  }
+  100% {
+    background-image: url('./imgs/pickup-particles/blue-gem-particles/blue-gem-particles5.png');
+  }
+}
+
+.red-gem-particles {
+  z-index: 10000;
+  width: 95px;
+  height: 95px;
+  --left: 22.5;
+  --bottom: -58;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: redGemParticles 0.4s step-start;
+}
+
+@keyframes redGemParticles {
+  0% {
+    background-image: url('./imgs/pickup-particles/red-gem-particles/red-gem-particles1.png');
+  }
+  20% {
+    background-image: url('./imgs/pickup-particles/red-gem-particles/red-gem-particles1.png');
+  }
+  40% {
+    background-image: url('./imgs/pickup-particles/red-gem-particles/red-gem-particles2.png');
+  }
+  60% {
+    background-image: url('./imgs/pickup-particles/red-gem-particles/red-gem-particles3.png');
+  }
+  80% {
+    background-image: url('./imgs/pickup-particles/red-gem-particles/red-gem-particles4.png');
+  }
+  100% {
+    background-image: url('./imgs/pickup-particles/red-gem-particles/red-gem-particles5.png');
+  }
+}
+
+.green-gem-particles {
+  z-index: 10000;
+  width: 95px;
+  height: 95px;
+  --left: 22.5;
+  --bottom: -58;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: greenGemParticles 0.4s step-start;
+}
+
+@keyframes greenGemParticles {
+  0% {
+    background-image: url('./imgs/pickup-particles/green-gem-particles/green-gem-particles1.png');
+  }
+  20% {
+    background-image: url('./imgs/pickup-particles/green-gem-particles/green-gem-particles1.png');
+  }
+  40% {
+    background-image: url('./imgs/pickup-particles/green-gem-particles/green-gem-particles2.png');
+  }
+  60% {
+    background-image: url('./imgs/pickup-particles/green-gem-particles/green-gem-particles3.png');
+  }
+  80% {
+    background-image: url('./imgs/pickup-particles/green-gem-particles/green-gem-particles4.png');
+  }
+  100% {
+    background-image: url('./imgs/pickup-particles/green-gem-particles/green-gem-particles5.png');
+  }
+}
+
+.star-particles {
+  z-index: 10000;
+  width: 95px;
+  height: 95px;
+  --left: 22.5;
+  --bottom: -58;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: starParticles 0.4s step-start;
+}
+
+@keyframes starParticles {
+  0% {
+    background-image: url('./imgs/star-particles/star-particles1.png');
+  }
+  20% {
+    background-image: url('./imgs/star-particles/star-particles1.png');
+  }
+  40% {
+    background-image: url('./imgs/star-particles/star-particles2.png');
+  }
+  60% {
+    background-image: url('./imgs/star-particles/star-particles3.png');
+  }
+  80% {
+    background-image: url('./imgs/star-particles/star-particles4.png');
+  }
+  100% {
+    background-image: url('./imgs/star-particles/star-particles5.png');
+  }
 }
 
 .poof-particles {
