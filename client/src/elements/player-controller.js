@@ -144,7 +144,7 @@ function handleRun(delta, speedScale, selectedStarter) {
     setTimeout(() => {
       createStarParticles();
       starParticlesCreated = false; // Update the flag to indicate that star particles have been created
-    }, 200); // Adjust the delay as needed (in milliseconds)
+    }, 220); // Adjust the delay as needed (in milliseconds)
   }
   if (isJumping) {
     startJump(selectedStarter);

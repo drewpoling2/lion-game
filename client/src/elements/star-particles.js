@@ -17,7 +17,7 @@ export function createStarParticles() {
     element,
     '--bottom',
     getCustomProperty(dinoElem, '--bottom') -
-      Math.floor(Math.random() * (8 - 4) + 4)
+      Math.floor(Math.random() * (8 - 4) + 5)
   );
 
   worldElem.appendChild(element);

@@ -1,7 +1,7 @@
 //snow particle system
 const snow = {
   el: '#snow',
-  density: 37500, // higher = fewer bits
+  density: 40500, // higher = fewer bits
   maxHSpeed: 1, // How much do you want them to move horizontally
   minFallSpeed: 0.5,
   canvas: null,
