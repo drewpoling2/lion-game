@@ -2,6 +2,7 @@ import {
   startSlotMachine,
   updateNotificationItem,
 } from './elements/slot-machine-item.js';
+import { updateGeneratedPhase } from './phases/generate-phase.js';
 import {
   createColumnOfCoins,
   createArrowOfCoins,
@@ -125,7 +126,7 @@ import { snow } from './elements/particle-systems.js';
 import { phases } from './phases/phase-properties.js';
 import { updatePhase1 } from './phases/phase1.js';
 import { updatePhase2 } from './phases/phase2.js';
-import { updateBonusPhase } from './phases/bonus-phase.js';
+import { updateBonusPhase, setRandomBonusKey } from './phases/bonus-phase.js';
 import { setupBonusLayer, updateBonusLayer } from './elements/bonus-layer.js';
 import { updateInterfaceText } from './utility/update-interface-text.js';
 import InterfaceTextElemsSingleton from './interface-text-elems-state.js';
@@ -136,6 +137,11 @@ import ItemDropStateSingleton from './item-drop-state.js';
 import { normalizeWeights, getRandomWeighted } from './elements/platform.js';
 import { getCustomProperty } from './utility/updateCustomProperty.js';
 import { notifySnackBar } from './elements/snackbar.js';
+import e from 'cors';
+import {
+  bonusCollectableOptions,
+  generatedBonusPhases,
+} from './phases/bonus-phase-properties.js';
 
 const { removeInterfaceTextElem, addInterfaceTextElem } =
   InterfaceTextElemsSingleton;
@@ -160,6 +166,7 @@ const {
   getSelectedStarter,
   setSelectedStarter,
   getCurrentPhase,
+  setCurrentPhase,
   setJumpCountLimit,
   getLeafDuration,
   setLeafDuration,
@@ -171,6 +178,8 @@ const {
   getIsGroundLayer2Running,
   getCoinPickupRadius,
   setCoinPickupRadius,
+  getIsBonusRunning,
+  setIsBonusRunning,
 } = StateSingleton;
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 45;
@@ -193,7 +202,7 @@ let lastTime;
 let score;
 let idleIntervalId;
 let collisionOccurred = false; // Flag to track collision
-let milestone = 1025;
+let milestone = 105;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
@@ -353,11 +362,11 @@ function checkCollisions() {
   }
 }
 
-const phaseUpdateFunctions = {
-  1: updatePhase1,
-  bonus: updateBonusPhase,
-  2: updatePhase2,
-};
+// const phaseUpdateFunctions = {
+//   1: updatePhase1,
+//   bonus: updateBonusPhase,
+//   2: updatePhase2,
+// };
 
 let batchSpawned = false;
 let wholeBatchSpawned = false;
@@ -373,7 +382,7 @@ function update(time) {
     return;
   }
 
-  let baseDelta = 4;
+  let baseDelta = 14;
   // let delta = time - lastTime;
   let delta = baseDelta;
   if (collisionOccurred && !getPlayerImmunity()) {
@@ -385,11 +394,14 @@ function update(time) {
     }, 400);
     return; // Pause the update during the delay
   }
-
-  const updateFunction = phaseUpdateFunctions[getCurrentPhase()];
-  if (updateFunction) {
-    updateFunction(timer, delta, currentSpeedScale);
+  if (getCurrentPhase() === 'bonus') {
+    updateBonusPhase();
+  } else {
+    updateGeneratedPhase(getCurrentPhase());
   }
+  // if (updateFunction) {
+  //   updateFunction(timer, delta, currentSpeedScale);
+  // }
   updateGroundLayerTwoTwo(delta, currentSpeedScale);
   // updateBonusLayer(delta, currentSpeedScale);
   updateGround(delta, currentSpeedScale);
@@ -419,10 +431,10 @@ function update(time) {
   checkCollisions();
   lastTime = time;
   window.requestAnimationFrame(update);
-  if (!wholeBatchSpawned) {
-    createDiagonalOfCoins();
-    wholeBatchSpawned = true;
-  }
+  // if (!wholeBatchSpawned) {
+  //   createColumnOfCoins(6);
+  //   wholeBatchSpawned = true;
+  // }
   // if (!wholeBatchSpawned) {
   //   let baseBatchDelay = 0; // Initial delay
   //   const numBatches = 3; // Number of columns to create
@@ -538,9 +550,6 @@ function randomArc(element) {
 function calculateFontSize(points) {
   return Math.min(12 + points * 0.01, 36);
 }
-
-let goldCoinCounter = 0;
-let redGemMultiplier = 1;
 
 function checkCoinCollision() {
   const dinoRect = getDinoRect();
@@ -926,6 +935,10 @@ export function isCollision(rect1, rect2) {
   );
 }
 
+const silverCoinIndex = bonusCollectableOptions.findIndex(
+  (item) => item.type === 'silver-coin'
+);
+
 function updateSpeedScale(delta) {
   currentSpeedScale += delta * getSpeedScaleIncrease();
 }
@@ -939,6 +952,8 @@ function calculateNextMilestone(currentMilestone) {
   const growthRate = 2; // Adjust this as needed
   return Math.floor(currentMilestone * growthRate);
 }
+
+let levelSinceBonus = 0;
 
 function handleLevelUp() {
   scoreSinceMilestone = 0;
@@ -957,6 +972,22 @@ function handleLevelUp() {
   levelBarElem.value = 0;
   // Update the milestone for the next level
   milestone = calculateNextMilestone(milestone);
+  if (levelSinceBonus >= 0) {
+    if (
+      silverCoinIndex !== -1 &&
+      bonusCollectableOptions[silverCoinIndex].weight >= 0
+    ) {
+      bonusCollectableOptions[silverCoinIndex].weight =
+        bonusCollectableOptions[silverCoinIndex].weight - getCurrentPhase() - 2;
+    }
+    setIsBonusRunning(true);
+    setRandomBonusKey(generatedBonusPhases);
+    setCurrentPhase('bonus');
+    levelSinceBonus = 0;
+  } else {
+    setCurrentPhase(getCurrentPhase() + 1);
+    levelSinceBonus += 1;
+  }
 }
 
 let baselineSpeed = getSpeedScale();

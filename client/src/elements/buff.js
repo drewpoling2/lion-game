@@ -185,7 +185,7 @@ export function createBuffs() {
 
 const buffs = {
   Stopwatch: {
-    description: 'Speed up game speed.',
+    description: 'Speed up accelerating speed rate.',
     weight: 1,
     icon: stopwatch,
     effect: stopWatchEffect,

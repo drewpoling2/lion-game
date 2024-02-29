@@ -7,6 +7,8 @@ const StateSingleton = (function () {
     phaseTimerInterval: 10,
     multiplierTimer: 5000,
     currentPhase: 1,
+    currentBonusPhase: 1,
+    mostRecentPhase: 0,
     speedScale: 0.9,
     speedScaleIncrease: 0.000017,
     jumpCountLimit: 1,
@@ -23,6 +25,7 @@ const StateSingleton = (function () {
     isBirdRunning: false,
     isGroundEnemyRunning: false,
     isCrateRunning: false,
+    isBonusRunning: false,
 
     //world
     isGroundRunning: true,
@@ -328,6 +331,24 @@ const StateSingleton = (function () {
     },
     setCurrentPhase: function (newPhase) {
       state.currentPhase = newPhase;
+    },
+    getCurrentBonusPhase: function () {
+      return state.currentBonusPhase;
+    },
+    setCurrentBonusPhase: function (newBonusPhase) {
+      state.currentBonusPhase = newBonusPhase;
+    },
+    getIsBonusRunning: function () {
+      return state.isBonusRunning;
+    },
+    setIsBonusRunning: function (newIsBonusPhase) {
+      state.isBonusRunning = newIsBonusPhase;
+    },
+    getMostRecentPhase: function () {
+      return state.mostRecentPhase;
+    },
+    setMostRecentPhase: function (newMostRecentPhase) {
+      state.mostRecentPhase = newMostRecentPhase;
     },
     getSpeedScale: function () {
       return state.speedScale;
