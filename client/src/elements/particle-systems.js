@@ -86,7 +86,7 @@ const snow = {
 //confetti particle system
 const confetti = {
   el: '#confetti',
-  density: 800,
+  density: 40000,
   maxHSpeed: 2.1, // Increase max horizontal speed
   minFallSpeed: 2, // Increase min fall speed
   canvas: null,
@@ -117,7 +117,7 @@ const confetti = {
     this.canvas.height = this.h;
     this.particles = [];
     // Not dense at the beginning, then regular density
-    this.mp = 1500;
+    this.mp = 1000;
 
     for (let i = 0; i < this.mp; i++) {
       let size = 0;

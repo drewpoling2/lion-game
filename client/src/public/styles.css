@@ -233,6 +233,14 @@ body.pause-animation * {
   opacity: 0.35;
 }
 
+.hide-end-game-text {
+  opacity: 0;
+}
+
+.show-end-game-text {
+  opacity: 1;
+}
+
 .hide-element {
   opacity: 0;
   pointer-events: none;
@@ -781,6 +789,13 @@ body.pause-animation * {
 }
 
 .notification-flash .game-over-text {
+  text-transform: uppercase;
+  letter-spacing: 10px;
+  font-weight: 500;
+  color: white;
+}
+
+.game-over-text {
   text-transform: uppercase;
   letter-spacing: 10px;
   font-weight: 500;
@@ -1672,7 +1687,7 @@ br {
 }
 
 .magnet-item {
-  background-image: url('./imgs/Coin-1.png');
+  background-image: url('./imgs/items/magnet/magnet.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -1744,19 +1759,10 @@ br {
 
 @keyframes magnet {
   0% {
-    background-image: url('./imgs/Coin-1.png');
-  }
-  25% {
-    background-image: url('./imgs/Coin-1.png');
-  }
-  50% {
-    background-image: url('./imgs/Coin-1.png');
-  }
-  75% {
-    background-image: url('./imgs/Coin-1.png');
+    background-image: url('./imgs/items/magnet/magnet.png');
   }
   100% {
-    background-image: url('./imgs/Coin-1.png');
+    background-image: url('./imgs/items/magnet/magnet.png');
   }
 }
 
@@ -2238,6 +2244,22 @@ br {
   margin-bottom: 40px;
 }
 
+.castle {
+  background-color: black;
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  --bottom: 19.5;
+  --left: 70;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  z-index: 2;
+  bottom: calc(var(--bottom) * 1%);
+  left: calc(var(--left) * 1%);
+}
+
 .controls-item-block-grid {
   gap: 20px;
   display: grid;
@@ -2562,8 +2584,61 @@ br {
   }
 }
 
+.end-score-text {
+  font-size: 28px;
+  margin-top: 80px;
+}
+
+.end-grade-text {
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+
+.end-game-gem-counter-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.gem-counter-flex-container {
+  gap: 16px;
+  width: 350px;
+}
+
+.end-counter-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #000;
+}
+
+.end-game-title-text {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.end-counter-star {
+  width: 24px;
+  margin-left: 16px;
+}
+
+.end-gem-img {
+  width: 30px;
+  margin-right: 12px;
+}
+
+.end-gem-text {
+  color: white;
+}
+
 [transition-style='in:circle:hesitate'] {
   animation: 3s cubic-bezier(0.25, 1, 0.3, 1) circle-in-hesitate both;
+}
+
+[transition-style='out:circle:center'] {
+  animation: 3s cubic-bezier(0.25, 1, 0.3, 1) circle-out-center both;
 }
 
 .dodge-text {
@@ -3077,6 +3152,42 @@ br {
   }
 }
 
+.magnet-particles {
+  z-index: 10000;
+  width: 85px;
+  height: 85px;
+  --bottom: 77.5;
+  --left: 25;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: magnetParticles 0.4s step-start;
+}
+
+@keyframes magnetParticles {
+  0% {
+    background-image: url('./imgs/magnet-particles/magnet-particles1.png');
+  }
+  20% {
+    background-image: url('./imgs/magnet-particles/magnet-particles2.png');
+  }
+  40% {
+    background-image: url('./imgs/magnet-particles/magnet-particles3.png');
+  }
+  60% {
+    background-image: url('./imgs/magnet-particles/magnet-particles4.png');
+  }
+  80% {
+    background-image: url('./imgs/magnet-particles/magnet-particles5.png');
+  }
+  100% {
+    background-image: url('./imgs/magnet-particles/magnet-particles6.png');
+  }
+}
+
 .silver-coin-particles {
   z-index: 10000;
   width: 85px;
@@ -3097,19 +3208,19 @@ br {
     background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles1.png');
   }
   20% {
-    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles2.png');
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles1.png');
   }
   40% {
-    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles3.png');
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles2.png');
   }
   60% {
-    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles4.png');
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles3.png');
   }
   80% {
-    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles5.png');
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles4.png');
   }
   100% {
-    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles1.png');
+    background-image: url('./imgs/pickup-particles/silver-coin-particles/silver-particles5.png');
   }
 }
 
@@ -3133,19 +3244,19 @@ br {
     background-image: url('./imgs/pickup-particles/gold-coin-particles/particles1.png');
   }
   20% {
-    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles2.png');
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles1.png');
   }
   40% {
-    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles3.png');
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles2.png');
   }
   60% {
-    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles4.png');
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles3.png');
   }
   80% {
-    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles5.png');
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles4.png');
   }
   100% {
-    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles1.png');
+    background-image: url('./imgs/pickup-particles/gold-coin-particles/particles5.png');
   }
 }
 

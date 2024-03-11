@@ -9,9 +9,8 @@ const {
   getMostRecentPhase,
   getIsBonusRunning,
   setIsBonusRunning,
+  getCurrentPhase,
 } = StateSingleton;
-
-let wholeBatchSpawned = false;
 
 function getRandomCoin() {
   // Calculate the total weight
@@ -36,32 +35,41 @@ function getRandomCoin() {
   return selectedCollectable;
 }
 
+const batchDelay = 1000; // Delay between each column creation
+
+let totalPhaseTime = Math.floor(1 + getMostRecentPhase() / 2) * batchDelay;
+let nextBatchTime = 100;
+let totalBatchTimeThusFar = 0;
+
+export function resetBonusPhase() {
+  nextBatchTime = 100;
+  totalBatchTimeThusFar = 0;
+  totalPhaseTime = Math.floor(1 + getMostRecentPhase() / 2) * batchDelay;
+}
+
 // Define a function to execute loops for a given phase
-function executePhase(phase) {
-  if (!wholeBatchSpawned) {
-    const batchDelay = 2750; // Delay between each column creation
-    const phaseDetails = coinBatcher[phase];
-    const batchLoops = Math.floor(getMostRecentPhase() / 2);
-    if (!phaseDetails) return; // Return if the phase details are not found
-    for (let i = 0; i < batchLoops + 2; i++) {
-      setTimeout(() => {
-        // Generate a random index to select a loop function
-        const randomIndex = Math.floor(
-          Math.random() * phaseDetails.loops.length
-        );
-        const selectedLoop = phaseDetails.loops[randomIndex];
-        selectedLoop.function(
-          Math.floor(Math.random() * 3) + 4,
-          getRandomCoin()
-        );
-      }, i * batchDelay);
-    }
-    wholeBatchSpawned = true;
+function executePhase(phase, delta, speedScale) {
+  const phaseDetails = coinBatcher[phase];
+  if (!phaseDetails) return; // Return if the phase details are not found
+  console.log(totalPhaseTime, totalBatchTimeThusFar, nextBatchTime);
+  if (nextBatchTime <= 0 && totalPhaseTime > totalBatchTimeThusFar) {
+    // Generate a random index to select a loop function
+    const randomIndex = Math.floor(Math.random() * phaseDetails.loops.length);
+    const selectedLoop = phaseDetails.loops[randomIndex];
+    selectedLoop.function(Math.floor(Math.random() * 3) + 4, getRandomCoin());
+
+    nextBatchTime = batchDelay / speedScale;
+    totalBatchTimeThusFar += batchDelay;
   }
-  console.log(bonusCollectableOptions);
-  // Increase the current phase by 1
-  setCurrentPhase(getMostRecentPhase() + 1);
-  setIsBonusRunning(false);
+
+  if (totalBatchTimeThusFar >= totalPhaseTime) {
+    // Increase the current phase by 1
+    setCurrentPhase(getMostRecentPhase() + 1);
+    setIsBonusRunning(false);
+    resetBonusPhase();
+  }
+
+  nextBatchTime -= delta;
 }
 
 export function setRandomBonusKey(generatedBonusPhases) {
@@ -70,10 +78,10 @@ export function setRandomBonusKey(generatedBonusPhases) {
   setCurrentBonusPhase(keys[randomIndex]);
 }
 
-export function updateBonusPhase() {
+export function updateBonusPhase(delta, speedScale) {
   updateState(generatedBonusPhases[getCurrentBonusPhase()]);
   if (getIsBonusRunning()) {
-    executePhase(getCurrentBonusPhase()); // Execute loops for the current phase
+    executePhase(getCurrentBonusPhase(), delta, speedScale); // Execute loops for the current phase
   }
   // setCurrentPhase(getCurrentPhase() + 1);
   console.log(`Bonus-Phase ${getCurrentBonusPhase()} running`);

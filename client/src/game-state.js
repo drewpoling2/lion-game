@@ -17,6 +17,8 @@ const StateSingleton = (function () {
     lastPhase: 0,
     gravityFallAdjustment: 0.021,
     selectedStarter: null,
+    isWon: false,
+    grade: 10,
 
     //elements
     isCoinsRunning: true,
@@ -26,6 +28,7 @@ const StateSingleton = (function () {
     isGroundEnemyRunning: false,
     isCrateRunning: false,
     isBonusRunning: false,
+    isCastleRunning: false,
 
     //world
     isGroundRunning: true,
@@ -34,6 +37,7 @@ const StateSingleton = (function () {
     groundSpeed: 0.04,
     groundEnemySpeedFactor: 0.05,
     isFlagCreated: true,
+    isCastleCreated: false,
     platformSpeed: 0.035,
 
     //items
@@ -62,6 +66,12 @@ const StateSingleton = (function () {
   };
 
   return {
+    getGrade: function () {
+      return state.grade;
+    },
+    setGrade: function (newGrade) {
+      state.grade = newGrade;
+    },
     getCoinPickupRadius: function () {
       return state.coinPickupRadius;
     },
@@ -134,6 +144,12 @@ const StateSingleton = (function () {
     setIsMagnetColliding: function (newIsMagnetColliding) {
       state.isMagnetColliding = newIsMagnetColliding;
     },
+    getIsCastleRunning: function () {
+      return state.isCastleRunning;
+    },
+    setIsCastleRunning: function (newIsCastleRunning) {
+      state.isCastleRunning = newIsCastleRunning;
+    },
     getIsCrateRunning: function () {
       return state.isCrateRunning;
     },
@@ -175,6 +191,18 @@ const StateSingleton = (function () {
     },
     setIsFlagCreated: function (newIsFlagCreated) {
       state.isFlagCreated = newIsFlagCreated;
+    },
+    getIsCastleCreated: function () {
+      return state.isCastleCreated;
+    },
+    setIsCastleCreated: function (newIsCastleCreated) {
+      state.isCastleCreated = newIsCastleCreated;
+    },
+    getIsWon: function () {
+      return state.isWon;
+    },
+    setIsWon: function (newIsWon) {
+      state.isWon = newIsWon;
     },
     getGroundSpeed: function () {
       return state.groundSpeed;

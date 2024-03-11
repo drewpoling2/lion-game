@@ -91,7 +91,7 @@ import {
   startScreenElem,
   endScreenElem,
   gameOverTextElem,
-  gameOverIconElem,
+  // gameOverIconElem,
   leaderboardElem,
   scoreMultiplierElem,
   scoreNewHighScoreElem,
@@ -120,6 +120,12 @@ import {
   snackBarTextElem,
   snackBarElem,
   snackBarIconElem,
+  endBlueGemTextElem,
+  endGreenGemTextElem,
+  endRedGemTextElem,
+  endGradeElem,
+  endScoreElem,
+  endBonusTextElem,
 } from './elements-refs';
 import { toggleElemOff, toggleElemOn } from './utility/toggle-element.js';
 import { snow } from './elements/particle-systems.js';
@@ -127,7 +133,6 @@ import { phases } from './phases/phase-properties.js';
 import { updatePhase1 } from './phases/phase1.js';
 import { updatePhase2 } from './phases/phase2.js';
 import { updateBonusPhase, setRandomBonusKey } from './phases/bonus-phase.js';
-import { setupBonusLayer, updateBonusLayer } from './elements/bonus-layer.js';
 import { updateInterfaceText } from './utility/update-interface-text.js';
 import InterfaceTextElemsSingleton from './interface-text-elems-state.js';
 import { setupCrate, updateCrate } from './elements/crate.js';
@@ -137,11 +142,13 @@ import ItemDropStateSingleton from './item-drop-state.js';
 import { normalizeWeights, getRandomWeighted } from './elements/platform.js';
 import { getCustomProperty } from './utility/updateCustomProperty.js';
 import { notifySnackBar } from './elements/snackbar.js';
-import e from 'cors';
 import {
   bonusCollectableOptions,
   generatedBonusPhases,
 } from './phases/bonus-phase-properties.js';
+import { createMagnetParticles } from './elements/magnet-particles.js';
+import { updateCastle, setupCastle } from './elements/castle.js';
+import { setUpGrade } from './elements/grade.js';
 
 const { removeInterfaceTextElem, addInterfaceTextElem } =
   InterfaceTextElemsSingleton;
@@ -180,6 +187,11 @@ const {
   setCoinPickupRadius,
   getIsBonusRunning,
   setIsBonusRunning,
+  getIsCastleRunning,
+  setIsCastleRunning,
+  getIsWon,
+  setIsWon,
+  getGrade,
 } = StateSingleton;
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 45;
@@ -202,7 +214,7 @@ let lastTime;
 let score;
 let idleIntervalId;
 let collisionOccurred = false; // Flag to track collision
-let milestone = 105;
+let milestone = 10005;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
@@ -312,37 +324,6 @@ let currentSpeedScale = getSpeedScale();
 let isUpdatedSpeedScale = false;
 let decelerationFactor = 0.95; // Adjust the deceleration factor as needed
 
-function deleteLetters(index, elem, timeout) {
-  const text = elem.textContent;
-  if (index >= 0) {
-    elem.textContent = text.substring(0, index);
-    setTimeout(() => {
-      deleteLetters(index - 1, elem, timeout);
-    }, timeout); // Use the provided timeout
-  } else {
-  }
-}
-
-export function updateNotification(
-  notification,
-  deleteLettersDelay = 3000,
-  typeLettersDelay = 1000
-) {
-  const timeout = 125;
-  setTimeout(() => {
-    typeLettersWithoutSpaces(0, notification, gameNotificationElem, 100);
-    // After a delay, start deleting the letters in reverse order
-
-    setTimeout(() => {
-      deleteLetters(
-        gameNotificationElem.textContent.length - 1,
-        gameNotificationElem,
-        timeout
-      );
-    }, deleteLettersDelay);
-  }, typeLettersDelay);
-}
-
 function checkCollisions() {
   if (checkLose()) return handleLose();
   checkMultiplierCollision();
@@ -382,7 +363,7 @@ function update(time) {
     return;
   }
 
-  let baseDelta = 14;
+  let baseDelta = 4;
   // let delta = time - lastTime;
   let delta = baseDelta;
   if (collisionOccurred && !getPlayerImmunity()) {
@@ -395,7 +376,7 @@ function update(time) {
     return; // Pause the update during the delay
   }
   if (getCurrentPhase() === 'bonus') {
-    updateBonusPhase();
+    updateBonusPhase(delta, currentSpeedScale);
   } else {
     updateGeneratedPhase(getCurrentPhase());
   }
@@ -403,19 +384,19 @@ function update(time) {
   //   updateFunction(timer, delta, currentSpeedScale);
   // }
   updateGroundLayerTwoTwo(delta, currentSpeedScale);
-  // updateBonusLayer(delta, currentSpeedScale);
   updateGround(delta, currentSpeedScale);
   updateGroundLayerThree(delta, currentSpeedScale);
   updateGroundLayerTwo(delta, currentSpeedScale);
-  // updateCactus(delta, currentSpeedScale);
+  updateCactus(delta, currentSpeedScale);
   // updateBird(delta, currentSpeedScale);
   updateGroundEnemy(delta, currentSpeedScale);
-  updatePlatform(delta, currentSpeedScale);
-  // updateFlag(delta, currentSpeedScale);
+  // updatePlatform(delta, currentSpeedScale);
   updateInterfaceText(delta, currentSpeedScale);
-  // updateMultiplier(delta, currentSpeedScale);
   // updateMagnet(delta, currentSpeedScale);
   updateCoin(delta, currentSpeedScale);
+  if (getIsCastleRunning()) {
+    updateCastle(delta, currentSpeedScale);
+  }
   // updateCrate(delta, currentSpeedScale);
   updateNotificationItem(delta, currentSpeedScale);
   updateDino(
@@ -682,6 +663,7 @@ function checkMagnetCollision() {
   const dinoRect = getDinoRect();
   getMagnetRects().some((element) => {
     if (isCollision(element.rect, dinoRect)) {
+      createMagnetParticles(dinoElem);
       let numberOfCoins;
       numberOfCoins = Math.floor(Math.random() * 5) + 3;
 
@@ -787,6 +769,54 @@ export function updateScoreWithPoints(delta) {
     if (score >= initialScore + delta) {
       // Stop the interval when the target score is reached
       clearInterval(intervalId);
+    }
+  }, updateInterval);
+}
+
+const endPointsDuration = 5000;
+const endPointsUpdateInterval = 40;
+
+export function updateEndScoreWithPoints(delta) {
+  const initialScore = score;
+  const increments = Math.ceil(endPointsDuration / endPointsUpdateInterval);
+  const incrementAmount = delta / increments;
+  const intervalId = setInterval(() => {
+    score += incrementAmount;
+    scoreSinceMilestone += incrementAmount;
+    endScoreElem.textContent = Math.floor(score).toString().padStart(7, 0);
+
+    if (score >= initialScore + delta) {
+      // Stop the interval when the target score is reached
+      clearInterval(intervalId);
+    }
+  }, endPointsUpdateInterval);
+}
+
+export function updateEndGemScoreDown(
+  incrementDuration,
+  scoreElem,
+  initialTextContent,
+  initialScore
+) {
+  const targetScore = 0;
+  const increments = Math.ceil(incrementDuration / updateInterval);
+  const incrementAmount = (initialScore - targetScore) / increments;
+  let currentScore = initialScore;
+
+  const intervalId = setInterval(() => {
+    currentScore -= incrementAmount;
+
+    // Update the snackbar text
+    if (currentScore <= targetScore) {
+      // Stop the interval when the target score is reached
+      clearInterval(intervalId);
+      scoreElem.textContent = `${initialTextContent + '0'}`;
+    } else {
+      // Update the snackbar text with the current score
+      scoreElem.textContent = `${
+        initialTextContent +
+        Math.floor(currentScore).toString().padStart(1, '0')
+      }`;
     }
   }, updateInterval);
 }
@@ -943,6 +973,10 @@ function updateSpeedScale(delta) {
   currentSpeedScale += delta * getSpeedScaleIncrease();
 }
 
+function slowToWinSpeedScale() {
+  currentSpeedScale -= 14 * getSpeedScaleIncrease() * 200;
+}
+
 // Assuming you have the necessary elements in your HTML
 const levelBarElem = document.getElementById('levelBar');
 const levelDisplayElem = document.getElementById('levelDisplay');
@@ -1052,13 +1086,13 @@ function setUpElements() {
   setupPowerUps();
   setupPlatform();
   setupCrate();
+  setupCastle();
 }
 
 function setupGroundElements() {
   setupGround();
   setupGroundLayerTwo();
   setupGroundLayerThree();
-  setupBonusLayer();
 }
 
 function setupObstacles() {
@@ -1078,7 +1112,6 @@ function setupPowerUps() {
 }
 
 function handleStart() {
-  updateNotification(`stage ${getCurrentPhase()}!`);
   clearInterval(idleIntervalId); // Clear the interval
   worldElem.setAttribute('transition-style', 'in:circle:center');
   lastTime = null;
@@ -1093,7 +1126,7 @@ function handleStart() {
   livesElem.textContent = 10;
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
-  gameOverIconElem.classList.add('hide-element');
+  // gameOverIconElem.classList.add('hide-element');
 
   window.requestAnimationFrame(update);
 }
@@ -1101,7 +1134,22 @@ function handleStart() {
 let timer = 0;
 let intervalId;
 
+let totalGameMinLimit = 0.1;
+let totalGameSecondsLimit = totalGameMinLimit * 60;
+
+function checkIfWon() {
+  if (timer >= totalGameSecondsLimit) {
+    if (!getIsCastleRunning()) {
+      setIsCastleRunning(true);
+    }
+    if (currentSpeedScale > 0.75) {
+      slowToWinSpeedScale();
+    }
+  }
+}
+
 function updateTimer() {
+  checkIfWon();
   timer++;
   currentGameTimerElem.textContent = formatTime(timer);
 }
@@ -1137,7 +1185,7 @@ export function togglePause() {
 }
 
 function revealAchievementForm(index, score) {
-  gameOverIconElem.classList.add('hide-element');
+  // gameOverIconElem.classList.add('hide-element');
   const rank = index + 2;
   scoreNewHighScoreElem.textContent = Math.round(score);
   const achievementRankElem = document.getElementById('achievement-rank-text');
@@ -1347,6 +1395,111 @@ function stopLoading() {
   loading = false;
 }
 
+let endGamePointsToIncrement = 0;
+
+let initialGreenGemTextContent;
+let initialGreenGemScoreTextContent;
+
+let initialRedGemTextContent;
+let initialRedGemScoreTextContent;
+
+let initialBlueGemTextContent;
+let initialBlueGemScoreTextContent;
+
+function countGems() {
+  const powerUpDivs = document.querySelectorAll('.power-up');
+  const powerUpPoints = [];
+  const grade = getGrade();
+
+  powerUpDivs.forEach((powerUpDiv) => {
+    const powerUpRankDiv = powerUpDiv.querySelector('.power-up-rank');
+    if (powerUpRankDiv) {
+      const rankTextContent = powerUpRankDiv.textContent.trim();
+      const img = powerUpDiv.querySelector('img');
+      const imgAlt = img ? img.getAttribute('alt') : 'No alt text found';
+      powerUpPoints.push({ rank: rankTextContent, type: imgAlt });
+    }
+  });
+
+  const multipliedPowerUpPoints = powerUpPoints.map(({ rank, type }) => {
+    const collectableOption = collectableOptions.find(
+      (option) => option.type === type
+    );
+    if (!collectableOption) {
+      console.error(
+        `No collectable option found for power-up with alt text: ${type}`
+      );
+      return { type, totalPoints: 0 };
+    }
+    const totalPoints = collectableOption.points * parseFloat(rank) * grade;
+    return { type, totalPoints };
+  });
+
+  const displayGemPoints = (gemType) => {
+    const gemPoints = multipliedPowerUpPoints.find(
+      (item) => item.type === gemType
+    );
+    const gemRank = powerUpPoints.find((item) => item.type === gemType);
+    const gemBasePoints = collectableOptions.find(
+      (option) => option.type === gemType
+    );
+    if (gemPoints && gemPoints.totalPoints) {
+      if (!isNaN(gemPoints.totalPoints)) {
+        endGamePointsToIncrement += gemPoints.totalPoints;
+      }
+    }
+    if (gemPoints && gemType === 'green-gem') {
+      initialGreenGemTextContent = `${gemRank.rank} x ${gemBasePoints.points} x ${grade} = `;
+      initialGreenGemScoreTextContent = gemPoints.totalPoints;
+    }
+    if (gemPoints && gemType === 'red-gem') {
+      initialRedGemTextContent = `${gemRank.rank} x ${gemBasePoints.points} x ${grade} = `;
+      initialRedGemScoreTextContent = gemPoints.totalPoints;
+    }
+    if (gemPoints && gemType === 'blue-gem') {
+      initialBlueGemTextContent = `${gemRank.rank} x ${gemBasePoints.points} x ${grade} = `;
+      initialBlueGemScoreTextContent = gemPoints.totalPoints;
+    }
+    return gemPoints
+      ? `${gemRank.rank} x ${gemBasePoints.points} x ${grade} = ${gemPoints.totalPoints}`
+      : `0 x ${gemBasePoints.points} x ${grade} = 0`;
+  };
+
+  endGreenGemTextElem.textContent = displayGemPoints('green-gem');
+  endRedGemTextElem.textContent = displayGemPoints('red-gem');
+  endBlueGemTextElem.textContent = displayGemPoints('blue-gem');
+  endScoreElem.textContent = Math.floor(score).toString().padStart(7, 0);
+  endGradeElem.textContent = grade;
+}
+
+function handleUpdateEndGameScore() {
+  updateEndScoreWithPoints(endGamePointsToIncrement);
+  if (initialGreenGemTextContent && initialGreenGemScoreTextContent) {
+    updateEndGemScoreDown(
+      endPointsDuration,
+      endGreenGemTextElem,
+      initialGreenGemTextContent,
+      initialGreenGemScoreTextContent
+    );
+  }
+  if (initialRedGemTextContent && initialRedGemScoreTextContent) {
+    updateEndGemScoreDown(
+      endPointsDuration,
+      endRedGemTextElem,
+      initialRedGemTextContent,
+      initialRedGemScoreTextContent
+    );
+  }
+  if (initialBlueGemTextContent && initialBlueGemScoreTextContent) {
+    updateEndGemScoreDown(
+      endPointsDuration,
+      endBlueGemTextElem,
+      initialBlueGemTextContent,
+      initialBlueGemScoreTextContent
+    );
+  }
+}
+
 function handleToggleLeaderboard() {
   const leaderboardContent = document.getElementById('leaderboard-content');
   if (showLeaderboard !== null && showLeaderboard === false) {
@@ -1388,6 +1541,51 @@ function runTypeLetters() {
   typeLettersAny(0, '...', loadingTextElem, 120);
   const rerunDelay = 2700;
   setTimeout(runTypeLetters, rerunDelay);
+}
+
+export function handleWin() {
+  if (!getIsWon()) {
+    setIsWon(true);
+    countGems();
+    worldElem.setAttribute('transition-style', 'out:circle:center');
+    const gemContainer = document.querySelector('.gem-counter-flex-container');
+    const endScoreContainer = document.querySelector('.end-score-text');
+    // setTimeout(() => {
+    //   // document.addEventListener('keydown', handleStart, { once: true });
+    //   // document.addEventListener('touchstart', handleStart, {
+    //   //   once: true,
+    //   // });
+    //   endScreenElem.classList.remove('hide');
+
+    // }, 2000);
+
+    const incrementDelay = 2000;
+
+    setTimeout(() => {
+      setUpGrade();
+    }, 600); // Show the second element after 2000 ms
+
+    setTimeout(() => {
+      endBonusTextElem.classList.remove('hide-end-game-text');
+      endBonusTextElem.classList.add('show-end-game-text');
+    }, incrementDelay * 2.5); // Show the second element after 2000 ms
+
+    setTimeout(() => {
+      gemContainer.classList.remove('hide-end-game-text');
+      gemContainer.classList.add('show-end-game-text');
+    }, incrementDelay * 3.5); // Show the third element after 4000 ms
+
+    setTimeout(() => {
+      endScoreContainer.classList.remove('hide-end-game-text');
+      endScoreContainer.classList.add('show-end-game-text');
+    }, incrementDelay * 4.5); // Show the fourth element after 6000 ms
+
+    setTimeout(() => {
+      handleUpdateEndGameScore();
+    }, incrementDelay * 5.5);
+
+    return;
+  }
 }
 
 function handleLose() {
@@ -1440,8 +1638,20 @@ function typeLetters(index) {
     gameOverTextElem.textContent += textToType.charAt(index);
     setTimeout(() => typeLetters(index + 1), 200); // Adjust the delay as needed
   } else {
-    gameOverIconElem.classList.remove('hide-element');
-    gameOverIconElem.classList.add('show-element');
+    // gameOverIconElem.classList.remove('hide-element');
+    // gameOverIconElem.classList.add('show-element');
+  }
+}
+
+const winToType = 'You Win';
+
+function typeWinLetters(index) {
+  if (index < winToType.length) {
+    gameOverTextElem.textContent += winToType.charAt(index);
+    setTimeout(() => typeWinLetters(index + 1), 200); // Adjust the delay as needed
+  } else {
+    // gameOverIconElem.classList.remove('hide-element');
+    // gameOverIconElem.classList.add('show-element');
   }
 }
 
@@ -1475,8 +1685,8 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 }
 
 export let collectableOptions = [
-  { type: 'gold-coin', weight: 20, points: 31 },
-  { type: 'silver-coin', weight: 60, points: 16 },
+  // { type: 'gold-coin', weight: 20, points: 31 },
+  // { type: 'silver-coin', weight: 60, points: 16 },
   { type: 'green-gem', weight: 1, points: 250 },
   { type: 'red-gem', weight: 0.75, points: 500 },
   { type: 'blue-gem', weight: 0.5, points: 1000 },

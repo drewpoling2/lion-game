@@ -315,7 +315,6 @@ export function updateFlag(delta, speedScale) {
       bonusElem.setAttribute('transition-style', 'out:circle:bottom-left');
       scoreElem.classList.add('white-out-text');
       currentGameTimerElem.classList.add('white-out-text');
-      // updateNotification(`${getCurrentPhase()}!`, 2000, 0);
       hasAlreadyPassedFlag = true;
 
       // Example usage:

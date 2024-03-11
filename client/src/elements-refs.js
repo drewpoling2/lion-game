@@ -5,7 +5,7 @@ const highScoreElem = document.querySelector('[data-high-score]');
 const startScreenElem = document.querySelector('[data-start-screen]');
 const endScreenElem = document.querySelector('[data-game-over-screen]');
 const gameOverTextElem = document.querySelector('[data-game-over-text]');
-const gameOverIconElem = document.getElementById('game-over-icon');
+// const gameOverIconElem = document.getElementById('game-over-icon');
 const leaderboardElem = document.querySelector('[data-leaderboard-body]');
 const scoreMultiplierElem = document.querySelector('[data-score-multiplier]');
 const scoreNewHighScoreElem = document.querySelector(
@@ -14,6 +14,10 @@ const scoreNewHighScoreElem = document.querySelector(
 const scoreErrorMessageElem = document.querySelector(
   '[data-score-error-message]'
 );
+const endGreenGemTextElem = document.querySelector('[data-end-green-gem-text]');
+const endRedGemTextElem = document.querySelector('[data-end-red-gem-text]');
+const endBlueGemTextElem = document.querySelector('[data-end-blue-gem-text]');
+const endGradeElem = document.querySelector('[data-end-grade]');
 const multiplierTimerElem = document.querySelector('[data-multiplier-timer]');
 const tickerElem = document.querySelector('[data-ticker]');
 const tickerElem2 = document.querySelector('[data-ticker2]');
@@ -40,6 +44,7 @@ const interfaceComboContainer = document.getElementById(
 const currentMultiplierScoreElem = document.querySelector(
   '[data-current-multiplier-score]'
 );
+const endScoreElem = document.querySelector('[data-end-score]');
 const currentComboScoreContainer = document.getElementById(
   'current-combo-score-container'
 );
@@ -58,8 +63,10 @@ const gameNotificationElem = document.querySelector(
   '[data-notification-screen]'
 );
 const pausedScreenElem = document.querySelector('[data-paused-screen]');
+const endBonusTextElem = document.querySelector('[data-end-bonus-text]');
 const speedElem = document.querySelector('[data-speed]');
 export {
+  endBonusTextElem,
   dinoTopElem,
   speedElem,
   bonusElem,
@@ -75,7 +82,8 @@ export {
   startScreenElem,
   endScreenElem,
   gameOverTextElem,
-  gameOverIconElem,
+  endScoreElem,
+  // gameOverIconElem,
   leaderboardElem,
   scoreMultiplierElem,
   scoreNewHighScoreElem,
@@ -98,4 +106,8 @@ export {
   snackBarElem,
   snackBarIconElem,
   snackBarTextElem,
+  endGreenGemTextElem,
+  endBlueGemTextElem,
+  endRedGemTextElem,
+  endGradeElem,
 };

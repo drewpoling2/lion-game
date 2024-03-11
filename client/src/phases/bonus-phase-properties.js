@@ -15,14 +15,14 @@ export const generatedBonusPhases = {
   },
   2: {
     isCoinsRunning: false,
-    isPlatformRunning: true,
+    isPlatformRunning: false,
     isCactusRunning: false,
     isBirdRunning: true,
     isGroundEnemyRunning: false,
     isCrateRunning: false,
   },
   3: {
-    isCoinsRunning: true,
+    isCoinsRunning: false,
     isPlatformRunning: false,
     isCactusRunning: false,
     isBirdRunning: false,
@@ -42,26 +42,38 @@ export const generatedBonusPhases = {
 export const coinBatcher = {
   1: {
     loops: [
-      { function: createColumnOfCoins },
       { function: createArrowOfCoins },
+      { function: createDiagonalOfCoins },
+
+      // { function: createColumnOfCoins },
+      // { function: createArrowOfCoins },
     ],
   },
   2: {
     loops: [
-      { function: createDiagonalOfCoins },
-      { function: createColumnOfCoins },
+      { function: createArrowOfCoins },
+
+      // { function: createDiagonalOfCoins },
+      // { function: createColumnOfCoins },
     ],
   },
   3: {
     loops: [
-      { function: createColumnOfCoins },
+      // { function: createArrowOfCoins },
+
       { function: createDiagonalOfCoins },
+
+      // { function: createColumnOfCoins },
+      // { function: createDiagonalOfCoins },
     ],
   },
   4: {
     loops: [
-      { function: createArrowOfCoins },
-      { function: createDiagonalOfCoins },
+      { function: createColumnOfCoins },
+      // { function: createDiagonalOfCoins },
+
+      // { function: createArrowOfCoins },
+      // { function: createDiagonalOfCoins },
     ],
   },
 };

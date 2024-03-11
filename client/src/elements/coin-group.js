@@ -3,23 +3,25 @@ import { setCustomProperty } from '../utility/updateCustomProperty';
 import { randomNumberBetween } from './coin';
 
 export function createColumnOfCoins(row, collectable) {
-  let delay = 0; // Initial delay
   const numColumns = Math.floor(Math.random() * 4) + 3; // Number of columns to create
-  const columnDelay = 300; // Delay between each column creation
 
   for (let j = 0; j < numColumns; j++) {
-    setTimeout(() => {
-      for (let i = 0; i < row; i++) {
-        // Create a coin element for each row
-        const coinElement = document.createElement('div');
+    for (let i = 0; i < row; i++) {
+      // Create a coin element for each row
+      const coinElement = document.createElement('div');
 
-        coinElement.dataset.coin = true;
+      coinElement.dataset.coin = true;
+      if (collectable.type && collectable) {
         coinElement.dataset.type = collectable.type;
-        coinElement.dataset.locked = 'false';
-        coinElement.dataset.isLocking = 'false';
-        coinElement.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
-        coinElement.dataset.isLockingDuration = randomNumberBetween(100, 300);
-        coinElement.dataset.points = collectable.points;
+      } else {
+        coinElement.dataset.type = '';
+      }
+      coinElement.dataset.locked = 'false';
+      coinElement.dataset.isLocking = 'false';
+      coinElement.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
+      coinElement.dataset.isLockingDuration = randomNumberBetween(100, 300);
+      coinElement.dataset.points = collectable.points;
+      if (collectable && collectable.type) {
         if (
           collectable.type === 'red-gem' ||
           collectable.type === 'blue-gem' ||
@@ -27,53 +29,51 @@ export function createColumnOfCoins(row, collectable) {
         ) {
           coinElement.dataset.gem = true;
         }
-
-        coinElement.classList.add(
-          collectable.type,
-          'collectable',
-          'move-bottom',
-          'column'
-        );
-        coinElement.id = Math.random().toString(16).slice(2);
-
-        const elementIndex = i === 0 ? i + 1 : (i + 1) / 2;
-        const indexBottomFactor = elementIndex * 15;
-        // Calculate the bottom position for the current row
-        const bottomPosition = 10 + indexBottomFactor; // Adjust the increment as needed
-
-        // Set the initial position of the coin
-        coinElement.style.position = 'absolute';
-        setCustomProperty(coinElement, '--left', 100);
-        setCustomProperty(coinElement, '--bottom', bottomPosition); // Set bottom position
-
-        // Append the coin element to the world container
-        worldElem.appendChild(coinElement);
       }
-    }, delay);
-    delay += columnDelay; // Increment the delay for the next column
+
+      coinElement.classList.add(
+        collectable && collectable.type ? collectable.type : '',
+        'collectable',
+        'move-bottom',
+        'column'
+      );
+      coinElement.id = Math.random().toString(16).slice(2);
+
+      const leftPosition = j * 5;
+      // Calculate the bottom position for the current row
+      const bottomPosition = 25 + i * 7; // Adjust the increment as needed
+
+      // Set the initial position of the coin
+      coinElement.style.position = 'absolute';
+      setCustomProperty(coinElement, '--left', 100 + leftPosition);
+      setCustomProperty(coinElement, '--bottom', bottomPosition); // Set bottom position
+
+      // Append the coin element to the world container
+      worldElem.appendChild(coinElement);
+    }
   }
 }
 
 export function createArrowOfCoins(column, collectable) {
-  console.log('hit2', column);
   const numColumns = column; // Number of columns in the triangle
-  let columnDelay = 0; // Initial delay for the first column
-  const coinDelay = 300; // Delay between each coin creation
 
-  for (let i = 0; i < numColumns; i++) {
-    const numCoinsInColumn = numColumns - i; // Number of coins in the current column
-    let rowDelay = 0; // Initial delay for the first coin in the column
-    for (let j = 0; j < numCoinsInColumn; j++) {
-      setTimeout(() => {
-        const coinElement = document.createElement('div');
+  for (let j = 0; j < numColumns; j++) {
+    const numCoinsInColumn = numColumns - j; // Number of coins in the current column
+    for (let i = 0; i < numCoinsInColumn; i++) {
+      const coinElement = document.createElement('div');
 
-        coinElement.dataset.coin = true;
+      coinElement.dataset.coin = true;
+      if (collectable.type && collectable) {
         coinElement.dataset.type = collectable.type;
-        coinElement.dataset.locked = 'false';
-        coinElement.dataset.isLocking = 'false';
-        coinElement.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
-        coinElement.dataset.isLockingDuration = randomNumberBetween(100, 300);
-        coinElement.dataset.points = collectable.points;
+      } else {
+        coinElement.dataset.type = '';
+      }
+      coinElement.dataset.locked = 'false';
+      coinElement.dataset.isLocking = 'false';
+      coinElement.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
+      coinElement.dataset.isLockingDuration = randomNumberBetween(100, 300);
+      coinElement.dataset.points = collectable.points;
+      if (collectable && collectable.type) {
         if (
           collectable.type === 'red-gem' ||
           collectable.type === 'blue-gem' ||
@@ -81,55 +81,50 @@ export function createArrowOfCoins(column, collectable) {
         ) {
           coinElement.dataset.gem = true;
         }
+      }
 
-        coinElement.classList.add(
-          collectable.type,
-          'collectable',
-          'move-bottom',
-          'arrow'
-        );
-        coinElement.id = Math.random().toString(16).slice(2);
+      coinElement.classList.add(
+        collectable && collectable.type ? collectable.type : '',
+        'collectable',
+        'move-bottom',
+        'arrow'
+      );
+      coinElement.id = Math.random().toString(16).slice(2);
 
-        const elementIndex = j === 0 ? j + 1 : (j + 1) / 2;
-        const indexBottomFactor = elementIndex * 15;
-        // Calculate the bottom position for the current row
-        const bottomPosition = 10 + indexBottomFactor; // Adjust the increment as needed
+      const leftPosition = j * 5;
+      // Calculate the bottom position for the current row
+      const bottomPosition = 25 + i * 7; // Adjust the increment as needed
 
-        // Set the initial position of the coin
-        coinElement.style.position = 'absolute';
-        setCustomProperty(coinElement, '--left', 100);
-        setCustomProperty(coinElement, '--bottom', bottomPosition); // Set bottom position
+      // Set the initial position of the coin
+      coinElement.style.position = 'absolute';
+      setCustomProperty(coinElement, '--left', 100 + leftPosition);
+      setCustomProperty(coinElement, '--bottom', bottomPosition); // Set bottom position
 
-        // Append the coin element to the world container
-        worldElem.appendChild(coinElement);
-      }, columnDelay + rowDelay);
-
-      rowDelay += coinDelay; // Increment the delay for the next row within the column
+      // Append the coin element to the world container
+      worldElem.appendChild(coinElement);
     }
-
-    columnDelay += coinDelay; // Increment the delay for the next column
   }
 }
 
 export function createDiagonalOfCoins(column, collectable) {
-  console.log('hit3', column);
   const numColumns = column; // Number of columns in the triangle
-  let columnDelay = 0; // Initial delay for the first column
-  const coinDelay = 300; // Delay between each coin creation
 
-  for (let i = 0; i < numColumns; i++) {
-    let rowDelay = 0; // Initial delay for the first coin in the column
-    for (let j = 0; j < 1; j++) {
-      setTimeout(() => {
-        const coinElement = document.createElement('div');
+  for (let j = 0; j < numColumns; j++) {
+    for (let i = 0; i < 1; i++) {
+      const coinElement = document.createElement('div');
 
-        coinElement.dataset.coin = true;
+      coinElement.dataset.coin = true;
+      if (collectable.type && collectable) {
         coinElement.dataset.type = collectable.type;
-        coinElement.dataset.locked = 'false';
-        coinElement.dataset.isLocking = 'false';
-        coinElement.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
-        coinElement.dataset.isLockingDuration = randomNumberBetween(100, 300);
-        coinElement.dataset.points = collectable.points;
+      } else {
+        coinElement.dataset.type = '';
+      }
+      coinElement.dataset.locked = 'false';
+      coinElement.dataset.isLocking = 'false';
+      coinElement.dataset.isMagnetSpeedFactor = randomNumberBetween(1.3, 2.4);
+      coinElement.dataset.isLockingDuration = randomNumberBetween(100, 300);
+      coinElement.dataset.points = collectable.points;
+      if (collectable && collectable.type) {
         if (
           collectable.type === 'red-gem' ||
           collectable.type === 'blue-gem' ||
@@ -137,32 +132,27 @@ export function createDiagonalOfCoins(column, collectable) {
         ) {
           coinElement.dataset.gem = true;
         }
+      }
 
-        coinElement.classList.add(
-          collectable.type,
-          'collectable',
-          'move-bottom',
-          'arrow'
-        );
-        coinElement.id = Math.random().toString(16).slice(2);
+      coinElement.classList.add(
+        collectable && collectable.type ? collectable.type : '',
+        'collectable',
+        'move-bottom',
+        'arrow'
+      );
+      coinElement.id = Math.random().toString(16).slice(2);
 
-        const elementIndex = i === 0 ? i + 1 : i + 1;
-        const indexBottomFactor = elementIndex * 7;
-        // Calculate the bottom position for the current row
-        const bottomPosition = 10 + indexBottomFactor; // Adjust the increment as needed
+      const leftPosition = j * 5;
+      // Calculate the bottom position for the current row
+      const bottomPosition = 25 + j * 7; // Adjust the increment as needed
 
-        // Set the initial position of the coin
-        coinElement.style.position = 'absolute';
-        setCustomProperty(coinElement, '--left', 100);
-        setCustomProperty(coinElement, '--bottom', bottomPosition); // Set bottom position
+      // Set the initial position of the coin
+      coinElement.style.position = 'absolute';
+      setCustomProperty(coinElement, '--left', 100 + leftPosition);
+      setCustomProperty(coinElement, '--bottom', bottomPosition); // Set bottom position
 
-        // Append the coin element to the world container
-        worldElem.appendChild(coinElement);
-      }, columnDelay + rowDelay);
-
-      rowDelay += coinDelay; // Increment the delay for the next row within the column
+      // Append the coin element to the world container
+      worldElem.appendChild(coinElement);
     }
-
-    columnDelay += coinDelay; // Increment the delay for the next column
   }
 }

@@ -438,15 +438,55 @@
         </div>
       </div>
       <div data-game-over-screen class="game-over-screen hide"></div>
+      <div class="w-fit digit-container" id="digitContainer"></div>
+      <div class="end-counter-container sans">
+        <div class="hide-end-game-text" data-end-bonus-text>
+          <div class="flex-row justify-center items-center end-gem-text">
+            <div class="end-game-title-text">You made it!</div>
+          </div>
+          <div
+            class="flex-row justify-center items-center end-gem-text end-grade-text"
+          >
+            <div class="uppercase">BONUS:</div>
+            <img alt="..." class="end-counter-star" src="imgs/icons/Star.png" />
+            <div>&nbsp;x&nbsp;</div>
+            <div data-end-grade>10</div>
+          </div>
+        </div>
+        <div class="end-game-gem-counter-container">
+          <div
+            class="flex-col items-start gem-counter-flex-container hide-end-game-text"
+          >
+            <div class="flex-row justify-center items-center">
+              <img class="end-gem-img" src="imgs/green-gem/green-gem.png" />
+              <div class="end-gem-text" data-end-green-gem-text>test</div>
+            </div>
+            <div class="flex-row justify-center items-center">
+              <img class="end-gem-img" src="imgs/red-gem/red-gem.png" />
+              <div class="end-gem-text" data-end-red-gem-text>test</div>
+            </div>
+            <div class="flex-row justify-center items-center">
+              <img class="end-gem-img" src="imgs/blue-gem/blue-gem.png" />
+              <div class="end-gem-text" data-end-blue-gem-text>test</div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-row justify-center items-center end-gem-text">
+          <div class="end-score-text flex hide-end-game-text">
+            SCORE:&nbsp;
+            <div data-end-score></div>
+          </div>
+        </div>
+      </div>
       <div class="game-over-screen items-center">
-        <div class="game-over-text" data-game-over-text></div>
+        <div class="game-over-text sans" data-game-over-text></div>
         <div class="loading-text flex sans" data-loading-text></div>
-        <img
+        <!-- <img
           alt=""
           class="game-over-icon hide-element transition-medium"
           id="game-over-icon"
           src="imgs/icons//Redo.png"
-        />
+        /> -->
       </div>
       <!-- new high score form -->
       <div
@@ -755,7 +795,6 @@
         <div class="start-screen blink" data-start-screen>
           Press Any Key To Start
         </div>
-        <div class="w-fit digit-container" id="digitContainer"></div>
         <div class="pause-overlay" style="display: none" data-paused-screen>
           <div class="paused-screen">Game Paused</div>
         </div>
@@ -770,6 +809,7 @@
             ></div>
           </div>
         </div>
+
         <div class="flashing-screen" data-bonus>
           <img
             alt=""
@@ -794,18 +834,6 @@
             src="imgs/backgrounds/Foreground-Trees.png"
             class="foreground-trees"
             data-ground-layer-two
-          />
-          <img
-            alt=""
-            src="imgs/backgrounds/Bonus.png"
-            class="bonus-layer"
-            data-bonus-layer
-          />
-          <img
-            alt=""
-            src="imgs/backgrounds/Bonus.png"
-            class="bonus-layer"
-            data-bonus-layer
           />
         </div>
         <img alt="" src="imgs/ground.png" class="ground" data-ground />
