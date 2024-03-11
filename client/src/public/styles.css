@@ -1538,7 +1538,7 @@ br {
 
 .digit-container {
   position: absolute;
-  top: 25%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 100;
@@ -1564,7 +1564,7 @@ br {
 }
 
 .digit-star {
-  width: 20px;
+  width: 24px;
   animation: flashStar infinite step-start 0.5s, showDigit ease 4s;
 }
 

@@ -18,7 +18,7 @@ const StateSingleton = (function () {
     gravityFallAdjustment: 0.021,
     selectedStarter: null,
     isWon: false,
-    grade: 10,
+    grade: 5,
 
     //elements
     isCoinsRunning: true,
