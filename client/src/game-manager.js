@@ -149,7 +149,7 @@ import {
 import { createMagnetParticles } from './elements/magnet-particles.js';
 import { updateCastle, setupCastle } from './elements/castle.js';
 import { setUpGrade } from './elements/grade.js';
-
+import { levelPerMinGrade, incrementGrade } from './elements/grade.js';
 const { removeInterfaceTextElem, addInterfaceTextElem } =
   InterfaceTextElemsSingleton;
 const {
@@ -229,16 +229,16 @@ tickerContainerElem.classList.add('hide-element');
 tickerContainerElem.classList.remove('show-element');
 const pauseIconButton = document.getElementById('pause-icon-button');
 
-const shareContainer = document.getElementById('share-container');
-const shareButton = document.getElementById('shareButton');
+// const shareContainer = document.getElementById('share-container');
+// const shareButton = document.getElementById('shareButton');
 
-shareContainer.addEventListener('mouseenter', () => {
-  shareButton.classList.add('transparent-background');
-});
+// shareContainer.addEventListener('mouseenter', () => {
+//   shareButton.classList.add('transparent-background');
+// });
 
-shareContainer.addEventListener('mouseleave', () => {
-  shareButton.classList.remove('transparent-background');
-});
+// shareContainer.addEventListener('mouseleave', () => {
+//   shareButton.classList.remove('transparent-background');
+// });
 
 // function typeLoadingText(elem) {
 //   setTimeout(() => {
@@ -363,7 +363,7 @@ function update(time) {
     return;
   }
 
-  let baseDelta = 4;
+  let baseDelta = 14;
   // let delta = time - lastTime;
   let delta = baseDelta;
   if (collisionOccurred && !getPlayerImmunity()) {
@@ -389,15 +389,15 @@ function update(time) {
   updateGroundLayerTwo(delta, currentSpeedScale);
   updateCactus(delta, currentSpeedScale);
   // updateBird(delta, currentSpeedScale);
-  updateGroundEnemy(delta, currentSpeedScale);
-  // updatePlatform(delta, currentSpeedScale);
+  // updateGroundEnemy(delta, currentSpeedScale);
+  updatePlatform(delta, currentSpeedScale);
   updateInterfaceText(delta, currentSpeedScale);
   // updateMagnet(delta, currentSpeedScale);
   updateCoin(delta, currentSpeedScale);
   if (getIsCastleRunning()) {
     updateCastle(delta, currentSpeedScale);
   }
-  // updateCrate(delta, currentSpeedScale);
+  updateCrate(delta, currentSpeedScale);
   updateNotificationItem(delta, currentSpeedScale);
   updateDino(
     delta,
@@ -473,7 +473,6 @@ function startMultiplierTimer() {
   const timerInterval = setInterval(() => {
     setMultiplierTimer(getMultiplierTimer() - 100); // Subtract 100 milliseconds (adjust as needed)
     const progressValue = (getMultiplierTimer() / 5000) * 100; // Calculate progress value
-
     if (getMultiplierTimer() <= 0) {
       resetMultiplier();
     } else {
@@ -956,12 +955,32 @@ muteButton.addEventListener('click', function () {
   }
 });
 
-export function isCollision(rect1, rect2) {
+export function isCollision(rect1, rect2, threshold = 0.25) {
+  // Calculate the dimensions of the expanded or shrunken rectangles
+  const widthThreshold = rect1.width * threshold;
+  const heightThreshold = rect1.height * (threshold / 2);
+
+  // Shrink the rectangles
+  const shrunkenRect1 = {
+    left: rect1.left + widthThreshold,
+    top: rect1.top + heightThreshold,
+    right: rect1.right - widthThreshold,
+    bottom: rect1.bottom - heightThreshold,
+  };
+
+  const shrunkenRect2 = {
+    left: rect2.left + widthThreshold,
+    top: rect2.top + heightThreshold,
+    right: rect2.right - widthThreshold,
+    bottom: rect2.bottom - heightThreshold,
+  };
+
+  // Check for collision using the shrunken rectangles
   return (
-    rect1.left < rect2.right &&
-    rect1.top < rect2.bottom &&
-    rect1.right > rect2.left &&
-    rect1.bottom > rect2.top
+    shrunkenRect1.left < shrunkenRect2.right &&
+    shrunkenRect1.top < shrunkenRect2.bottom &&
+    shrunkenRect1.right > shrunkenRect2.left &&
+    shrunkenRect1.bottom > shrunkenRect2.top
   );
 }
 
@@ -1134,7 +1153,7 @@ function handleStart() {
 let timer = 0;
 let intervalId;
 
-let totalGameMinLimit = 0.1;
+let totalGameMinLimit = 10;
 let totalGameSecondsLimit = totalGameMinLimit * 60;
 
 function checkIfWon() {
@@ -1309,22 +1328,22 @@ async function handleSubmitNewScore() {
   }
 }
 
-document.addEventListener('click', function (event) {
-  const shareContainer = document.getElementById('share-container');
-  const shareButton = document.getElementById('shareButton');
+// document.addEventListener('click', function (event) {
+//   const shareContainer = document.getElementById('share-container');
+//   const shareButton = document.getElementById('shareButton');
 
-  if (
-    !shareContainer.contains(event.target) &&
-    !shareButton.contains(event.target)
-  ) {
-    shareContainer.classList.remove('show-share-container');
-  }
-});
+//   if (
+//     !shareContainer.contains(event.target) &&
+//     !shareButton.contains(event.target)
+//   ) {
+//     shareContainer.classList.remove('show-share-container');
+//   }
+// });
 
-function handleOpenShareContainer() {
-  const shareContainer = document.getElementById('share-container');
-  shareContainer.classList.add('show-share-container');
-}
+// function handleOpenShareContainer() {
+//   const shareContainer = document.getElementById('share-container');
+//   shareContainer.classList.add('show-share-container');
+// }
 
 if (document.getElementById('submit-button')) {
   document
@@ -1366,9 +1385,9 @@ document
   .getElementById('toggleLeaderboard')
   .addEventListener('click', handleToggleLeaderboard);
 
-document
-  .getElementById('shareButton')
-  .addEventListener('click', handleOpenShareContainer);
+// document
+//   .getElementById('shareButton')
+//   .addEventListener('click', handleOpenShareContainer);
 
 document
   .getElementById('show-wiki-page-button')
@@ -1546,6 +1565,7 @@ function runTypeLetters() {
 export function handleWin() {
   if (!getIsWon()) {
     setIsWon(true);
+    handleCheckGrade();
     countGems();
     worldElem.setAttribute('transition-style', 'out:circle:center');
     const gemContainer = document.querySelector('.gem-counter-flex-container');
@@ -1573,19 +1593,63 @@ export function handleWin() {
     setTimeout(() => {
       gemContainer.classList.remove('hide-end-game-text');
       gemContainer.classList.add('show-end-game-text');
-    }, incrementDelay * 3.5); // Show the third element after 4000 ms
+    }, incrementDelay * 3.2); // Show the third element after 4000 ms
 
     setTimeout(() => {
       endScoreContainer.classList.remove('hide-end-game-text');
       endScoreContainer.classList.add('show-end-game-text');
-    }, incrementDelay * 4.5); // Show the fourth element after 6000 ms
+    }, incrementDelay * 4); // Show the fourth element after 6000 ms
 
     setTimeout(() => {
       handleUpdateEndGameScore();
-    }, incrementDelay * 5.5);
+    }, incrementDelay * 4.8);
 
     return;
   }
+}
+
+function handleCheckGrade() {
+  const minutes = Math.floor(timer / 60);
+  const lvlPerMin =
+    minutes === 0 ? 0 : parseInt(levelDisplayElem.textContent, 10) / minutes;
+  console.log(minutes, lvlPerMin);
+  // Determine the appropriate threshold
+  let threshold;
+  if (lvlPerMin >= levelPerMinGrade[5].threshold) {
+    threshold = 5;
+  } else if (lvlPerMin >= levelPerMinGrade[4].threshold) {
+    threshold = 4;
+  } else if (lvlPerMin >= levelPerMinGrade[3].threshold) {
+    threshold = 3;
+  } else if (lvlPerMin >= levelPerMinGrade[2].threshold) {
+    threshold = 2;
+  } else if (lvlPerMin >= levelPerMinGrade[1].threshold) {
+    threshold = 1;
+  } else {
+    threshold = 0;
+  }
+
+  // Increment the grade based on the threshold
+  switch (threshold) {
+    case 5:
+      incrementGrade(5);
+      break;
+    case 4:
+      incrementGrade(4);
+      break;
+    case 3:
+      incrementGrade(3);
+      break;
+    case 2:
+      incrementGrade(2);
+      break;
+    case 1:
+      incrementGrade(1);
+      break;
+    default:
+      incrementGrade(0);
+  }
+  incrementGrade(minutes === 0 ? 1 : minutes);
 }
 
 function handleLose() {
@@ -1685,8 +1749,8 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 }
 
 export let collectableOptions = [
-  // { type: 'gold-coin', weight: 20, points: 31 },
-  // { type: 'silver-coin', weight: 60, points: 16 },
+  { type: 'gold-coin', weight: 20, points: 31 },
+  { type: 'silver-coin', weight: 60, points: 16 },
   { type: 'green-gem', weight: 1, points: 250 },
   { type: 'red-gem', weight: 0.75, points: 500 },
   { type: 'blue-gem', weight: 0.5, points: 1000 },

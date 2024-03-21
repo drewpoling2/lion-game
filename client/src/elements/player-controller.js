@@ -24,7 +24,7 @@ const dinoElem = document.querySelector('[data-dino]');
 const dinoImg = document.querySelector('.dino-img');
 const JUMP_SPEED = 0.245;
 const DOUBLE_JUMP_SPEED = 0.23; // Adjust this as needed
-const GRAVITY = 0.0009;
+const GRAVITY = 0.0008;
 const DINO_FRAME_COUNT = 4;
 const FRAME_TIME = 85;
 const BOTTOM_ANCHOR = 19.5;
@@ -109,6 +109,12 @@ function startJump(selectedStarter) {
   }
 }
 
+function startFall() {
+  if (!jumpAnimationInProgress) {
+    jumpAnimationInProgress = true;
+  }
+}
+
 function endJump() {
   isJumping = false;
   jumpAnimationInProgress = false;
@@ -179,8 +185,9 @@ function handleRun(delta, speedScale, selectedStarter) {
     }
   }
   if (dropOffPlatform === true) {
+    dinoImg.src = lionJumpImg2;
     const currentBottom = getCustomProperty(dinoElem, '--bottom');
-    yVelocity -= GRAVITY * delta - getGravityFallAdjustment() / 6; // Increase or decrease gravityAdjustment as needed
+    yVelocity -= GRAVITY * delta; // Increase or decrease gravityAdjustment as needed
     incrementCustomProperty(dinoElem, '--bottom', yVelocity * delta);
     if (currentBottom <= BOTTOM_ANCHOR) {
       setCustomProperty(dinoElem, '--bottom', BOTTOM_ANCHOR);

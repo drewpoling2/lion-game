@@ -5,10 +5,10 @@ const generatedPhases = {
     isCactusRunning: false,
     isBirdRunning: false,
     isGroundEnemyRunning: false,
-    isCrateRunning: false,
+    isCrateRunning: true,
   },
   2: {
-    isCactusRunning: true,
+    isCactusRunning: false,
     isCoinsRunning: true,
     isPlatformRunning: false,
     isGroundEnemyRunning: false,
@@ -20,7 +20,7 @@ const generatedPhases = {
     isGroundEnemyRunning: true,
   },
   4: {
-    isCactusRunning: true,
+    isCactusRunning: false,
     isCoinsRunning: true,
     isPlatformRunning: true,
     isGroundEnemyRunning: true,
@@ -32,7 +32,7 @@ const generatedPhases = {
     isGroundEnemyRunning: true,
   },
   6: {
-    isCactusRunning: true,
+    isCactusRunning: false,
     isCoinsRunning: true,
     isPlatformRunning: true,
     isGroundEnemyRunning: true,
@@ -44,7 +44,7 @@ const generatedPhases = {
     isGroundEnemyRunning: true,
   },
   8: {
-    isCactusRunning: true,
+    isCactusRunning: false,
     isCoinsRunning: true,
     isPlatformRunning: true,
     isGroundEnemyRunning: true,
@@ -56,7 +56,7 @@ const generatedPhases = {
     isGroundEnemyRunning: true,
   },
   10: {
-    isCactusRunning: true,
+    isCactusRunning: false,
     isCoinsRunning: true,
     isPlatformRunning: true,
     isGroundEnemyRunning: true,

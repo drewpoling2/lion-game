@@ -13,6 +13,7 @@ import ItemDropStateSingleton from '../item-drop-state';
 import { createCrateItemsAboveCrate } from '../utility/crate-items';
 import { worldElem } from '../elements-refs';
 import { moveItemToPlayer } from './coin';
+import { createCrateParticles } from './crate-particles';
 const { getIsCrateRunning, getGroundSpeed } = StateSingleton;
 const {
   getItemDropState,
@@ -32,6 +33,15 @@ export function setupCrate() {
   });
 }
 
+export function isCrateCollision(rect1, rect2) {
+  return (
+    rect1.left < rect2.right &&
+    rect1.top < rect2.bottom &&
+    rect1.right > rect2.left &&
+    rect1.bottom > rect2.top
+  );
+}
+
 export function updateCrate(delta, speedScale) {
   const dinoRect = getDinoRect();
 
@@ -40,8 +50,9 @@ export function updateCrate(delta, speedScale) {
     .forEach((crateContainer) => {
       // Get positions of the dinosaur and crate
       const crateContainerRect = crateContainer.getBoundingClientRect();
-      const collision = isCollision(dinoRect, crateContainerRect);
+      const collision = isCrateCollision(dinoRect, crateContainerRect);
       if (collision && !crateContainer.dataset.didCollide) {
+        createCrateParticles('crate', crateContainer);
         const crate = crateContainer.querySelector('img');
         crate.src = crate2Img;
         crateContainer.dataset.didCollide = true;

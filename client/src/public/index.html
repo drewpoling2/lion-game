@@ -27,7 +27,7 @@
       <p>Please flip your phone sideways to view the content.</p>
     </div>
 
-    <div class="flex-col world-container" style="background-color: #000">
+    <div class="flex-col world-container" style="background-color: #000321">
       <div
         class="leaderboard sans hide-element transition-medium"
         data-scrollable-table
@@ -82,7 +82,19 @@
               /></span>
               Controls
             </button>
-            <button
+            <div class="flex-col sidebar-right">
+              <div class="right-sidebar-title">Your Bests</div>
+              <div class="flex-row best-item-container body">
+                <span>Lvl:</span><span data-personal-best-lvl>--</span>
+              </div>
+              <div class="flex-row best-item-container body">
+                <span>Score:</span><span data-personal-best-score>--</span>
+              </div>
+              <div class="flex-row best-item-container body">
+                <span>Combos:</span><span data-personal-best-combo>--</span>
+              </div>
+            </div>
+            <!-- <button
               class="disabled-item tooltip capitalize sidebar-button body justify-start"
             >
               <span class="sidebar-icon-container">
@@ -98,7 +110,7 @@
                   <span class="tooltip-heading">Coming in the future</span>
                 </div>
               </span>
-            </button>
+            </button> -->
 
             <!-- will get added if we launch another season -->
             <!-- <button class="capitalize sidebar-button">
@@ -107,7 +119,7 @@
               /></span>
               Hall of fame
             </button> -->
-            <button
+            <!-- <button
               id="shareButton"
               class="capitalize sidebar-button relative body"
             >
@@ -119,11 +131,9 @@
                 id="share-container"
                 class="share-container pixel-corners absolute"
               >
-                <!-- <span class="share-item">Twitter</span>
-                <span class="share-item">Facebook</span> -->
                 <span id="copy-link-button" class="share-item">Copy link</span>
               </span>
-            </button>
+            </button> -->
           </div>
           <div class="menu-middle-container">
             <div class="flex-col justify-center items-center">
@@ -423,27 +433,17 @@
               </div>
             </div>
           </div>
-          <div class="flex-col sidebar-right">
-            <div class="uppercase right-sidebar-title">Your Bests</div>
-            <div class="flex-row best-item-container body">
-              <span>LVL</span><span data-personal-best-lvl>--</span>
-            </div>
-            <div class="flex-row best-item-container body">
-              <span>Score</span><span data-personal-best-score>--</span>
-            </div>
-            <div class="flex-row best-item-container body">
-              <span>Combos</span><span data-personal-best-combo>--</span>
-            </div>
-          </div>
         </div>
       </div>
       <div data-game-over-screen class="game-over-screen hide"></div>
-      <div class="w-fit digit-container" id="digitContainer"></div>
+      <div id="grade-container" class="hide grade-container">
+        <div class="flex-row justify-center items-center end-gem-text">
+          <div class="end-game-title-text sans">You made it!</div>
+        </div>
+        <div class="w-fit digit-container" id="digitContainer"></div>
+      </div>
       <div class="end-counter-container sans">
         <div class="hide-end-game-text" data-end-bonus-text>
-          <div class="flex-row justify-center items-center end-gem-text">
-            <div class="end-game-title-text">You made it!</div>
-          </div>
           <div
             class="flex-row justify-center items-center end-gem-text end-grade-text"
           >

@@ -104,7 +104,7 @@ export function updateCactus(delta, speedScale) {
         Math.pow(dinoRect.y - cactusRect.y, 2)
     );
     const collision = isCollision(dinoRect, cactusRect);
-
+    console.log(dinoRect);
     // Check if the cactus belongs to a group
     const groupId = cactus.dataset.groupId;
     const isGrouped = groupId !== undefined;

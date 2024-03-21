@@ -128,7 +128,7 @@ body.pause-animation * {
 
 .world-container {
   border-radius: 8px;
-  border: 2px solid #555;
+  border: 2px solid #363a3e;
   max-width: 1316px;
   max-height: 750px;
   overflow: hidden;
@@ -718,6 +718,19 @@ body.pause-animation * {
   border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><path d='M0 2h2v2H0zM2 0h2v2H2zM4 2h2v2H4zM2 4h2v2H2z' fill='%231F1F1F' /></svg>");
 }
 
+.nav-pixel-borders-inset {
+  border-radius: 14px;
+  display: inline-block;
+  position: relative;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #fff;
+  border-image-slice: 2;
+  border-image-width: 1;
+  border-image-outset: 0;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><path d='M0 2h2v2H0zM2 0h2v2H2zM4 2h2v2H4zM2 4h2v2H2z' fill='%23555555' /></svg>");
+}
+
 .new-high-score-form {
   margin-top: 30px;
 }
@@ -744,7 +757,7 @@ body.pause-animation * {
   color: white;
   width: 1316px;
   height: 900px;
-  background-color: #000;
+  background-color: var(--potential-midnight);
 }
 
 .start-screen {
@@ -837,7 +850,7 @@ body.pause-animation * {
 
 .sidebar-left {
   padding: 40px;
-  border-right: 1px solid #555;
+  border-right: 1px solid #363a3e;
 }
 
 .menu-title {
@@ -874,7 +887,7 @@ body.pause-animation * {
 }
 
 .first-sidebar-item {
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 
 .sidebar-button {
@@ -892,20 +905,22 @@ body.pause-animation * {
 }
 
 .sidebar-button:hover {
-  background-color: #202327;
+  background-color: var(--beaver-blue);
 }
 
 .best-item-container {
   gap: 10px;
   margin-bottom: 4px;
+  font-size: 10px;
 }
 
 .sidebar-right {
-  padding: 40px;
+  margin-top: 64px;
+  font-size: 10px;
 }
 
 .right-sidebar-title {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .leaderboard {
@@ -916,7 +931,7 @@ body.pause-animation * {
   max-width: 1316px;
   align-items: center;
   flex-direction: column;
-  background-color: #000;
+  background-color: var(--potential-midnight);
   z-index: 1000;
 }
 
@@ -1161,7 +1176,7 @@ td {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background-color: #000;
+  background-color: var(--potential-midnight);
   width: 100%;
   height: 100%;
   z-index: 1000000000;
@@ -1536,8 +1551,12 @@ br {
   color: white;
 }
 
-.digit-container {
+.grade-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: absolute;
+  gap: 24px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -1574,7 +1593,7 @@ br {
       brightness(97%) contrast(105%);
   }
   50% {
-    filter: invert(17%) sepia(50%) saturate(8200%) hue-rotate(190deg)
+    filter: invert(17%) sepia(60%) saturate(9000%) hue-rotate(190deg)
       brightness(65%) contrast(101%);
   }
   100% {
@@ -2240,7 +2259,7 @@ br {
 
 .controls-title {
   padding-bottom: 20px;
-  border-bottom: 1px solid #555;
+  border-bottom: 1px solid #363a3e;
   margin-bottom: 40px;
 }
 
@@ -2296,7 +2315,7 @@ br {
 
 .wiki-title {
   padding-bottom: 20px;
-  border-bottom: 1px solid #555;
+  border-bottom: 1px solid #363a3e;
   margin-bottom: 40px;
 }
 
@@ -2603,7 +2622,10 @@ br {
 
 .gem-counter-flex-container {
   gap: 16px;
-  width: 350px;
+  width: 420px;
+  background-color: #0d0d0d;
+  border: 1px solid #232323;
+  padding: 40px;
 }
 
 .end-counter-container {
@@ -2611,7 +2633,7 @@ br {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #000;
+  background-color: var(--potential-midnight);
 }
 
 .end-game-title-text {
@@ -2667,7 +2689,7 @@ br {
 }
 
 .test {
-  background-color: #000;
+  background-color: var(--potential-midnight);
   inline-size: 100%;
   overflow: hidden;
 }
@@ -2937,6 +2959,36 @@ br {
   position: absolute;
   left: calc(var(--left) * 1%);
   bottom: calc(var(--bottom) * 1%);
+}
+
+.crate-particles {
+  z-index: 10000;
+  width: 95px;
+  height: 95px;
+  --left: 22.5;
+  --bottom: -58;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: crateParticles 0.4s step-start;
+}
+
+@keyframes crateParticles {
+  0% {
+    background-image: url('./imgs/crate-particles/crate-particles-1.png');
+  }
+  50% {
+    background-image: url('./imgs/crate-particles/crate-particles-1.png');
+  }
+  75% {
+    background-image: url('./imgs/crate-particles/crate-particles-2.png');
+  }
+  100% {
+    background-image: url('./imgs/crate-particles/crate-particles-3.png');
+  }
 }
 
 .blue-gem-particles {

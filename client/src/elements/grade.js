@@ -1,7 +1,7 @@
 import StateSingleton from '../game-state';
 import starImg from '../public/imgs/icons/Star.png';
 
-const { getGrade } = StateSingleton;
+const { getGrade, setGrade } = StateSingleton;
 
 export function generateDigitWithStars(digit) {
   const digits = [
@@ -269,12 +269,28 @@ export function generateDigitWithStars(digit) {
 }
 
 export function setUpGrade() {
+  const gradeContainer = document.getElementById('grade-container');
+  const digitContainer = document.getElementById('digitContainer');
+  ``;
   setTimeout(() => {
     const digitZero = generateDigitWithStars(getGrade());
-    const digitContainer = document.getElementById('digitContainer');
+    gradeContainer.classList.remove('hide');
     digitContainer.innerHTML = digitZero;
   }, 300);
   setTimeout(() => {
+    gradeContainer.classList.add('hide');
     digitContainer.innerHTML = '';
   }, 3800);
 }
+
+export function incrementGrade(increment) {
+  setGrade(getGrade() + increment);
+}
+
+export const levelPerMinGrade = {
+  1: { threshold: 3 },
+  2: { threshold: 4 },
+  3: { threshold: 5 },
+  4: { threshold: 6 },
+  5: { threshold: 7 },
+};

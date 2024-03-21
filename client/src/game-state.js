@@ -18,7 +18,7 @@ const StateSingleton = (function () {
     gravityFallAdjustment: 0.021,
     selectedStarter: null,
     isWon: false,
-    grade: 5,
+    grade: 0,
 
     //elements
     isCoinsRunning: true,
@@ -26,7 +26,7 @@ const StateSingleton = (function () {
     isCactusRunning: false,
     isBirdRunning: false,
     isGroundEnemyRunning: false,
-    isCrateRunning: false,
+    isCrateRunning: true,
     isBonusRunning: false,
     isCastleRunning: false,
 
