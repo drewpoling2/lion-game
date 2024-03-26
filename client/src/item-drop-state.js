@@ -11,11 +11,12 @@ const {
 const ItemDropStateSingleton = (function () {
   //default state
   let state = {
-    // star: { weight: 8, colliderSetter: setIsStarColliding },
+    star: { weight: 8, colliderSetter: setIsStarColliding },
     magnet: { weight: 8, colliderSetter: setIsMagnetColliding },
-    // heart: { weight: 8, colliderSetter: setIsHeartColliding },
-    // leaf: { weight: 8, colliderSetter: setIsLeafColliding },
-    // empty: { weight: 8 },
+    heart: { weight: 8, colliderSetter: setIsHeartColliding },
+    leaf: { weight: 8, colliderSetter: setIsLeafColliding },
+    //error with colliderSetter
+    // empty: { weight: 8, colliderSetter: null },
   };
 
   let normalizedItemDropState = {};

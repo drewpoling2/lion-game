@@ -7,14 +7,19 @@ import crate1Img from '../public/imgs/Crate/Crate-1.png';
 import crate2Img from '../public/imgs/Crate/Crate-2.png';
 import { getDinoRect } from './player-controller';
 import { normalizeWeights, getRandomWeighted } from './platform';
-import { isCollision } from '../game-manager';
+import { addCratePointsText, updateMultiplierInterface } from '../game-manager';
 import StateSingleton from '../game-state';
 import ItemDropStateSingleton from '../item-drop-state';
+import InterfaceTextElemsSingleton from '../interface-text-elems-state';
 import { createCrateItemsAboveCrate } from '../utility/crate-items';
 import { worldElem } from '../elements-refs';
 import { moveItemToPlayer } from './coin';
-import { createCrateParticles } from './crate-particles';
-const { getIsCrateRunning, getGroundSpeed } = StateSingleton;
+const {
+  getIsCrateRunning,
+  getGroundSpeed,
+  getMultiplierRatio,
+  setMultiplierRatio,
+} = StateSingleton;
 const {
   getItemDropState,
   setNormalizedItemDropState,
@@ -42,6 +47,27 @@ export function isCrateCollision(rect1, rect2) {
   );
 }
 
+const { addInterfaceTextElem, removeInterfaceTextElem } =
+  InterfaceTextElemsSingleton;
+
+export function createCratePoofParticles(parent) {
+  const element = document.createElement('div');
+  addInterfaceTextElem(element);
+  element.classList.add(`crate-poof-particles`);
+  element.id = Math.random().toString(16).slice(2);
+  setCustomProperty(
+    element,
+    '--bottom',
+    getCustomProperty(parent, '--bottom') + 5
+  );
+  worldElem.appendChild(element);
+
+  element.addEventListener('animationend', () => {
+    removeInterfaceTextElem(element);
+    element.remove();
+  });
+}
+
 export function updateCrate(delta, speedScale) {
   const dinoRect = getDinoRect();
 
@@ -52,7 +78,6 @@ export function updateCrate(delta, speedScale) {
       const crateContainerRect = crateContainer.getBoundingClientRect();
       const collision = isCrateCollision(dinoRect, crateContainerRect);
       if (collision && !crateContainer.dataset.didCollide) {
-        createCrateParticles('crate', crateContainer);
         const crate = crateContainer.querySelector('img');
         crate.src = crate2Img;
         crateContainer.dataset.didCollide = true;
@@ -60,6 +85,12 @@ export function updateCrate(delta, speedScale) {
           getRandomWeighted(getNormalizedItemDropState()),
           crateContainer
         );
+        createCratePoofParticles(crateContainer);
+        const newElement = document.createElement('div');
+        addCratePointsText(newElement, crateContainer);
+        let currentMultiplierRatio = getMultiplierRatio();
+        setMultiplierRatio((currentMultiplierRatio += 1));
+        updateMultiplierInterface();
       }
       incrementCustomProperty(
         crateContainer,
@@ -93,7 +124,7 @@ export function updateCrate(delta, speedScale) {
           crateItemRect,
           distance,
           delta,
-          0.02
+          0.15
         );
       }
     });

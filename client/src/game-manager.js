@@ -214,7 +214,7 @@ let lastTime;
 let score;
 let idleIntervalId;
 let collisionOccurred = false; // Flag to track collision
-let milestone = 10005;
+let milestone = 100005;
 //init highScore elem
 highScoreElem.textContent = localStorage.getItem('lion-high-score')
   ? localStorage.getItem('lion-high-score')
@@ -363,7 +363,7 @@ function update(time) {
     return;
   }
 
-  let baseDelta = 14;
+  let baseDelta = 4;
   // let delta = time - lastTime;
   let delta = baseDelta;
   if (collisionOccurred && !getPlayerImmunity()) {
@@ -703,7 +703,58 @@ const lastMultiplierScore = document.querySelector(
   '[data-last-multiplier-score]'
 );
 
-function addPickupText(text, pickupElement) {
+let cratePoints = 10;
+
+export function addCratePointsText(text, pickupElement) {
+  if (!getIsGroundLayer2Running()) {
+    text.classList.add('plus-points-navy', 'sans');
+  } else {
+    text.classList.add('standard-plus-points', 'sans');
+  }
+  text.style.position = 'absolute';
+  text.style.top = pickupElement.offsetTop - 70 + 'px';
+  pickupElement.parentNode.insertBefore(text, pickupElement);
+  // Store the created element in the array
+  addInterfaceTextElem(text);
+
+  let points;
+  let currentMultiplierRatio = getMultiplierRatio();
+
+  points = cratePoints * currentMultiplierRatio;
+  updateScoreWithPoints(points);
+  const fontSize = calculateFontSize(points);
+  text.style.fontSize = fontSize + 'px';
+  text.textContent = `+${points}`;
+  // Add a div inside the lastMultiplierScore
+  const innerDiv = document.createElement('div');
+  innerDiv.textContent = `+${cratePoints}x${currentMultiplierRatio}`;
+  innerDiv.classList.add('inner-plus-points', 'sans');
+  text.dataset.interfaceText = true;
+
+  // Listen for the animationend event to remove the element
+  text.addEventListener('animationend', () => {
+    text.remove();
+    removeInterfaceTextElem(text);
+  });
+  // Check if there is an existing innerDiv, remove it if present
+  const existingInnerDiv =
+    lastMultiplierScore.querySelector('.inner-plus-points');
+  if (existingInnerDiv) {
+    existingInnerDiv.remove();
+  }
+
+  // Append the new innerDiv inside lastMultiplierScore
+  lastMultiplierScore.appendChild(innerDiv);
+
+  if (innerDiv) {
+    // Remove the new innerDiv after 1 second
+    setTimeout(() => {
+      innerDiv.remove();
+    }, 1000);
+  }
+}
+
+export function addPickupText(text, pickupElement) {
   if (!getIsGroundLayer2Running()) {
     text.classList.add('plus-points-navy', 'sans');
   } else {
@@ -1089,9 +1140,19 @@ function updateScore(delta) {
 }
 
 function handleCheckIfHighScore(score) {
+  const currentLevel = parseInt(levelDisplayElem.textContent, 10);
+
   if (score > highScoreElem.textContent) {
     highScoreElem.textContent = Math.floor(score).toString().padStart(6, 0);
     localStorage.setItem('lion-high-score', highScoreElem.textContent);
+  }
+  if (!parseInt(localStorage.getItem('lion-best-lvl'))) {
+    localStorage.setItem('lion-best-lvl', currentLevel);
+  } else if (
+    parseInt(localStorage.getItem('lion-best-lvl')) &&
+    currentLevel > parseInt(localStorage.getItem('lion-best-lvl'))
+  ) {
+    localStorage.setItem('lion-best-lvl', currentLevel);
   }
   if (handleCheckLeaderboardHighScore(score)) {
     return true;
@@ -1142,7 +1203,7 @@ function handleStart() {
   setUpElements();
   dinoElem.classList.remove('leap');
   currentMultiplierElem.textContent = `x${currentMultiplierRatio}`;
-  livesElem.textContent = 10;
+  livesElem.textContent = 1;
   startScreenElem.classList.add('hide');
   endScreenElem.classList.add('hide');
   // gameOverIconElem.classList.add('hide-element');
@@ -1518,6 +1579,7 @@ function handleUpdateEndGameScore() {
     );
   }
 }
+// handleToggleLeaderboard();
 
 function handleToggleLeaderboard() {
   const leaderboardContent = document.getElementById('leaderboard-content');
@@ -1612,7 +1674,6 @@ function handleCheckGrade() {
   const minutes = Math.floor(timer / 60);
   const lvlPerMin =
     minutes === 0 ? 0 : parseInt(levelDisplayElem.textContent, 10) / minutes;
-  console.log(minutes, lvlPerMin);
   // Determine the appropriate threshold
   let threshold;
   if (lvlPerMin >= levelPerMinGrade[5].threshold) {
@@ -1659,6 +1720,7 @@ function handleLose() {
   soundController.die.play();
   setDinoLose();
   handleCheckIfHighScore(score);
+  setUpElements();
 }
 
 function setPixelToWorldScale() {
@@ -1749,8 +1811,8 @@ function typeLettersWithoutSpaces(index, text, elem, timeout) {
 }
 
 export let collectableOptions = [
-  { type: 'gold-coin', weight: 20, points: 31 },
-  { type: 'silver-coin', weight: 60, points: 16 },
+  { type: 'gold-coin', weight: 20, points: 13 },
+  { type: 'silver-coin', weight: 60, points: 5 },
   { type: 'green-gem', weight: 1, points: 250 },
   { type: 'red-gem', weight: 0.75, points: 500 },
   { type: 'blue-gem', weight: 0.5, points: 1000 },

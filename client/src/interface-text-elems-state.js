@@ -12,6 +12,7 @@ const InterfaceTextElemsSingleton = (function () {
     },
     addInterfaceTextElem: function (elem) {
       interfaceTextElemsState.push(elem);
+      console.log(interfaceTextElemsState);
     },
     removeInterfaceTextElem: function (elem) {
       const index = interfaceTextElemsState.indexOf(elem);

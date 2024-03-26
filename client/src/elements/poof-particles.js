@@ -5,7 +5,8 @@ import {
 import { worldElem } from '../elements-refs';
 import InterfaceTextElemsSingleton from '../interface-text-elems-state';
 
-const { addInterfaceTextElem } = InterfaceTextElemsSingleton;
+const { addInterfaceTextElem, removeInterfaceTextElem } =
+  InterfaceTextElemsSingleton;
 
 export function createPoofParticles(parent) {
   const element = document.createElement('div');
@@ -16,6 +17,7 @@ export function createPoofParticles(parent) {
   worldElem.appendChild(element);
 
   element.addEventListener('animationend', () => {
+    removeInterfaceTextElem(element);
     element.remove();
   });
 }

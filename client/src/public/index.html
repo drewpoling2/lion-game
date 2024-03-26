@@ -90,9 +90,6 @@
               <div class="flex-row best-item-container body">
                 <span>Score:</span><span data-personal-best-score>--</span>
               </div>
-              <div class="flex-row best-item-container body">
-                <span>Combos:</span><span data-personal-best-combo>--</span>
-              </div>
             </div>
             <!-- <button
               class="disabled-item tooltip capitalize sidebar-button body justify-start"
@@ -158,8 +155,10 @@
                   />
                 </span>
               </div>
-
-              <div class="menu-title uppercase">Lion game</div>
+              <div class="flex-row menu-text-container">
+                <div class="menu-title uppercase">Lion</div>
+                <div class="menu-title uppercase">game</div>
+              </div>
             </div>
 
             <!-- leaderboard page -->
@@ -174,10 +173,22 @@
                   style="border-collapse: collapse"
                 >
                   <thead>
-                    <tr>
-                      <th class="leaderboard-rank-item wave-animation">Rank</th>
-                      <th class="leaderboard-score-item">Score</th>
-                      <th class="leaderboard-name-item">Name</th>
+                    <tr class="leaderboard-row-header-parent">
+                      <th
+                        class="leaderboard-title uppercase leaderboard-row-header leaderboard-rank-item wave-animation"
+                      >
+                        Rank
+                      </th>
+                      <th
+                        class="leaderboard-title leaderboard-row-header leaderboard-score-item"
+                      >
+                        Score
+                      </th>
+                      <th
+                        class="leaderboard-title leaderboard-row-header leaderboard-name-item"
+                      >
+                        Name
+                      </th>
                     </tr>
                   </thead>
                   <tbody data-leaderboard-body></tbody>
@@ -188,34 +199,31 @@
             <!-- wiki page -->
             <div id="wiki-page" class="hide-page">
               <div class="flex-col items-center justify-center">
-                <div class="leaderboard-label-text uppercase">Wiki</div>
+                <div class="wiki-leaderboard-label-text uppercase">Wiki</div>
               </div>
               <div class="wiki-container top-mask">
                 <div class="flex-col wiki-block">
-                  <div class="wiki-title uppercase">Collectables</div>
+                  <div class="wiki-title">Collectables</div>
                   <div class="body">
-                    Collect coins & gem tokens to boost your score. Different
-                    coins have varying rarities, with rarer ones offering higher
-                    point increases. When you have a high combo, keep an eye out
-                    for the rare & epic tokens to maximize your score and climb
-                    the leaderboard.
+                    Collect coins & gem tokens to boost your score. Points count
+                    toward lvl experience & score. Coins boost score instantly.
+                    Gems are stored & their points are gained at the end of the
+                    game based on the players grade bonus.
                   </div>
                 </div>
 
                 <div class="flex-col wiki-block">
-                  <div class="wiki-item-block-title uppercase">
-                    Collectable Items
-                  </div>
-                  <div class="wiki-item-block-grid">
+                  <div class="wiki-item-block-title uppercase">Coins</div>
+                  <div class="flex-col wiki-block-container">
                     <div class="flex-row wiki-item-block">
                       <img
                         class="wiki-item-image"
                         alt=""
-                        src="imgs/silver-coin/Silver-Coin-1.png"
+                        src="imgs/silver-coin/Silver-Coin-2.png"
                       />
-                      <div class="w-full">
-                        <div class="uppercase">Silver coin</div>
-                        <div class="body">Points: +46</div>
+                      <div class="w-full flex-col">
+                        <div class="uppercase wiki-item-name">Silver coin</div>
+                        <div class="body wiki-item-body">Grants +5 points</div>
                         <div class="body">Rarity: common</div>
                       </div>
                     </div>
@@ -223,12 +231,28 @@
                       <img
                         class="wiki-item-image"
                         alt=""
-                        src="imgs/gold-coin/Gold-Coin-1.png"
+                        src="imgs/gold-coin/Gold-Coin-2.png"
                       />
                       <div class="w-full">
-                        <div class="uppercase">Gold coin</div>
-                        <div class="body">Points: +82</div>
+                        <div class="uppercase wiki-item-name">Gold coin</div>
+                        <div class="body wiki-item-body">Grants +13 points</div>
                         <div class="body">Rarity: uncommon</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="wiki-item-block-title uppercase">Gems</div>
+
+                  <div class="flex-col wiki-block-container">
+                    <div class="flex-row wiki-item-block">
+                      <img
+                        class="wiki-item-image"
+                        alt=""
+                        src="imgs/green-gem/green-gem.png"
+                      />
+                      <div class="w-full">
+                        <div class="uppercase wiki-item-name">Green gem</div>
+                        <div class="body wiki-item-body">Grans +250 points</div>
+                        <div class="body">Rarity: rare</div>
                       </div>
                     </div>
                     <div class="flex-row wiki-item-block">
@@ -238,9 +262,11 @@
                         src="imgs/red-gem/red-gem.png"
                       />
                       <div class="w-full">
-                        <div class="uppercase">Red gem</div>
-                        <div class="body">Points: +325</div>
-                        <div class="body">Rarity: rare</div>
+                        <div class="uppercase wiki-item-name">Red gem</div>
+                        <div class="body wiki-item-body">
+                          Grants +500 points
+                        </div>
+                        <div class="body">Rarity: epic</div>
                       </div>
                     </div>
                     <div class="flex-row wiki-item-block">
@@ -250,101 +276,265 @@
                         src="imgs/blue-gem/blue-gem.png"
                       />
                       <div class="w-full">
-                        <div class="uppercase">Blue gem</div>
-                        <div class="body">Points: +954</div>
-                        <div class="body">Rarity: epic</div>
+                        <div class="uppercase wiki-item-name">Blue gem</div>
+                        <div class="body wiki-item-body">
+                          Grants +1000 points
+                        </div>
+                        <div class="body">Rarity: legendary</div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div class="flex-col wiki-block">
-                  <div class="wiki-title">COMBOS</div>
+                  <div class="wiki-title">Items</div>
                   <div class="body">
-                    When activated, combos multiply the points you earn,
-                    allowing you to accumulate higher scores during the
-                    specified duration. Use it strategically to boost your
-                    performance and achieve a temporary scoring advantage. Keep
-                    in mind that the effect is time-limited, so plan your moves
-                    wisely to make the most of this valuable power-up.
-                    <br />
-                    <br />
-                    Combos can also be stacked. Each combo item has a specified
-                    duration. If you already have a combo, and get another one
-                    before the current duration runs out, then your current
-                    duration timer gets reset to the new combo’s duration limit.
+                    These randomly drop and give either timed or instant power
+                    up. They can either be in a cloud, or a breakable crate.
                   </div>
                 </div>
 
-                <div class="flex-col wiki-block">
-                  <div class="wiki-item-block-title">COMBO ITEMS</div>
-                  <div class="wiki-item-block-grid">
-                    <div class="flex-row wiki-item-block">
-                      <img
-                        class="wiki-item-image"
-                        alt=""
-                        src="imgs/blue-gem/blue-gem.png"
-                      />
-                      <div class="w-full">
-                        <div class="uppercase">COWBELL</div>
-                        <div class="body">Combo: x2</div>
-                        <div class="body">Rarity: common</div>
-                        <div class="body">Duration: 5s</div>
+                <div class="flex-col wiki-block-container">
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/items/star/Star-1.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Star</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Makes the Lion invincible to enemy hits for a short
+                        period of time. During this period, enemies Lion touches
+                        fall over instantly. Every enemy the lion touches gives
+                        points incrementing by 2x every time.
+                      </div>
+                      <div class="body wiki-item-body">Rarity: common</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Duration: 8s
                       </div>
                     </div>
-                    <div class="flex-row wiki-item-block">
-                      <img
-                        class="wiki-item-image"
-                        alt=""
-                        src="imgs/blue-gem/blue-gem.png"
-                      />
-                      <div class="w-full">
-                        <div class="uppercase">CREAMERY CONE</div>
-                        <div class="body">Combo: x5</div>
-                        <div class="body">Rarity: uncommon</div>
-                        <div class="body">Duration: 4s</div>
+                  </div>
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/items/magnet/magnet.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">MAGNET</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Makes all collectables on the screen at the moment get
+                        pulled into the lion.
+                      </div>
+                      <div class="body wiki-item-body">Rarity: common</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Duration: 8s
                       </div>
                     </div>
-                    <div class="flex-row wiki-item-block">
-                      <img
-                        class="wiki-item-image"
-                        alt=""
-                        src="imgs/blue-gem/blue-gem.png"
-                      />
-                      <div class="w-full">
-                        <div class="uppercase">GOLDEN SPATULA</div>
-                        <div class="body">Combo: x10</div>
-                        <div class="body">Rarity: rare</div>
-                        <div class="body">Duration: 3s</div>
+                  </div>
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/items/leaf/Leaf-1.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Elm Leaf</div>
+                      <div class="body" style="margin-bottom: 15px">
+                        Gives Lion slowfall, and gives lion unlimited jump limit
+                        for short time.
+                      </div>
+                      <div class="body wiki-item-body">Rarity: rare</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Duration: 3s
                       </div>
                     </div>
-                    <div class="flex-row wiki-item-block">
-                      <img
-                        class="wiki-item-image"
-                        alt=""
-                        src="imgs/blue-gem/blue-gem.png"
-                      />
-                      <div class="w-full">
-                        <div class="uppercase">LUCKY MITTENS</div>
-                        <div class="body">Combo: x100</div>
-                        <div class="body">Rarity: epic</div>
-                        <div class="body">Duration: 1s</div>
+                  </div>
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/buffs/icecream.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Sundae</div>
+                      <div class="body" style="margin-bottom: 15px">
+                        Gives Lion +1 life
+                      </div>
+                      <div class="body wiki-item-body">Rarity: epic</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Duration: 1s
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="flex-col wiki-block">
-                  <div class="wiki-title">Milestones</div>
+                  <div class="wiki-title">Power Ups</div>
                   <div class="body">
-                    The longer you endure, the higher your level climbs, marking
-                    each milestone with a corresponding score. Level progression
-                    is directly tied to your survival time, where hitting the
-                    1-minute mark propels you to level 2, 2 minutes advances you
-                    to level 2, and so on.
-                    <br />
-                    <br />
-                    At every milestone, you’ll earn a "1 Up," granting you an
-                    extra life to extend your gameplay.
+                    The longer you endure, the higher your level climbs, and the
+                    more power ups you can get. Upon your first level up, you
+                    get to choose a starter power up that is very impactful.
+                    Following level ups give you the choice between less
+                    impactful power ups, that are the same every time.
+                  </div>
+                </div>
+                <div class="wiki-item-block-title uppercase">Starters</div>
+                <div class="flex-col wiki-block-container">
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/buffs/cowbell.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Cowbell</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Items effects with duration last 2 times as long, item
+                        effects that are instant occur 2 times.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/buffs/sneakers.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">New Sneakers</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Gain the ability to jump twice.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/buffs/book.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Textbook</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Every time you get a level, the value of any collectable
+                        you get is incremented by 1.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/buffs/mittens.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Lucky Gloves</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Your pick up range is increased by 15% and items spawn
+                        15% more often.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="wiki-item-block-title uppercase">Regular</div>
+                <div
+                  class="flex-col wiki-block-container"
+                  style="padding-bottom: 40px"
+                >
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/buffs/stopwatch.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Stopwatch</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Speed up lion acceleration
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/buffs/coffee.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Magic Coffee</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Gain 1 random item
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/buffs/backpack.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Backpack</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Gain 25 random coins
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex-row wiki-item-block">
+                    <img
+                      class="wiki-item-image"
+                      alt=""
+                      src="imgs/buffs/icecream.png"
+                    />
+                    <div class="w-full">
+                      <div class="uppercase wiki-item-name">Sundae</div>
+                      <div
+                        class="body wiki-item-body"
+                        style="margin-bottom: 15px"
+                      >
+                        Gain 1 life.
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -520,7 +710,10 @@
                   />
                 </span>
               </div>
-              <div class="menu-title uppercase">Lion Game</div>
+              <div>
+                <div class="menu-title uppercase">Lion</div>
+                <div class="menu-title uppercase">Game</div>
+              </div>
             </div>
             <div
               id="achievement-block"

@@ -6,7 +6,8 @@ import { worldElem } from '../elements-refs';
 import { dinoElem } from '../elements-refs';
 import InterfaceTextElemsSingleton from '../interface-text-elems-state';
 
-const { addInterfaceTextElem } = InterfaceTextElemsSingleton;
+const { addInterfaceTextElem, removeInterfaceTextElem } =
+  InterfaceTextElemsSingleton;
 
 export function createStarParticles() {
   const element = document.createElement('div');
@@ -24,6 +25,7 @@ export function createStarParticles() {
 
   // Add an event listener to the animated element
   element.addEventListener('animationend', () => {
+    removeInterfaceTextElem(element);
     element.remove();
   });
 }

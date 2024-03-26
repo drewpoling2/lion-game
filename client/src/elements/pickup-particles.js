@@ -5,7 +5,8 @@ import {
 import { worldElem } from '../elements-refs';
 import InterfaceTextElemsSingleton from '../interface-text-elems-state';
 
-const { addInterfaceTextElem } = InterfaceTextElemsSingleton;
+const { addInterfaceTextElem, removeInterfaceTextElem } =
+  InterfaceTextElemsSingleton;
 
 export function createPickUpParticles(particleName, parent) {
   const element = document.createElement('div');
@@ -22,6 +23,7 @@ export function createPickUpParticles(particleName, parent) {
 
   // Add an event listener to the animated element
   element.addEventListener('animationend', () => {
+    removeInterfaceTextElem(element);
     element.remove();
   });
 }

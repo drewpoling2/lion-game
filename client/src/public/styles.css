@@ -853,9 +853,15 @@ body.pause-animation * {
   border-right: 1px solid #363a3e;
 }
 
+.menu-text-container {
+  gap: 24px;
+}
+
 .menu-title {
-  font-size: 32px;
-  color: lightskyblue;
+  margin-top: 25px;
+  margin-bottom: 20px;
+  font-size: 48px;
+  color: var(--pugh-blue);
 }
 
 .sidebar-icon-container {
@@ -937,6 +943,7 @@ body.pause-animation * {
 
 .leaderboard-label-text {
   letter-spacing: 10px;
+  margin-bottom: 30px;
 }
 
 .menu-container {
@@ -972,6 +979,81 @@ td {
   text-transform: uppercase;
 }
 
+/* Assuming you want to change the color of the text */
+.leaderboard-row-parent:first-child {
+  color: #72b9ff; /* Change color to whatever you prefer */
+}
+/* Assuming you want to change the color of the text */
+.leaderboard-row-parent:nth-child(2) {
+  color: #6be9f2; /* Change color to whatever you prefer */
+}
+
+.leaderboard-row-parent:nth-child(3) {
+  color: #ffe46a; /* Change color to whatever you prefer */
+}
+
+.leaderboard-row-parent:nth-child(4) {
+  color: #fb6a62; /* Change color to whatever you prefer */
+}
+
+.leaderboard-row-parent:nth-child(5) {
+  color: #b07ee5; /* Change color to whatever you prefer */
+}
+
+.leaderboard-row {
+  font-size: 15px;
+  letter-spacing: 10%;
+  padding-bottom: 14px;
+  letter-spacing: 2.6px;
+}
+
+.leaderboard-row-header {
+  font-size: 15px;
+  letter-spacing: 2.6px;
+  padding-bottom: 32px;
+}
+
+tbody,
+thead {
+  /* display: block; */
+}
+
+.wiki-item-name {
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.wiki-block-container {
+  gap: 32px;
+  margin-bottom: 64px;
+}
+
+.wiki-item-body {
+  margin-bottom: 6px;
+}
+
+.leaderboard-title {
+  position: sticky;
+  top: 0;
+  background-color: var(--potential-midnight);
+  -webkit-mask-image: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(black),
+    to(transparent)
+  );
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(black),
+    to(transparent)
+  );
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+
 .leaderboard-rank-title {
   color: white;
   width: fit-content;
@@ -986,22 +1068,19 @@ td {
   text-transform: uppercase;
 }
 .leaderboard-score-item {
-  color: white;
   width: fit-content;
-  text-align: right;
+  text-align: left;
   padding-inline: 15px;
   text-transform: uppercase;
 }
 .leaderboard-rank-item {
-  color: white;
   width: fit-content;
-  text-align: right;
-  padding-right: 40px;
-  text-transform: uppercase;
+  text-align: left;
+  padding-right: 80px;
 }
 .leaderboard-name-item {
   width: fit-content;
-  text-align: right;
+  text-align: left;
   padding-left: 80px;
   text-transform: uppercase;
 }
@@ -1068,7 +1147,7 @@ td {
 }
 
 .menu-middle-container {
-  padding-inline: 120px;
+  padding-inline: 200px;
   padding-top: 40px;
   padding-bottom: 40px;
 }
@@ -1114,9 +1193,9 @@ td {
 
 .scrollable-table {
   scroll-behavior: smooth; /* Add smooth scrolling (optional) */
-  max-height: 440px; /* Adjust the height as needed */
+  max-height: 490px; /* Adjust the height as needed */
   overflow-y: auto;
-
+  display: block;
   -webkit-mask-image: -webkit-gradient(
     linear,
     left top,
@@ -1124,7 +1203,7 @@ td {
     from(black),
     to(transparent)
   );
-  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
   mask-image: -webkit-gradient(
     linear,
     left top,
@@ -1132,7 +1211,7 @@ td {
     from(black),
     to(transparent)
   );
-  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
 }
 
 .error-message {
@@ -1524,6 +1603,21 @@ progress[value]::-moz-progress-bar {
   }
 }
 
+@keyframes standardFadeInUp {
+  0% {
+    opacity: 0.7;
+    transform: translateY(-20px) scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1.17);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(1);
+  }
+}
+
 @keyframes fadeInUp {
   0% {
     opacity: 0;
@@ -1631,6 +1725,18 @@ br {
   color: white;
   animation: fadeInUp 0.6s forwards; /* Animation for fade in with upward translate */
   transition: opacity 0.6s; /* Add a transition for the opacity property over 1 second */
+}
+
+.standard-plus-points {
+  text-shadow: 1px 2px 0 #000;
+  width: fit-content;
+  -webkit-text-stroke: 0.5px #fffb9c; /* width and color */
+  color: #fffb9c;
+  animation: standardFadeInUp 1s forwards; /* Animation for fade in with upward translate */
+  transition: opacity 1s; /* Add a transition for the opacity property over 1 second */
+  --left: 25;
+  position: absolute;
+  left: calc(var(--left) * 1%);
 }
 
 .one-up {
@@ -1828,6 +1934,7 @@ br {
   left: 37%;
   height: 28px;
   background-image: url('./imgs/items/heart/Heart-1.png');
+  animation: translateCollectable ease-out 0.6s;
   image-rendering: pixelated; /* Prevent blurriness between images */
 }
 
@@ -1841,7 +1948,8 @@ br {
   left: 37%;
   height: 28px;
   image-rendering: pixelated; /* Prevent blurriness between images */
-  background-image: url('./imgs/items/cherry/Cherry-1.png');
+  background-image: url('./imgs/items/magnet/magnet.png');
+  animation: translateCollectable ease-out 0.6s;
 }
 
 .cherry-collectable-item-translate {
@@ -1854,7 +1962,8 @@ br {
   left: 37%;
   height: 28px;
   image-rendering: pixelated; /* Prevent blurriness between images */
-  background-image: url('./imgs/items/cherry/Cherry-1.png');
+  background-image: url('./imgs/items/magnet/magnet.png');
+  animation: translateCollectable ease-out 0.6s;
 }
 
 .leaf-collectable-item-translate {
@@ -1868,6 +1977,7 @@ br {
   height: 28px;
   image-rendering: pixelated; /* Prevent blurriness between images */
   background-image: url('./imgs/items/leaf/Leaf-1.png');
+  animation: translateCollectable ease-out 0.6s;
 }
 
 .star-collectable-item-translate {
@@ -1881,6 +1991,7 @@ br {
   height: 28px;
   image-rendering: pixelated; /* Prevent blurriness between images */
   background-image: url('./imgs/items/star/Star-1.png');
+  animation: translateCollectable ease-out 0.6s;
 }
 
 @keyframes invert {
@@ -2286,14 +2397,18 @@ br {
 }
 
 .wiki-item-image {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   margin-right: 15px;
+}
+
+.wiki-leaderboard-label-text {
+  padding-bottom: 30px;
 }
 
 .wiki-container {
   max-height: 600px;
-  padding-top: 20px;
+  padding-top: 30px;
   overflow: scroll;
 }
 
@@ -2302,7 +2417,7 @@ br {
 }
 
 .wiki-block {
-  margin-bottom: 80px;
+  margin-bottom: 64px;
 }
 
 .wiki-item-block {
@@ -2311,6 +2426,8 @@ br {
 
 .wiki-item-block-title {
   margin-bottom: 40px;
+  font-size: 10px;
+  color: var(--limestone-gray);
 }
 
 .wiki-title {
@@ -3171,6 +3288,39 @@ br {
   }
 }
 
+.crate-poof-particles {
+  z-index: 10000;
+  width: 85px;
+  height: 85px;
+  --bottom: 77.5;
+  --left: 25;
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  bottom: calc(var(--bottom) * 1%);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: cratePoofParticles 0.3s step-start;
+}
+
+@keyframes cratePoofParticles {
+  0% {
+    background-image: url('./imgs/crate-smoke/crate-smoke-1.png');
+  }
+  25% {
+    background-image: url('./imgs/crate-smoke/crate-smoke-1.png');
+  }
+  50% {
+    background-image: url('./imgs/crate-smoke/crate-smoke-2.png');
+  }
+  75% {
+    background-image: url('./imgs/crate-smoke/crate-smoke-2.png');
+  }
+  100% {
+    background-image: url('./imgs/crate-smoke/crate-smoke-3.png');
+  }
+}
+
 .jump-particles {
   z-index: 10000;
   width: 85px;
@@ -3328,11 +3478,28 @@ br {
 @keyframes translateCollectable {
   0% {
     opacity: 0.9;
-    transform: translateY(0px) scale(0.8);
+    transform: translateY(0px) scale(0.6);
+    filter: grayscale(0%) brightness(100%) saturate(100%) invert(1);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-80px) scale(1);
+    filter: grayscale(0%) brightness(100%) saturate(100%) invert(0);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-80px) scale(1);
+    filter: grayscale(0%) brightness(100%) saturate(100%) invert(1);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(-80px) scale(1);
+    filter: grayscale(0%) brightness(100%) saturate(100%) invert(0);
   }
   100% {
     opacity: 1;
     transform: translateY(-80px) scale(1);
+    filter: grayscale(0%) brightness(100%) saturate(100%) invert(1);
   }
 }
 
@@ -3351,6 +3518,19 @@ br {
   position: absolute;
   left: calc(var(--left) * 1%);
   bottom: calc(var(--bottom) * 1%);
+  animation: crate infinite 2s;
+}
+
+@keyframes crate {
+  0% {
+    filter: grayscale(0%) brightness(100%) saturate(100%);
+  }
+  50% {
+    filter: grayscale(0%) brightness(115%) saturate(105%);
+  }
+  100% {
+    filter: grayscale(0%) brightness(100%) saturate(100%);
+  }
 }
 
 .crate-parent-container {
